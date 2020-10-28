@@ -10,11 +10,21 @@ XData ProductionDefinition
   </Item>
   <Item Name="Formation.BP.Main" Category="" ClassName="Formation.BP.Main" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
   </Item>
-  <Item Name="EnsLib.RecordMap.Service.FileService" Category="" ClassName="EnsLib.RecordMap.Service.FileService" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+  <Item Name="EnsLib.RecordMap.Service.FileService" Category="" ClassName="EnsLib.RecordMap.Service.FileService" PoolSize="1" Enabled="false" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
     <Setting Target="Host" Name="RecordMap">Formation.RM.Csv</Setting>
     <Setting Target="Host" Name="TargetConfigNames">Formation.BP.Main</Setting>
     <Setting Target="Adapter" Name="FilePath">/tmp/iris/misc/</Setting>
     <Setting Target="Adapter" Name="FileSpec">*.csv</Setting>
+  </Item>
+  <Item Name="EnsLib.RecordMap.Service.BatchFileService" Category="" ClassName="EnsLib.RecordMap.Service.BatchFileService" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="BatchClass">Formation.RM.Csv.Batch</Setting>
+    <Setting Target="Host" Name="RecordMap">Formation.RM.Csv</Setting>
+    <Setting Target="Host" Name="TargetConfigNames">Formation.BP.Batch</Setting>
+    <Setting Target="Adapter" Name="FilePath">/tmp/iris/misc/</Setting>
+    <Setting Target="Adapter" Name="FileSpec">*.csv</Setting>
+    <Setting Target="Host" Name="BatchHandling">Whole</Setting>
+  </Item>
+  <Item Name="Formation.BP.Batch" Category="" ClassName="Formation.BP.Batch" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
   </Item>
 </Production>
 }
