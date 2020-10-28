@@ -5,7 +5,7 @@ services:
     build:
       context: .
     volumes:
-      - ./:/irisdev/app
+      - ./:/tmp/iris
     ports:
     - 52775:52773
     - 51776:1972
@@ -24,4 +24,4 @@ services:
     ports:
     - 5432:5432
     volumes:
-      - ./init:/docker-entrypoint-initdb.d/
+      - ./misc:/docker-entrypoint-initdb.d/
