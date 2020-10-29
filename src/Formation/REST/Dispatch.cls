@@ -27,7 +27,12 @@ ClassMethod import() As %Status
 
   Try {
 
-
+        set tBsName = ""
+        set tMsg = ##class(Ens.Request).%New()
+        
+        $$$ThrowOnError(##class(Ens.Director).CreateBusinessService(tBsName,.tService))
+        
+        $$$ThrowOnError(tService.ProcessInput(tMsg,.output))
 
   } Catch ex {
       set tSc = ex.AsStatus()
