@@ -1,4 +1,4 @@
-Class Formation.BO.RemoteBDD Extends Ens.BusinessOperation
+Class Formation.BO.Rest Extends Ens.BusinessOperation
 {
 
 Parameter ADAPTER = "EnsLib.HTTP.OutboundAdapter";
