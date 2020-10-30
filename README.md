@@ -41,7 +41,7 @@ Maintenant que notre première production est créée nous aller passer aux opé
 L’objectif de cette opération va être de sauvegarder dans IRIS le contenu d’un message.
 
 1.	Créer la classe de stockage.
-Les classe de stockage dans IRIS sont de type %Persistent
+Les classes de stockage dans IRIS sont de type %Persistent
 
 ```objectscript
 Class Formation.Table.Formation Extends %Persistent
@@ -66,7 +66,7 @@ Property Salle As %String;
 
 }
 ```
-La classe Message :
+La classe Message qui contient l'objet formation :
 ```objectscript
 Class Formation.Msg.FormationInsertRequest Extends Ens.Request
 {
@@ -113,7 +113,7 @@ XData MessageMap
 
 }
 
-	```
+```
 
 Ajouter l'opération à la production :
 
