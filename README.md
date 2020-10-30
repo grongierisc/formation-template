@@ -137,7 +137,7 @@ Ajoutons maintenant l'appel au BO avec le message construit précédemment
 
 Ce BP peut etre instancié dans la production comme pour les BO et etre testé.
 
-Ici, il s'agit d'un simple passe plat. Nous allons le complexifier afin qu'il puisse prendre en entrée un ligne d'un fichier CSV.
+Ici, il s'agit d'un simple passe plat. Nous allons le complexifier afin qu'il puisse prendre en entrée une ligne d'un fichier CSV.
 
 ### Creer un recard map
 
@@ -147,7 +147,7 @@ Creer un record map :
 
 ![RecordMapCsv](https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/RecordMapCsv.gif)
 
-Maintenant que le record map est créer nous allons creer une transformation entre le format des record maps et les messages d'insertion en BDD.
+Maintenant que le record map est crée nous allons creer une transformation entre le format des record maps et les messages d'insertion en BDD.
 
 ### Creer une data transformation
 
@@ -165,7 +165,7 @@ Ici, la première action réalisée est de modifier l'entrée du BP pour qu'il p
 
 Passons à la configuration de cette transforamtion :
 
-Nous commencons par l'ajout du message à envoyer au BO dans le context du BP.
+Nous commencons par l'ajout du message à envoyer au BO dans le **context** du BP.
 
 ![AddMsgToContext](https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/AddMsgToContext.gif)
 
@@ -182,7 +182,7 @@ Le nouveau BP est pret, configurons le tout dans la production :
 ![AddBPandServiceProd](https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/AddBPandServiceProd.gif)
 
 1. Peu de configuration pour le BP
-2. Pour le record map, nous utilisons un service générique qui est configurer pour utiliser le record map
+2. Pour le record map, nous utilisons un service générique qui est configuré pour utiliser le record map
 
 ![ConfigureRMinProd](https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/ConfigureRMinProd.gif)
 
