@@ -190,3 +190,185 @@ Test le flux de bout en bout :
 
 ![TestProdRMEndToEnd](https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/TestProdRMEndToEnd.gif)
 
+## Accèder à une base de données externe en JDBC
+
+Pour accèder à une base de données externe nous allons utiliser le protocle JDBC et l'adapter SQL d'ensemble.
+
+Créer l'opération suivante :
+
+```objectscript
+Include EnsSQLTypes
+
+Class Formation.BO.RemoteBDD Extends Ens.BusinessOperation
+{
+
+Parameter ADAPTER = "EnsLib.SQL.OutboundAdapter";
+
+Property Adapter As EnsLib.SQL.OutboundAdapter;
+
+Parameter INVOCATION = "Queue";
+
+Method InsertRemoteBDD(pRequest As Formation.Msg.FormationInsertRequest, Output pResponse As Ens.StringResponse) As %Status
+{
+	set tStatus = $$$OK
+	
+	try{
+		set pResponse = ##class(Ens.Response).%New()
+		set ^inc = $I(^inc)
+		set tInsertSql = "INSERT INTO public.formation (id, nom, salle) VALUES(?, ?, ?)"
+		$$$ThrowOnError(..Adapter.ExecuteUpdate(.nrows,tInsertSql,^inc,pRequest.Formation.Nom, pRequest.Formation.Salle ))
+	}
+	catch exp
+	{
+		Set tStatus = exp.AsStatus()
+	}
+
+	Quit tStatus
+}
+
+XData MessageMap
+{
+<MapItems>
+	<MapItem MessageType="Formation.Msg.FormationInsertRequest"> 
+		<Method>InsertRemoteBDD</Method>
+	</MapItem>
+</MapItems>
+}
+
+}
+```
+
+Nous pouvons remarquer que cette opération utilise le même message que l'opération d'insertion en local.
+
+Instancier l'opération :
+
+![AddRemoteBDD](https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/AddRemoteBDD.gif)
+
+Ajouter la JavaGateway pour le driver JDBC :
+
+![AddJG](https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/AddJG.gif)
+
+Configurer l'opération :
+
+![ConfigJDBC](https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/ConfigJDBC.gif)
+
+Configurer les credentials :
+
+![Credential](https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/Credential.gif)
+
+Test la configuration en ajoutant le JavaGateway à l'opération :
+
+![JGPlusTestJDBC](https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/JGPlusTestJDBC.gif)
+
+## Creer un service Rest
+
+Pour creer un service rest, il faut une classe qui hérite de %CSP.REST :
+
+```objectscript
+Class Formation.REST.Dispatch Extends %CSP.REST
+{
+
+/// Ignore any writes done directly by the REST method.
+Parameter IgnoreWrites = 0;
+
+/// By default convert the input stream to Unicode
+Parameter CONVERTINPUTSTREAM = 1;
+
+/// The default response charset is utf-8
+Parameter CHARSET = "utf-8";
+
+Parameter HandleCorsRequest = 1;
+
+XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
+{
+<Routes>
+  <!-- Get this spec -->
+  <Route Url="/import" Method="post" Call="import" />
+</Routes>
+}
+
+/// Get this spec
+ClassMethod import() As %Status
+{
+  set tSc = $$$OK
+
+  Try {
+
+      set tBsName = "Formation.BS.RestInput"
+      set tMsg = ##class(Formation.Msg.FormationInsertRequest).%New()
+
+      set body = $zcvt(%request.Content.Read(),"I","UTF8")
+      set dyna = {}.%FromJSON(body)
+
+      set tFormation = ##class(Formation.Obj.Formation).%New()
+      set tFormation.Nom = dyna.nom
+      set tFormation.Salle = dyna.salle
+
+      set tMsg.Formation = tFormation
+      
+      $$$ThrowOnError(##class(Ens.Director).CreateBusinessService(tBsName,.tService))
+      
+      $$$ThrowOnError(tService.ProcessInput(tMsg,.output))
+
+  } Catch ex {
+      set tSc = ex.AsStatus()
+  }
+
+  Quit tSc
+}
+
+}
+```
+
+Cette classe contient une route import avec le verbe POST lié à la méthode import :
+
+```xml
+<Routes>
+  <!-- Get this spec -->
+  <Route Url="/import" Method="post" Call="import" />
+</Routes>
+```
+
+La méthode import creer un nouveau message à destination d'un BS.
+
+Classe du BS REST, c'est une classe générique qui route toutes ses solicitations vers TargetConfigNames qui sera configuré lors de son instanciation 
+
+```objectscript
+Class Formation.BS.RestInput Extends Ens.BusinessService
+{
+
+Property TargetConfigNames As %String(MAXLEN = 1000) [ InitialExpression = "BuisnessProcess" ];
+
+Parameter SETTINGS = "TargetConfigNames:Basic:selector?multiSelect=1&context={Ens.ContextSearch/ProductionItems?targets=1&productionName=@productionId}";
+
+Method OnProcessInput(pDocIn As %RegisteredObject, Output pDocOut As %RegisteredObject) As %Status
+{
+    set status = $$$OK
+
+    try {
+
+        for iTarget=1:1:$L(..TargetConfigNames, ",") {
+		    set tOneTarget=$ZStrip($P(..TargetConfigNames,",",iTarget),"<>W")  Continue:""=tOneTarget
+		    $$$ThrowOnError(..SendRequestSync(tOneTarget,pDocIn,.pDocOut))
+	    }
+    } catch ex {
+        set status = ex.AsStatus()
+    }
+
+    Quit status
+}
+
+}
+```
+
+Instanciation du BS :
+
+![ConfigurationBSRest](https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/ConfigurationBSRest.gif)
+
+Publication du service REST :
+
+![ConfigurationDiscpatch](https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/ConfigurationDiscpatch.gif)
+
+Tester le nouveau service :
+
+![TestRESTOperation](https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/TestRESTOperation.gif)
