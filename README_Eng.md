@@ -21,7 +21,7 @@ The goal of this formation is to learn InterSystems' interoperability framework,
 
 
 
-![Framework](https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/FrameworkFull.png)
+![Framework](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/FrameworkFull.png)
 
 All of these components form a production. The arrows between them are **messages**.
 
