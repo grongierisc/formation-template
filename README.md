@@ -37,8 +37,8 @@ Créer notre première production :
 
 ## Les opérations :
 
-Maintenant que notre première production est créée nous aller passer aux opérations.
-L’objectif de cette opération va être de sauvegarder dans IRIS le contenu d’un message.
+Maintenant que notre première production est créée nous pouvons passer aux opérations.
+L’objectif de cette permière opération va être de sauvegarder dans IRIS le contenu d’un message.
 
 1.	Créer la classe de stockage.
 Les classes de stockage dans IRIS sont de type %Persistent
