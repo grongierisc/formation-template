@@ -36,7 +36,7 @@ We then have to press `New`, select the `Formation` package and chose a name for
 
 ![ProductionCreation](misc/img/ProductionCreation.png)
 
-Immediatly after creating our production, we will need to click on the `Production Settings` just above the `Operations` section. In the right sidebar menu, we will have to activate `Testing Enabled` in the `Development and Debugging` part of the `Settings` tab.
+Immediatly after creating our production, we will need to click on the `Production Settings` just above the `Operations` section. In the right sidebar menu, we will have to activate `Testing Enabled` in the `Development and Debugging` part of the `Settings` tab (don't forget to press Apply).
 
 ![ProductionTesting](misc/img/ProductionTesting.png)
 
@@ -147,4 +147,6 @@ We now need to add this operation to the production. For this, we use the Manage
 
 5. Testing the operation : 
 
-By selecting the operation and going in the `Actions` tabs in the right sidebar menu, we should be able to test the operation (if not see the production creation part to activate testings).
+Double clicking on the operation will enable us to activate it. After that, by selecting the operation and going in the `Actions` tabs in the right sidebar menu, we should be able to test the operation (if not see the production creation part to activate testings).
+
+We will send the operation a message of the type we declared earlier. If all goes well, the results should be as expected. 
