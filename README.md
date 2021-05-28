@@ -1,6 +1,6 @@
 # Ensemble / Interoperability Formation
 
-# Prerequisite :
+# Prerequisites :
 
  For this formation, you'll need :
 * VSCode : https://code.visualstudio.com/
@@ -9,32 +9,36 @@
 
 # Goal : 
 
-The goal of this formation is to learn InterSystems' interoperability framework, and particularly : 
+The goal of this formation is to learn InterSystems' interoperability framework, and particularly the use of : 
 * Productions
 * Messages
-* Operations
+* Business Operations
 * Adapters
 * Business Processes
-* Services
+* Business Services
 * REST Services and Operations
 # The framework : 
 
 This is the framework we will be working with :
-![Framework](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/FrameworkFull.png)
+![Framework](misc/img/FrameworkFull.png)
 
 All of these components form a production. The arrows between them are **messages**. 
 In the first place, we will build a production, with its operations, services and processes that will enable us to read data from a CSV file and save it in the iris database.
 After building and composing our containers with the `docker-compose.yml` and `Dockerfile` files given, we will open a Management Portal. It will give us access to an HUD where we will be able to create our productions. 
 
-The portal should be at the url : http://localhost:52775/csp/sys/UtilHome.csp?$NAMESPACE=IRISAPP. 
+The portal should be located at the url : http://localhost:52775/csp/sys/UtilHome.csp?$NAMESPACE=IRISAPP. 
 # Productions : 
 We can now create our first production. For this, we will go through the Interoperability and Configure menus : 
 
-![ProductionMenu](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ProductionMenu.png)
+![ProductionMenu](misc/img/ProductionMenu.png)
 
 We then have to press `New`, select the `Formation` package and chose a name for our production : 
 
-![ProductionCreation](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ProductionCreation.png)
+![ProductionCreation](misc/img/ProductionCreation.png)
+
+Immediatly after creating our production, we will need to click on the `Production Settings` just above the `Operations` section. In the right sidebar menu, we will have to activate `Testing Enabled` in the `Development and Debugging` part of the `Settings` tab.
+
+![ProductionTesting](misc/img/ProductionTesting.png)
 
 In this first production we will now add Business Operations.
 
@@ -140,3 +144,7 @@ As we can see, if the operation received a message of the type `Formation.Msg.Fo
 We now need to add this operation to the production. For this, we use the Management Portal. By pressing the `+` sign next to `Operations`, we have access to the Business Operation Wizard. There, we chose the operation class we just created in the scrolling menu. 
 
 ![OperationCreation](misc/img/OperationCreation.png)
+
+5. Testing the operation : 
+
+By selecting the operation and going in the `Actions` tabs in the right sidebar menu, we should be able to test the operation (if not see the production creation part to activate testings).
