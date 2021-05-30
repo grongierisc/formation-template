@@ -155,7 +155,7 @@ By doing so, we will send the operation a message of the type we declared earlie
 
 Showing the visual trace will enable us to see what happened between the processes, services and operations. here, we can see the message being sent to the operation by the process, and the operation sending back a response (that is just an empty string).
 
-## Busines Processes
+## Business Processes
 
 Business Processes (BP) are the business logic of our production. They are used to process requests or relay those requests to other components of the production.
 
@@ -165,7 +165,7 @@ Business Processes are created within the Management Portal :
 
 We are going to create a simple BP that will call our operation : 
 
-![BPAddingCall](misc/img/BPAddingCall.png)
+![BPAddingCall](misc/img/BPAddingCall.gif)
 
 We then need to bind that call function to our BO. A BP has a **Context**. It is composed of a request class, the class of the input, and of a response clas, the class of the output. It is also possible to add properties. 
 
@@ -175,6 +175,6 @@ Since our BP will only be used to call our BO, we can put as request class the m
 
 We then chose the target of the call function : our BO. That operation, being **called** has a **callrequest**. We need to bind that callrequest to the request of the BP (they both are of the class ‘Formation.Msg.FormationInsertRequest‘), we do that by clicking on the call function and using the request builder : 
 
-![BPBindRequest](misc/img/BPBindRequest)
+![BPBindRequest](misc/img/BPBindRequest.gif)
 
 We can now save this BP (in the package ‘Formation.BP‘ and under the name ‘InsertLocalBDD‘ for example). Just like the operations, the processes can be instantiated and tested through the production configuration. 
