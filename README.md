@@ -27,7 +27,7 @@ In the first place, we will build a production, with its operations, services an
 After building and composing our containers with the `docker-compose.yml` and `Dockerfile` files given, we will open a Management Portal. It will give us access to an HUD where we will be able to create our productions. 
 
 The portal should be located at the url : http://localhost:52775/csp/sys/UtilHome.csp?$NAMESPACE=IRISAPP. 
-# Productions : 
+## Productions : 
 We can now create our first production. For this, we will go through the Interoperability and Configure menus : 
 
 ![ProductionMenu](misc/img/ProductionMenu.png)
@@ -42,7 +42,7 @@ Immediatly after creating our production, we will need to click on the `Producti
 
 In this first production we will now add Business Operations.
 
-# Operations : 
+## Operations : 
 
 A Business Operation is a specific operation that will enable us to send requests from IRIS to an external application / system. It can also be used to directly save in IRIS what we want.
 
@@ -52,7 +52,7 @@ For our first operation we will save the content of a message in  the local data
 
 We need to have a way of storing this message first. 
 
-1. Creation of our storage class
+### 1. Creation of our storage class
 
 > Storage classes in IRIS extends the type `%Persistent`. They will be saved in the intern database.
 
@@ -70,7 +70,7 @@ Property Salle As %String;
 
 > Note that when saving, additional lines are automatically added to the file. They are mandatory and are added by the InterSystems addons.
 
-2. Creation of our message class
+### 2. Creation of our message class
 
 > This message will contain a `Formation` object, located in the `Formation/Obj/Formation.cls` file : 
 ```objectscript
@@ -94,7 +94,7 @@ Property Formation As Formation.Obj.Formation;
 }
 ```
 
-3. Creation of our operation : 
+### 3. Creation of our operation : 
 
 > Now that we have all the elements we need, we can create our operation, in the `Formation/BO/LocalBDD` file : 
 ```objectscript
@@ -139,13 +139,13 @@ XData MessageMap
 
 > As we can see, if the operation received a message of the type `Formation.Msg.FormationInsertRequest`, the `InsertLocalBDD` method will be called. This method will save the message in the IRIS local database.
 
-4. Adding the operation to the production : 
+### 4. Adding the operation to the production : 
 
 > We now need to add this operation to the production. For this, we use the Management Portal. By pressing the `+` sign next to `Operations`, we have access to the Business Operation Wizard. There, we chose the operation class we just created in the scrolling menu. 
 
 ![OperationCreation](misc/img/OperationCreation.png)
 
-5. Testing the operation : 
+### 5. Testing the operation : 
 
 > Double clicking on the operation will enable us to activate it. After that, by selecting the operation and going in the `Actions` tabs in the right sidebar menu, we should be able to test the operation (if not see the production creation part to activate testings / you may need to start the production if stopped).
 
@@ -153,4 +153,7 @@ XData MessageMap
 
 ![OperationTest](misc/img/OperationTest.png)
 
-> Showing the visual trace will enable us to see what happened between the processes, services and operations. here, we can see the message being sent to the operation by the process, and the operation sending back a response (that is just an empty string). 
+> Showing the visual trace will enable us to see what happened between the processes, services and operations. here, we can see the message being sent to the operation by the process, and the operation sending back a response (that is just an empty string).
+
+## Busines Processes
+
