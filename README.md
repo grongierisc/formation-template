@@ -175,6 +175,6 @@ Since our BP will only be used to call our BO, we can put as request class the m
 
 We then chose the target of the call function : our BO. That operation, being **called** has a **callrequest**. We need to bind that callrequest to the request of the BP (they both are of the class ‘Formation.Msg.FormationInsertRequest‘), we do that by clicking on the call function and using the request builder : 
 
-![BPBindRequest](misc/img/BPBindRequest.gif)
+![BPBindRequests](misc/img/BPBindRequests.gif)
 
 We can now save this BP (in the package ‘Formation.BP‘ and under the name ‘InsertLocalBDD‘ for example). Just like the operations, the processes can be instantiated and tested through the production configuration. 
