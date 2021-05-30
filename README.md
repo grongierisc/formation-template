@@ -147,6 +147,10 @@ We now need to add this operation to the production. For this, we use the Manage
 
 5. Testing the operation : 
 
-Double clicking on the operation will enable us to activate it. After that, by selecting the operation and going in the `Actions` tabs in the right sidebar menu, we should be able to test the operation (if not see the production creation part to activate testings).
+Double clicking on the operation will enable us to activate it. After that, by selecting the operation and going in the `Actions` tabs in the right sidebar menu, we should be able to test the operation (if not see the production creation part to activate testings / you may need to start the production if stopped).
 
-We will send the operation a message of the type we declared earlier. If all goes well, the results should be as expected. 
+By doing so, we will send the operation a message of the type we declared earlier. If all goes well, the results should be as shown below : 
+
+![OperationTest](misc/img/OperationTest.png)
+
+Showing the visual trace will enable us to see what happened between the processes, services and operations. here, we can see the message being sent to the operation by the process, and the operation sending back a response (that is just an empty string). 
