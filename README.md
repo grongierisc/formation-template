@@ -253,3 +253,11 @@ With the `+` sign, we can add our new process to the production (if you already 
 We can now test the whole production: 
 
 ![TestProductionCSV](misc/img/TestProductionCSV.gif)
+
+In `System Explorer > SQL` menu, you can execute the command
+````sql
+SELECT 
+ID, Name, Salle
+FROM Formation_Table.Formation
+````
+to see the objexts we just saved.
