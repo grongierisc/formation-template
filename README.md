@@ -40,7 +40,7 @@ A part of the things we will be doing will be on local, but all the processes an
 
 ![ExportProgress](misc/img/ExportProgress.png)
 
-After that, when we close our docker container, we will still have all of our progress saved locally (it is, of course, to be done after every change through the portal).
+We will have to save our Production, Record Map, Business Processes and Data Transfromation this way. After that, when we close our docker container and compose it up again, we will still have all of our progress saved locally (it is, of course, to be done after every change through the portal).
 ## Productions 
 We can now create our first production. For this, we will go through the Interoperability and Configure menus: 
 
