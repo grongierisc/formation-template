@@ -239,3 +239,16 @@ In the end, our new BP can be represented like this :
 
 ![BP2Diagram](misc/img/BP2Diagram.png)
 
+#### Configuring Production
+
+With the `+` sign, we can add our new process to the production (if you already added the process, you can restart it by double clicking on it). We also need a generic service to use the record map. This service is `EnsLib.RecordMap.Service.FileService`. We then parameter the service : 
+
+![ServiceParam](misc/img/ServiceParam.gif)
+
+(In this gif, we named our process `Formation.BP.Main`).
+
+#### Testing 
+
+We can now test the whole production : 
+
+![TestProductionCSV](misc/img/TestProductionCSV.gif)
