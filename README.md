@@ -188,19 +188,53 @@ Our Process for now only passes the message to our Operation. We are going to co
 
 #### Creating a record map
 
-In order to read a file and put its content into a file, we need a record map. There is a Record Mapper sepcialized for CSV files in the `Interoperability > Build` menu of the management portal : 
+In order to read a file and put its content into a file, we need a Record Map (RM). There is a Record Mapper sepcialized for CSV files in the `Interoperability > Build` menu of the management portal: 
 
 ![RMMenu](misc/img/RMMenu.png)
 
-We will create the mapper like this : 
+We will create the mapper like this: 
 
 ![RMCreation](misc/img/RMCreation.png)
 
-You should now have this Record Map : 
+You should now have this Record Map: 
 
 ![RMDetails](misc/img/RMDetails.png)
 
-Now that the Map is created, we need to have a Data Transformation from the record map format and an insertion message.
+Now that the Map is created, we have to generate it (with the Generate button). We now need to have a Data Transformation from the record map format and an insertion message.
 
 #### Creating a Data Transformation
+
+We will find the Data Transformation (DT) Builder in the `Interoperability > Builder` menu. We will create our DT like this (if you can't find `Formation.RM.Csv.Record`, maybe you didn't generate the record map): 
+
+![DTCreation](misc/img/DTCreation.png)
+
+Now, we can map the different fields together and compile our DT :
+
+![DTMap](misc/img/DTMap.gif)
+
+#### Adding the Data Transformation to the Business Process
+
+The first thing we have to change is the BP's request class, since we need to have in input the Record Map we created.
+
+![BP2ChangeContext](misc/img/BP2ChangeContext.png)
+
+We can then add our transformation : 
+
+![BP2AddingTransform](misc/img/BP2AddingTransform.gif)
+
+The transform will take the request of the BP (a Record of the CSV file, thanks top our Record Mapper), and transform it into a `FormationInsertRequest` message. In order to store that message to send it to the BO, we need to add a property to the context of the BP. 
+
+![BP2MsgContext](misc/img/BP2MsgContext.png)
+
+We can now configure our transform function so that it takes it input as the input of the BP and saves its output in the newly created property. The source and target of the `RmToMsg` transformation are respectively `request` and `context.Msg` :
+
+![BP2RmToMsg](misc/img/BP2RmToMsg.png)
+
+We need to do the same for `Call BO`. Its input, or `callrequest`, is the value stored in `context.msg` and its output is the reponse of the BP : 
+
+![BP2CallBO](misc/img/BP2CallBO.gif)
+
+In the end, our new BP can be represented like this : 
+
+![BP2Diagram](misc/img/BP2Diagram.png)
 
