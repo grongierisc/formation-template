@@ -1,13 +1,13 @@
 # Ensemble / Interoperability Formation
 
-## Prerequisites :
+## Prerequisites
 
  For this formation, you'll need:
 * VSCode: https://code.visualstudio.com/
 * The InterSystems addons suite for vscode: https://intersystems-community.github.io/vscode-objectscript/installation/
 * Docker: https://docs.docker.com/get-docker/
 
-## Goal : 
+## Goal 
 
 The goal of this formation is to learn InterSystems' interoperability framework, and particularly the use of: 
 * Productions
@@ -17,17 +17,31 @@ The goal of this formation is to learn InterSystems' interoperability framework,
 * Business Processes
 * Business Services
 * REST Services and Operations
-## The framework : 
+## The framework
 
 This is the framework we will be working with:
 ![Framework](misc/img/FrameworkFull.png)
 
 All of these components form a production. The arrows between them are **messages**. 
 In the first place, we will build a production, with its operations, services and processes that will enable us to read data from a CSV file and save it in the iris database.
-After building and composing our containers with the `docker-compose.yml` and `Dockerfile` files given, we will open a Management Portal. It will give us access to an HMI where we will be able to create our productions. 
 
-The portal should be located at the url: http://localhost:52775/csp/sys/UtilHome.csp?$NAMESPACE=IRISAPP. 
-## Productions : 
+
+Then, we will see how to save all of our data in an extern database, namely a postgre database, in another docker container.
+
+
+Finally, we will see how to use composite applications to insert new objects in our database or to consult this database (through a REST service).
+
+
+After building and composing our containers with the `docker-compose.yml` and `Dockerfile` files given, we will open a Management Portal. It will give us access to an HMI where we will be able to create our productions. The portal should be located at the url: http://localhost:52775/csp/sys/UtilHome.csp?$NAMESPACE=IRISAPP. 
+
+## Docker and saving progress
+
+A part of the things we will be doing will be on local, but all the processes and productions are saved in the docker container. In order to persist all of our progress, we need to export every class that is created through the Management Portal with the intersystems addon `ObjectScript`:
+
+![ExportProgress](misc/img/ExportProgress.png)
+
+After that, when we close our docker container, we will still have all of our progress saved locally (it is, of course, to be done after every change through the portal).
+## Productions 
 We can now create our first production. For this, we will go through the Interoperability and Configure menus: 
 
 ![ProductionMenu](misc/img/ProductionMenu.png)
