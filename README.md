@@ -171,7 +171,7 @@ We are now in the Business Process Designer. We are going to create a simple BP 
 
 A BP has a **Context**. It is composed of a request class, the class of the input, and of a response class, the class of the output. **BP only have one input and one output**. It is also possible to add properties. 
 
-Since our BP will only be used to call our BO, we can put as request class the message class we created.
+Since our BP will only be used to call our BO, we can put as request class the message class we created (we don't need an output as we just want to insert into the database).
 
 ![BPContext](misc/img/BPContext.png)
 
@@ -212,6 +212,7 @@ Now, we can map the different fields together and compile our DT :
 
 ![DTMap](misc/img/DTMap.gif)
 
+
 #### Adding the Data Transformation to the Business Process
 
 The first thing we have to change is the BP's request class, since we need to have in input the Record Map we created.
@@ -230,7 +231,7 @@ We can now configure our transform function so that it takes it input as the inp
 
 ![BP2RmToMsg](misc/img/BP2RmToMsg.png)
 
-We need to do the same for `Call BO`. Its input, or `callrequest`, is the value stored in `context.msg` and its output is the reponse of the BP : 
+We need to do the same for `Call BO`. Its input, or `callrequest`, is the value stored in `context.msg` : 
 
 ![BP2CallBO](misc/img/BP2CallBO.gif)
 
