@@ -163,7 +163,7 @@ Business Processes are created within the Management Portal:
 
 ![BPMenu](misc/img/BPMenu.png)
 
-### Simple BP
+### 1. Simple BP
 
 We are now in the Business Process Designer. We are going to create a simple BP that will call our operation: 
 
@@ -184,9 +184,9 @@ We can now save this BP (in the package ‘Formation.BP‘ and under the name �
 Our Process for now only passes the message to our Operation. We are going to complexify it so that the BP will take as input one line of a CSV file. 
 
 
-### BP reading CSV lines
+### 2. BP reading CSV lines
 
-#### Creating a record map
+#### a. Creating a record map
 
 In order to read a file and put its content into a file, we need a Record Map (RM). There is a Record Mapper sepcialized for CSV files in the `Interoperability > Build` menu of the management portal: 
 
@@ -202,7 +202,7 @@ You should now have this Record Map:
 
 Now that the Map is created, we have to generate it (with the Generate button). We now need to have a Data Transformation from the record map format and an insertion message.
 
-#### Creating a Data Transformation
+#### b. Creating a Data Transformation
 
 We will find the Data Transformation (DT) Builder in the `Interoperability > Builder` menu. We will create our DT like this (if you can't find `Formation.RM.Csv.Record`, maybe you didn't generate the record map): 
 
@@ -214,7 +214,7 @@ Now, we can map the different fields together:
 
 Don't forget to compile.
 
-#### Adding the Data Transformation to the Business Process
+#### c. Adding the Data Transformation to the Business Process
 
 The first thing we have to change is the BP's request class, since we need to have in input the Record Map we created.
 
@@ -240,7 +240,7 @@ In the end, our new BP can be represented like this:
 
 ![BP2Diagram](misc/img/BP2Diagram.png)
 
-#### Configuring Production
+#### d. Configuring Production
 
 With the `+` sign, we can add our new process to the production (if you already added the process, you can restart it by double clicking on it). We also need a generic service to use the record map. This service is `EnsLib.RecordMap.Service.FileService`. We then parameter the service: 
 
@@ -248,7 +248,7 @@ With the `+` sign, we can add our new process to the production (if you already 
 
 (In this gif, we named our process `Formation.BP.Main`).
 
-#### Testing 
+#### e. Testing 
 
 We can now test the whole production: 
 
