@@ -220,7 +220,7 @@ The first thing we have to change is the BP's request class, since we need to ha
 
 ![BP2ChangeContext](misc/img/BP2ChangeContext.png)
 
-We can then add our transformation: 
+We can then add our transformation (the name of the process doesn't change anything, from here we chose to name it `Main`): 
 
 ![BP2AddingTransform](misc/img/BP2AddingTransform.gif)
 
@@ -242,11 +242,11 @@ In the end, our new BP can be represented like this:
 
 #### d. Configuring Production
 
-With the `+` sign, we can add our new process to the production (if you already added the process, you can restart it by double clicking on it). We also need a generic service to use the record map. This service is `EnsLib.RecordMap.Service.FileService`. We then parameter the service: 
+With the `+` sign, we can add our new process to the production (if not already done). We also need a generic service to use the record map, we use `EnsLib.RecordMap.Service.FileService` (we add it with the `+` button next to services). We then parameter this service: 
 
 ![ServiceParam](misc/img/ServiceParam.gif)
 
-(In this gif, we named our process `Formation.BP.Main`).
+We should now be able to test our BP.
 
 #### e. Testing 
 
@@ -260,4 +260,4 @@ SELECT
 ID, Name, Salle
 FROM Formation_Table.Formation
 ````
-to see the objexts we just saved.
+to see the objects we just saved.
