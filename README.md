@@ -24,7 +24,7 @@ This is the framework we will be working with :
 
 All of these components form a production. The arrows between them are **messages**. 
 In the first place, we will build a production, with its operations, services and processes that will enable us to read data from a CSV file and save it in the iris database.
-After building and composing our containers with the `docker-compose.yml` and `Dockerfile` files given, we will open a Management Portal. It will give us access to an HUD where we will be able to create our productions. 
+After building and composing our containers with the `docker-compose.yml` and `Dockerfile` files given, we will open a Management Portal. It will give us access to an HMI where we will be able to create our productions. 
 
 The portal should be located at the url : http://localhost:52775/csp/sys/UtilHome.csp?$NAMESPACE=IRISAPP. 
 ## Productions : 
@@ -52,7 +52,7 @@ For our first operation we will save the content of a message in  the local data
 
 We need to have a way of storing this message first. 
 
-### 1. Creation of our storage class
+### 1. Creating our storage class
 
 Storage classes in IRIS extends the type `%Persistent`. They will be saved in the intern database.
 
@@ -70,7 +70,7 @@ Property Salle As %String;
 
 Note that when saving, additional lines are automatically added to the file. They are mandatory and are added by the InterSystems addons.
 
-### 2. Creation of our message class
+### 2. Creating our message class
 
 This message will contain a `Formation` object, located in the `Formation/Obj/Formation.cls` file : 
 ```objectscript
@@ -94,7 +94,7 @@ Property Formation As Formation.Obj.Formation;
 }
 ```
 
-### 3. Creation of our operation : 
+### 3. Creating our operation : 
 
 Now that we have all the elements we need, we can create our operation, in the `Formation/BO/LocalBDD` file : 
 ```objectscript
@@ -163,18 +163,44 @@ Business Processes are created within the Management Portal :
 
 ![BPMenu](misc/img/BPMenu.png)
 
-We are going to create a simple BP that will call our operation : 
+### Simple BP
+
+We are now in the Business Process Designer. We are going to create a simple BP that will call our operation : 
 
 ![BPAddingCall](misc/img/BPAddingCall.gif)
 
-We then need to bind that call function to our BO. A BP has a **Context**. It is composed of a request class, the class of the input, and of a response clas, the class of the output. It is also possible to add properties. 
+A BP has a **Context**. It is composed of a request class, the class of the input, and of a response class, the class of the output. **BP only have one input and one output**. It is also possible to add properties. 
 
 Since our BP will only be used to call our BO, we can put as request class the message class we created.
 
 ![BPContext](misc/img/BPContext.png)
 
-We then chose the target of the call function : our BO. That operation, being **called** has a **callrequest**. We need to bind that callrequest to the request of the BP (they both are of the class ‘Formation.Msg.FormationInsertRequest‘), we do that by clicking on the call function and using the request builder : 
+We then chose the target of the call function : our BO. That operation, being **called** has a **callrequest** property. We need to bind that callrequest to the request of the BP (they both are of the class ‘Formation.Msg.FormationInsertRequest‘), we do that by clicking on the call function and using the request builder : 
 
 ![BPBindRequests](misc/img/BPBindRequests.gif)
 
-We can now save this BP (in the package ‘Formation.BP‘ and under the name ‘InsertLocalBDD‘ for example). Just like the operations, the processes can be instantiated and tested through the production configuration. 
+We can now save this BP (in the package ‘Formation.BP‘ and under the name ‘InsertLocalBDD‘ for example). Just like the operations, the processes can be instantiated and tested through the production configuration, for that they need to be compiled beforehand (on the Business Process Designer screen).
+
+Our Process for now only passes the message to our Operation. We are going to complexify it so that the BP will take as input one line of a CSV file. 
+
+
+### BP reading CSV lines
+
+#### Creating a record map
+
+In order to read a file and put its content into a file, we need a record map. There is a Record Mapper sepcialized for CSV files in the `Interoperability > Build` menu of the management portal : 
+
+![RMMenu](misc/img/RMMenu.png)
+
+We will create the mapper like this : 
+
+![RMCreation](misc/img/RMCreation.png)
+
+You should now have this Record Map : 
+
+![RMDetails](misc/img/RMDetails.png)
+
+Now that the Map is created, we need to have a Data Transformation from the record map format and an insertion message.
+
+#### Creating a Data Transformation
+
