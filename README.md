@@ -2,14 +2,14 @@
 
 ## Prerequisites :
 
- For this formation, you'll need :
-* VSCode : https://code.visualstudio.com/
-* The InterSystems addons suite for vscode : https://intersystems-community.github.io/vscode-objectscript/installation/
-* Docker : https://docs.docker.com/get-docker/
+ For this formation, you'll need:
+* VSCode: https://code.visualstudio.com/
+* The InterSystems addons suite for vscode: https://intersystems-community.github.io/vscode-objectscript/installation/
+* Docker: https://docs.docker.com/get-docker/
 
 ## Goal : 
 
-The goal of this formation is to learn InterSystems' interoperability framework, and particularly the use of : 
+The goal of this formation is to learn InterSystems' interoperability framework, and particularly the use of: 
 * Productions
 * Messages
 * Business Operations
@@ -19,20 +19,20 @@ The goal of this formation is to learn InterSystems' interoperability framework,
 * REST Services and Operations
 ## The framework : 
 
-This is the framework we will be working with :
+This is the framework we will be working with:
 ![Framework](misc/img/FrameworkFull.png)
 
 All of these components form a production. The arrows between them are **messages**. 
 In the first place, we will build a production, with its operations, services and processes that will enable us to read data from a CSV file and save it in the iris database.
 After building and composing our containers with the `docker-compose.yml` and `Dockerfile` files given, we will open a Management Portal. It will give us access to an HMI where we will be able to create our productions. 
 
-The portal should be located at the url : http://localhost:52775/csp/sys/UtilHome.csp?$NAMESPACE=IRISAPP. 
+The portal should be located at the url: http://localhost:52775/csp/sys/UtilHome.csp?$NAMESPACE=IRISAPP. 
 ## Productions : 
-We can now create our first production. For this, we will go through the Interoperability and Configure menus : 
+We can now create our first production. For this, we will go through the Interoperability and Configure menus: 
 
 ![ProductionMenu](misc/img/ProductionMenu.png)
 
-We then have to press `New`, select the `Formation` package and chose a name for our production : 
+We then have to press `New`, select the `Formation` package and chose a name for our production: 
 
 ![ProductionCreation](misc/img/ProductionCreation.png)
 
@@ -56,7 +56,7 @@ We need to have a way of storing this message first.
 
 Storage classes in IRIS extends the type `%Persistent`. They will be saved in the intern database.
 
-In our `Formation/Table/Formation.cls` file we have : 
+In our `Formation/Table/Formation.cls` file we have: 
 ```objectscript
 Class Formation.Table.Formation Extends %Persistent
 {
@@ -72,7 +72,7 @@ Note that when saving, additional lines are automatically added to the file. The
 
 ### 2. Creating our message class
 
-This message will contain a `Formation` object, located in the `Formation/Obj/Formation.cls` file : 
+This message will contain a `Formation` object, located in the `Formation/Obj/Formation.cls` file: 
 ```objectscript
 Class Formation.Obj.Formation Extends (%SerialObject, %XML.Adaptor)
 {
@@ -84,7 +84,7 @@ Property Salle As %String;
 }
 ```
 
-The `Message` class will use that `Formation`object; `src/Formation/Msg/FormationInsertRequest` :
+The `Message` class will use that `Formation`object; `src/Formation/Msg/FormationInsertRequest`:
 ```objectscript
 Class Formation.Msg.FormationInsertRequest Extends Ens.Request
 {
@@ -94,9 +94,9 @@ Property Formation As Formation.Obj.Formation;
 }
 ```
 
-### 3. Creating our operation : 
+### 3. Creating our operation: 
 
-Now that we have all the elements we need, we can create our operation, in the `Formation/BO/LocalBDD` file : 
+Now that we have all the elements we need, we can create our operation, in the `Formation/BO/LocalBDD` file: 
 ```objectscript
 Class Formation.BO.LocalBDD Extends Ens.BusinessOperation
 {
@@ -139,17 +139,17 @@ The MessageMap gives us the method to launch depending on the type of the reques
 
 As we can see, if the operation received a message of the type `Formation.Msg.FormationInsertRequest`, the `InsertLocalBDD` method will be called. This method will save the message in the IRIS local database.
 
-### 4. Adding the operation to the production : 
+### 4. Adding the operation to the production: 
 
 We now need to add this operation to the production. For this, we use the Management Portal. By pressing the `+` sign next to `Operations`, we have access to the Business Operation Wizard. There, we chose the operation class we just created in the scrolling menu. 
 
 ![OperationCreation](misc/img/OperationCreation.png)
 
-### 5. Testing the operation : 
+### 5. Testing the operation: 
 
 Double clicking on the operation will enable us to activate it. After that, by selecting the operation and going in the `Actions` tabs in the right sidebar menu, we should be able to test the operation (if not see the production creation part to activate testings / you may need to start the production if stopped).
 
-By doing so, we will send the operation a message of the type we declared earlier. If all goes well, the results should be as shown below : 
+By doing so, we will send the operation a message of the type we declared earlier. If all goes well, the results should be as shown below: 
 
 ![OperationTest](misc/img/OperationTest.png)
 
@@ -159,13 +159,13 @@ Showing the visual trace will enable us to see what happened between the process
 
 Business Processes (BP) are the business logic of our production. They are used to process requests or relay those requests to other components of the production.
 
-Business Processes are created within the Management Portal :
+Business Processes are created within the Management Portal:
 
 ![BPMenu](misc/img/BPMenu.png)
 
 ### Simple BP
 
-We are now in the Business Process Designer. We are going to create a simple BP that will call our operation : 
+We are now in the Business Process Designer. We are going to create a simple BP that will call our operation: 
 
 ![BPAddingCall](misc/img/BPAddingCall.gif)
 
@@ -175,7 +175,7 @@ Since our BP will only be used to call our BO, we can put as request class the m
 
 ![BPContext](misc/img/BPContext.png)
 
-We then chose the target of the call function : our BO. That operation, being **called** has a **callrequest** property. We need to bind that callrequest to the request of the BP (they both are of the class ‘Formation.Msg.FormationInsertRequest‘), we do that by clicking on the call function and using the request builder : 
+We then chose the target of the call function : our BO. That operation, being **called** has a **callrequest** property. We need to bind that callrequest to the request of the BP (they both are of the class ‘Formation.Msg.FormationInsertRequest‘), we do that by clicking on the call function and using the request builder: 
 
 ![BPBindRequests](misc/img/BPBindRequests.gif)
 
@@ -208,18 +208,19 @@ We will find the Data Transformation (DT) Builder in the `Interoperability > Bui
 
 ![DTCreation](misc/img/DTCreation.png)
 
-Now, we can map the different fields together and compile our DT :
+Now, we can map the different fields together:
 
 ![DTMap](misc/img/DTMap.gif)
 
+Don't forget to compile.
 
-#### Adding the Data Transformation to the Business Process
+#### Adding the Data Transformation to the Business Process
 
 The first thing we have to change is the BP's request class, since we need to have in input the Record Map we created.
 
 ![BP2ChangeContext](misc/img/BP2ChangeContext.png)
 
-We can then add our transformation : 
+We can then add our transformation: 
 
 ![BP2AddingTransform](misc/img/BP2AddingTransform.gif)
 
@@ -227,21 +228,21 @@ The transform will take the request of the BP (a Record of the CSV file, thanks 
 
 ![BP2MsgContext](misc/img/BP2MsgContext.png)
 
-We can now configure our transform function so that it takes it input as the input of the BP and saves its output in the newly created property. The source and target of the `RmToMsg` transformation are respectively `request` and `context.Msg` :
+We can now configure our transform function so that it takes it input as the input of the BP and saves its output in the newly created property. The source and target of the `RmToMsg` transformation are respectively `request` and `context.Msg`:
 
 ![BP2RmToMsg](misc/img/BP2RmToMsg.png)
 
-We need to do the same for `Call BO`. Its input, or `callrequest`, is the value stored in `context.msg` : 
+We need to do the same for `Call BO`. Its input, or `callrequest`, is the value stored in `context.msg`: 
 
 ![BP2CallBO](misc/img/BP2CallBO.gif)
 
-In the end, our new BP can be represented like this : 
+In the end, our new BP can be represented like this: 
 
 ![BP2Diagram](misc/img/BP2Diagram.png)
 
 #### Configuring Production
 
-With the `+` sign, we can add our new process to the production (if you already added the process, you can restart it by double clicking on it). We also need a generic service to use the record map. This service is `EnsLib.RecordMap.Service.FileService`. We then parameter the service : 
+With the `+` sign, we can add our new process to the production (if you already added the process, you can restart it by double clicking on it). We also need a generic service to use the record map. This service is `EnsLib.RecordMap.Service.FileService`. We then parameter the service: 
 
 ![ServiceParam](misc/img/ServiceParam.gif)
 
@@ -249,6 +250,6 @@ With the `+` sign, we can add our new process to the production (if you already 
 
 #### Testing 
 
-We can now test the whole production : 
+We can now test the whole production: 
 
 ![TestProductionCSV](misc/img/TestProductionCSV.gif)
