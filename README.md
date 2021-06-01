@@ -11,7 +11,7 @@
     - [6.2. Creating our message class](#62-creating-our-message-class)
     - [6.3. Creating our operation](#63-creating-our-operation)
     - [6.4. Adding the operation to the production](#64-adding-the-operation-to-the-production)
-    - [6.5. Testing the operation](#65-testing-the-operation)
+    - [6.5. Testing](#65-testing)
   - [7. Business Processes](#7-business-processes)
     - [7.1. Simple BP](#71-simple-bp)
     - [7.2. BP reading CSV lines](#72-bp-reading-csv-lines)
@@ -184,7 +184,7 @@ We now need to add this operation to the production. For this, we use the Manage
 
 ![OperationCreation](misc/img/OperationCreation.png)
 
-### 6.5. Testing the operation 
+### 6.5. Testing
 
 Double clicking on the operation will enable us to activate it. After that, by selecting the operation and going in the `Actions` tabs in the right sidebar menu, we should be able to test the operation (if not see the production creation part to activate testings / you may need to start the production if stopped).
 
