@@ -1,29 +1,32 @@
-# **Ensemble / Interoperability Formation**
+ **Ensemble / Interoperability Formation**
 
-- [**Ensemble / Interoperability Formation**](#ensemble--interoperability-formation)
-  - [1. Prerequisites](#1-prerequisites)
-  - [2. Goal](#2-goal)
-  - [3. The framework](#3-the-framework)
-  - [4. Docker and saving progress](#4-docker-and-saving-progress)
-  - [5. Productions](#5-productions)
-  - [6. Operations](#6-operations)
-    - [6.1. Creating our storage class](#61-creating-our-storage-class)
-    - [6.2. Creating our message class](#62-creating-our-message-class)
-    - [6.3. Creating our operation](#63-creating-our-operation)
-    - [6.4. Adding the operation to the production](#64-adding-the-operation-to-the-production)
-    - [6.5. Testing](#65-testing)
-  - [7. Business Processes](#7-business-processes)
-    - [7.1. Simple BP](#71-simple-bp)
-    - [7.2. BP reading CSV lines](#72-bp-reading-csv-lines)
-      - [7.2.1. Creating a record map](#721-creating-a-record-map)
-      - [7.2.2. Creating a Data Transformation](#722-creating-a-data-transformation)
-      - [7.2.3. Adding the Data Transformation to the Business Process](#723-adding-the-data-transformation-to-the-business-process)
-      - [7.2.4. Configuring Production](#724-configuring-production)
-      - [7.2.5. Testing](#725-testing)
-  - [8. Getting access to an extern database using JDBC](#8-getting-access-to-an-extern-database-using-jdbc)
-    - [8.1. Creating our new operation](#81-creating-our-new-operation)
-    - [8.2. Configuring the production](#82-configuring-the-production)
-    - [8.3. Testing](#83-testing)
+- [1. Prerequisites](#1-prerequisites)
+- [2. Goal](#2-goal)
+- [3. The framework](#3-the-framework)
+- [4. Docker and saving progress](#4-docker-and-saving-progress)
+- [5. Productions](#5-productions)
+- [6. Operations](#6-operations)
+  - [6.1. Creating our storage class](#61-creating-our-storage-class)
+  - [6.2. Creating our message class](#62-creating-our-message-class)
+  - [6.3. Creating our operation](#63-creating-our-operation)
+  - [6.4. Adding the operation to the production](#64-adding-the-operation-to-the-production)
+  - [6.5. Testing](#65-testing)
+- [7. Business Processes](#7-business-processes)
+  - [7.1. Simple BP](#71-simple-bp)
+  - [7.2. BP reading CSV lines](#72-bp-reading-csv-lines)
+    - [7.2.1. Creating a record map](#721-creating-a-record-map)
+    - [7.2.2. Creating a Data Transformation](#722-creating-a-data-transformation)
+    - [7.2.3. Adding the Data Transformation to the Business Process](#723-adding-the-data-transformation-to-the-business-process)
+    - [7.2.4. Configuring Production](#724-configuring-production)
+    - [7.2.5. Testing](#725-testing)
+- [8. Getting access to an extern database using JDBC](#8-getting-access-to-an-extern-database-using-jdbc)
+  - [8.1. Creating our new operation](#81-creating-our-new-operation)
+  - [8.2. Configuring the production](#82-configuring-the-production)
+  - [8.3. Testing](#83-testing)
+- [9. REST service](#9-rest-service)
+  - [9.1. Creating the service](#91-creating-the-service)
+  - [9.2. Adding our BS](#92-adding-our-bs)
+  - [Testing](#testing)
 
 ## 1. Prerequisites
 
@@ -394,3 +397,123 @@ When testing the visual trace should show a success:
 We have successfully connected with an extern database. 
 
 As an exercise, it could be interesting to modify our BP and our BO.LocalBDD so that the operation returns a boolean that will tell the BP to call BO.RemoteBDD depending on the value of that boolean. This can be done by changing the type of reponse LocalBDD returns and by adding a new property to the context and using the `if` activity in our BP.
+
+## 9. REST service
+
+In this part, we will create and use a REST Service.
+
+### 9.1. Creating the service
+
+To create a REST service, we need a cless that extends %CSP.REST, in `Formation.REST.Dispatch.cls`:
+
+````objectscript
+Class Formation.REST.Dispatch Extends %CSP.REST
+{
+
+/// Ignore any writes done directly by the REST method.
+Parameter IgnoreWrites = 0;
+
+/// By default convert the input stream to Unicode
+Parameter CONVERTINPUTSTREAM = 1;
+
+/// The default response charset is utf-8
+Parameter CHARSET = "utf-8";
+
+Parameter HandleCorsRequest = 1;
+
+XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
+{
+<Routes>
+  <!-- Get this spec -->
+  <Route Url="/import" Method="post" Call="import" />
+</Routes>
+}
+
+/// Get this spec
+ClassMethod import() As %Status
+{
+  set tSc = $$$OK
+
+  Try {
+
+      set tBsName = "Formation.BS.RestInput"
+      set tMsg = ##class(Formation.Msg.FormationInsertRequest).%New()
+
+      set body = $zcvt(%request.Content.Read(),"I","UTF8")
+      set dyna = {}.%FromJSON(body)
+
+      set tFormation = ##class(Formation.Obj.Formation).%New()
+      set tFormation.Nom = dyna.nom
+      set tFormation.Salle = dyna.salle
+
+      set tMsg.Formation = tFormation
+      
+      $$$ThrowOnError(##class(Ens.Director).CreateBusinessService(tBsName,.tService))
+      
+      $$$ThrowOnError(tService.ProcessInput(tMsg,.output))
+
+  } Catch ex {
+      set tSc = ex.AsStatus()
+  }
+
+  Quit tSc
+}
+
+}
+````
+
+This class contains a route to import an object, bound to the POST verb: 
+
+````xml
+<Routes>
+  <!-- Get this spec -->
+  <Route Url="/import" Method="post" Call="import" />
+</Routes>
+````
+The import method will create a message that will be sent to a Business Service.
+
+### 9.2. Adding our BS
+
+We are going to create a generic class that will route all of its sollicitations towards `TargetConfigNames`. This target will be configured when we will instantiate this service. In the `Formation/BS/RestInput.cls` file we have:
+
+```objectscript
+Class Formation.BS.RestInput Extends Ens.BusinessService
+{
+
+Property TargetConfigNames As %String(MAXLEN = 1000) [ InitialExpression = "BuisnessProcess" ];
+
+Parameter SETTINGS = "TargetConfigNames:Basic:selector?multiSelect=1&context={Ens.ContextSearch/ProductionItems?targets=1&productionName=@productionId}";
+
+Method OnProcessInput(pDocIn As %RegisteredObject, Output pDocOut As %RegisteredObject) As %Status
+{
+    set status = $$$OK
+
+    try {
+
+        for iTarget=1:1:$L(..TargetConfigNames, ",") {
+		    set tOneTarget=$ZStrip($P(..TargetConfigNames,",",iTarget),"<>W")  Continue:""=tOneTarget
+		    $$$ThrowOnError(..SendRequestSync(tOneTarget,pDocIn,.pDocOut))
+	    }
+    } catch ex {
+        set status = ex.AsStatus()
+    }
+
+    Quit status
+}
+
+}
+```
+
+Back to the production configuration, we add the service the usual way. In the `Target Config Names`, we put our BO LocalBDD: 
+
+![RESTServiceSetup](misc/img/RESTServiceSetup.png)
+
+To use this service, we need to publish it. For that, we use the `Edit Web Application` menu:
+
+![RESTServicePublish](misc/img/RESTServicePublish.gif)
+
+### Testing
+
+Finally, we can test our service witth any kind of REST client:
+
+![RESTTest](misc/img/RESTTest.gif)
