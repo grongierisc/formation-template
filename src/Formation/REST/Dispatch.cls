@@ -27,12 +27,21 @@ ClassMethod import() As %Status
 
   Try {
 
-        set tBsName = ""
-        set tMsg = ##class(Ens.Request).%New()
-        
-        $$$ThrowOnError(##class(Ens.Director).CreateBusinessService(tBsName,.tService))
-        
-        $$$ThrowOnError(tService.ProcessInput(tMsg,.output))
+      set tBsName = "Formation.BS.RestInput"
+      set tMsg = ##class(Formation.Msg.FormationInsertRequest).%New()
+
+      set body = $zcvt(%request.Content.Read(),"I","UTF8")
+      set dyna = {}.%FromJSON(body)
+
+      set tFormation = ##class(Formation.Obj.Formation).%New()
+      set tFormation.Nom = dyna.nom
+      set tFormation.Salle = dyna.salle
+
+      set tMsg.Formation = tFormation
+      
+      $$$ThrowOnError(##class(Ens.Director).CreateBusinessService(tBsName,.tService))
+      
+      $$$ThrowOnError(tService.ProcessInput(tMsg,.output))
 
   } Catch ex {
       set tSc = ex.AsStatus()

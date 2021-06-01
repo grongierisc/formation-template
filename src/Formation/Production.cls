@@ -25,6 +25,9 @@ XData ProductionDefinition
   </Item>
   <Item Name="EnsLib.JavaGateway.Service" Category="" ClassName="EnsLib.JavaGateway.Service" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
   </Item>
+  <Item Name="Formation.BS.RestInput" Category="" ClassName="Formation.BS.RestInput" PoolSize="0" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="TargetConfigNames">Formation.BO.LocalBDD</Setting>
+  </Item>
 </Production>
 }
 

@@ -1,26 +1,32 @@
-# **Ensemble / Interoperability Formation**
+ **Ensemble / Interoperability Formation**
 
-- [**Ensemble / Interoperability Formation**](#ensemble--interoperability-formation)
-  - [1. Prerequisites](#1-prerequisites)
-  - [2. Goal](#2-goal)
-  - [3. The framework](#3-the-framework)
-  - [4. Docker and saving progress](#4-docker-and-saving-progress)
-  - [5. Productions](#5-productions)
-  - [6. Operations :](#6-operations-)
-    - [6.1. Creating our storage class](#61-creating-our-storage-class)
-    - [6.2. Creating our message class](#62-creating-our-message-class)
-    - [6.3. Creating our operation:](#63-creating-our-operation)
-    - [6.4. Adding the operation to the production:](#64-adding-the-operation-to-the-production)
-    - [6.5. Testing the operation:](#65-testing-the-operation)
-  - [7. Business Processes](#7-business-processes)
-    - [7.1. Simple BP](#71-simple-bp)
-    - [7.2. BP reading CSV lines](#72-bp-reading-csv-lines)
-      - [7.2.1. Creating a record map](#721-creating-a-record-map)
-      - [7.2.2. Creating a Data Transformation](#722-creating-a-data-transformation)
-      - [7.2.3. Adding the Data Transformation to the Business Process](#723-adding-the-data-transformation-to-the-business-process)
-      - [7.2.4. Configuring Production](#724-configuring-production)
-      - [7.2.5. Testing](#725-testing)
-  - [8. Getting access to an extern databse using JDBC](#8-getting-access-to-an-extern-databse-using-jdbc)
+- [1. Prerequisites](#1-prerequisites)
+- [2. Goal](#2-goal)
+- [3. The framework](#3-the-framework)
+- [4. Docker and saving progress](#4-docker-and-saving-progress)
+- [5. Productions](#5-productions)
+- [6. Operations](#6-operations)
+  - [6.1. Creating our storage class](#61-creating-our-storage-class)
+  - [6.2. Creating our message class](#62-creating-our-message-class)
+  - [6.3. Creating our operation](#63-creating-our-operation)
+  - [6.4. Adding the operation to the production](#64-adding-the-operation-to-the-production)
+  - [6.5. Testing](#65-testing)
+- [7. Business Processes](#7-business-processes)
+  - [7.1. Simple BP](#71-simple-bp)
+  - [7.2. BP reading CSV lines](#72-bp-reading-csv-lines)
+    - [7.2.1. Creating a record map](#721-creating-a-record-map)
+    - [7.2.2. Creating a Data Transformation](#722-creating-a-data-transformation)
+    - [7.2.3. Adding the Data Transformation to the Business Process](#723-adding-the-data-transformation-to-the-business-process)
+    - [7.2.4. Configuring Production](#724-configuring-production)
+    - [7.2.5. Testing](#725-testing)
+- [8. Getting access to an extern database using JDBC](#8-getting-access-to-an-extern-database-using-jdbc)
+  - [8.1. Creating our new operation](#81-creating-our-new-operation)
+  - [8.2. Configuring the production](#82-configuring-the-production)
+  - [8.3. Testing](#83-testing)
+- [9. REST service](#9-rest-service)
+  - [9.1. Creating the service](#91-creating-the-service)
+  - [9.2. Adding our BS](#92-adding-our-bs)
+  - [Testing](#testing)
 
 ## 1. Prerequisites
 
@@ -78,7 +84,7 @@ Immediatly after creating our production, we will need to click on the `Producti
 
 In this first production we will now add Business Operations.
 
-## 6. Operations : 
+## 6. Operations
 
 A Business Operation (BO) is a specific operation that will enable us to send requests from IRIS to an external application / system. It can also be used to directly save in IRIS what we want.
 
@@ -130,7 +136,7 @@ Property Formation As Formation.Obj.Formation;
 }
 ```
 
-### 6.3. Creating our operation: 
+### 6.3. Creating our operation
 
 Now that we have all the elements we need, we can create our operation, in the `Formation/BO/LocalBDD` file: 
 ```objectscript
@@ -175,13 +181,13 @@ The MessageMap gives us the method to launch depending on the type of the reques
 
 As we can see, if the operation received a message of the type `Formation.Msg.FormationInsertRequest`, the `InsertLocalBDD` method will be called. This method will save the message in the IRIS local database.
 
-### 6.4. Adding the operation to the production: 
+### 6.4. Adding the operation to the production
 
 We now need to add this operation to the production. For this, we use the Management Portal. By pressing the `+` sign next to `Operations`, we have access to the Business Operation Wizard. There, we chose the operation class we just created in the scrolling menu. 
 
 ![OperationCreation](misc/img/OperationCreation.png)
 
-### 6.5. Testing the operation: 
+### 6.5. Testing
 
 Double clicking on the operation will enable us to activate it. After that, by selecting the operation and going in the `Actions` tabs in the right sidebar menu, we should be able to test the operation (if not see the production creation part to activate testings / you may need to start the production if stopped).
 
@@ -299,11 +305,13 @@ FROM Formation_Table.Formation
 to see the objects we just saved.
 
 
-## 8. Getting access to an extern databse using JDBC
+## 8. Getting access to an extern database using JDBC
 
 In this section, we will create an operation to save our objects in an extern database. We will be using the JDBC API, as well as the other docker container that we set up, with postgre on it. 
 
-`Formation/BO/RemoteBDD`: 
+### 8.1. Creating our new operation
+
+Our new operation, in the file `Formation/BO/RemoteBDD` is as follows: 
 
 ````objectscript
 Include EnsSQLTypes
@@ -349,6 +357,8 @@ XData MessageMap
 
 This operation is similar to the first one we created. When it will receive a message of the type `Formation.Msg.FormationInsertRequest`, it will use an adapter to save it into the an sql database.
 
+### 8.2. Configuring the production
+
 Now, through the Management Portal, we will instanciate that operation (by adding it with the `+` sign in the production).
 
 We will also need to add the JavaGateway for the JDBC driver in the services. The full name of this service is `EnsLib.JavaGateway.Service`.
@@ -377,6 +387,8 @@ Back to the production, we can add `"Postgre"` in the `Credential` field in the 
 
 ![JDBCService](misc/img/JDBCService.png)
 
+### 8.3. Testing
+
 When testing the visual trace should show a success: 
 
 
@@ -385,3 +397,123 @@ When testing the visual trace should show a success:
 We have successfully connected with an extern database. 
 
 As an exercise, it could be interesting to modify our BP and our BO.LocalBDD so that the operation returns a boolean that will tell the BP to call BO.RemoteBDD depending on the value of that boolean. This can be done by changing the type of reponse LocalBDD returns and by adding a new property to the context and using the `if` activity in our BP.
+
+## 9. REST service
+
+In this part, we will create and use a REST Service.
+
+### 9.1. Creating the service
+
+To create a REST service, we need a cless that extends %CSP.REST, in `Formation.REST.Dispatch.cls`:
+
+````objectscript
+Class Formation.REST.Dispatch Extends %CSP.REST
+{
+
+/// Ignore any writes done directly by the REST method.
+Parameter IgnoreWrites = 0;
+
+/// By default convert the input stream to Unicode
+Parameter CONVERTINPUTSTREAM = 1;
+
+/// The default response charset is utf-8
+Parameter CHARSET = "utf-8";
+
+Parameter HandleCorsRequest = 1;
+
+XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
+{
+<Routes>
+  <!-- Get this spec -->
+  <Route Url="/import" Method="post" Call="import" />
+</Routes>
+}
+
+/// Get this spec
+ClassMethod import() As %Status
+{
+  set tSc = $$$OK
+
+  Try {
+
+      set tBsName = "Formation.BS.RestInput"
+      set tMsg = ##class(Formation.Msg.FormationInsertRequest).%New()
+
+      set body = $zcvt(%request.Content.Read(),"I","UTF8")
+      set dyna = {}.%FromJSON(body)
+
+      set tFormation = ##class(Formation.Obj.Formation).%New()
+      set tFormation.Nom = dyna.nom
+      set tFormation.Salle = dyna.salle
+
+      set tMsg.Formation = tFormation
+      
+      $$$ThrowOnError(##class(Ens.Director).CreateBusinessService(tBsName,.tService))
+      
+      $$$ThrowOnError(tService.ProcessInput(tMsg,.output))
+
+  } Catch ex {
+      set tSc = ex.AsStatus()
+  }
+
+  Quit tSc
+}
+
+}
+````
+
+This class contains a route to import an object, bound to the POST verb: 
+
+````xml
+<Routes>
+  <!-- Get this spec -->
+  <Route Url="/import" Method="post" Call="import" />
+</Routes>
+````
+The import method will create a message that will be sent to a Business Service.
+
+### 9.2. Adding our BS
+
+We are going to create a generic class that will route all of its sollicitations towards `TargetConfigNames`. This target will be configured when we will instantiate this service. In the `Formation/BS/RestInput.cls` file we have:
+
+```objectscript
+Class Formation.BS.RestInput Extends Ens.BusinessService
+{
+
+Property TargetConfigNames As %String(MAXLEN = 1000) [ InitialExpression = "BuisnessProcess" ];
+
+Parameter SETTINGS = "TargetConfigNames:Basic:selector?multiSelect=1&context={Ens.ContextSearch/ProductionItems?targets=1&productionName=@productionId}";
+
+Method OnProcessInput(pDocIn As %RegisteredObject, Output pDocOut As %RegisteredObject) As %Status
+{
+    set status = $$$OK
+
+    try {
+
+        for iTarget=1:1:$L(..TargetConfigNames, ",") {
+		    set tOneTarget=$ZStrip($P(..TargetConfigNames,",",iTarget),"<>W")  Continue:""=tOneTarget
+		    $$$ThrowOnError(..SendRequestSync(tOneTarget,pDocIn,.pDocOut))
+	    }
+    } catch ex {
+        set status = ex.AsStatus()
+    }
+
+    Quit status
+}
+
+}
+```
+
+Back to the production configuration, we add the service the usual way. In the `Target Config Names`, we put our BO LocalBDD: 
+
+![RESTServiceSetup](misc/img/RESTServiceSetup.png)
+
+To use this service, we need to publish it. For that, we use the `Edit Web Application` menu:
+
+![RESTServicePublish](misc/img/RESTServicePublish.gif)
+
+### Testing
+
+Finally, we can test our service witth any kind of REST client:
+
+![RESTTest](misc/img/RESTTest.gif)
