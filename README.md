@@ -6,12 +6,12 @@
   - [3. The framework](#3-the-framework)
   - [4. Docker and saving progress](#4-docker-and-saving-progress)
   - [5. Productions](#5-productions)
-  - [6. Operations :](#6-operations-)
+  - [6. Operations](#6-operations)
     - [6.1. Creating our storage class](#61-creating-our-storage-class)
     - [6.2. Creating our message class](#62-creating-our-message-class)
-    - [6.3. Creating our operation:](#63-creating-our-operation)
-    - [6.4. Adding the operation to the production:](#64-adding-the-operation-to-the-production)
-    - [6.5. Testing the operation:](#65-testing-the-operation)
+    - [6.3. Creating our operation](#63-creating-our-operation)
+    - [6.4. Adding the operation to the production](#64-adding-the-operation-to-the-production)
+    - [6.5. Testing the operation](#65-testing-the-operation)
   - [7. Business Processes](#7-business-processes)
     - [7.1. Simple BP](#71-simple-bp)
     - [7.2. BP reading CSV lines](#72-bp-reading-csv-lines)
@@ -20,7 +20,10 @@
       - [7.2.3. Adding the Data Transformation to the Business Process](#723-adding-the-data-transformation-to-the-business-process)
       - [7.2.4. Configuring Production](#724-configuring-production)
       - [7.2.5. Testing](#725-testing)
-  - [8. Getting access to an extern databse using JDBC](#8-getting-access-to-an-extern-databse-using-jdbc)
+  - [8. Getting access to an extern database using JDBC](#8-getting-access-to-an-extern-database-using-jdbc)
+    - [8.1. Creating our new operation](#81-creating-our-new-operation)
+    - [8.2. Configuring the production](#82-configuring-the-production)
+    - [8.3. Testing](#83-testing)
 
 ## 1. Prerequisites
 
@@ -78,7 +81,7 @@ Immediatly after creating our production, we will need to click on the `Producti
 
 In this first production we will now add Business Operations.
 
-## 6. Operations : 
+## 6. Operations
 
 A Business Operation (BO) is a specific operation that will enable us to send requests from IRIS to an external application / system. It can also be used to directly save in IRIS what we want.
 
@@ -130,7 +133,7 @@ Property Formation As Formation.Obj.Formation;
 }
 ```
 
-### 6.3. Creating our operation: 
+### 6.3. Creating our operation
 
 Now that we have all the elements we need, we can create our operation, in the `Formation/BO/LocalBDD` file: 
 ```objectscript
@@ -175,13 +178,13 @@ The MessageMap gives us the method to launch depending on the type of the reques
 
 As we can see, if the operation received a message of the type `Formation.Msg.FormationInsertRequest`, the `InsertLocalBDD` method will be called. This method will save the message in the IRIS local database.
 
-### 6.4. Adding the operation to the production: 
+### 6.4. Adding the operation to the production
 
 We now need to add this operation to the production. For this, we use the Management Portal. By pressing the `+` sign next to `Operations`, we have access to the Business Operation Wizard. There, we chose the operation class we just created in the scrolling menu. 
 
 ![OperationCreation](misc/img/OperationCreation.png)
 
-### 6.5. Testing the operation: 
+### 6.5. Testing the operation 
 
 Double clicking on the operation will enable us to activate it. After that, by selecting the operation and going in the `Actions` tabs in the right sidebar menu, we should be able to test the operation (if not see the production creation part to activate testings / you may need to start the production if stopped).
 
@@ -299,11 +302,13 @@ FROM Formation_Table.Formation
 to see the objects we just saved.
 
 
-## 8. Getting access to an extern databse using JDBC
+## 8. Getting access to an extern database using JDBC
 
 In this section, we will create an operation to save our objects in an extern database. We will be using the JDBC API, as well as the other docker container that we set up, with postgre on it. 
 
-`Formation/BO/RemoteBDD`: 
+### 8.1. Creating our new operation
+
+Our new operation, in the file `Formation/BO/RemoteBDD` is as follows: 
 
 ````objectscript
 Include EnsSQLTypes
@@ -349,6 +354,8 @@ XData MessageMap
 
 This operation is similar to the first one we created. When it will receive a message of the type `Formation.Msg.FormationInsertRequest`, it will use an adapter to save it into the an sql database.
 
+### 8.2. Configuring the production
+
 Now, through the Management Portal, we will instanciate that operation (by adding it with the `+` sign in the production).
 
 We will also need to add the JavaGateway for the JDBC driver in the services. The full name of this service is `EnsLib.JavaGateway.Service`.
@@ -376,6 +383,8 @@ The login and password are both `DemoData`, as we set up in the `docker-compose.
 Back to the production, we can add `"Postgre"` in the `Credential` field in the settings of our operation (it should be in the scrolling menu). Before being able to test it, we need to add the JGService to the operation. In the Settings tab, in the Additional Settings: 
 
 ![JDBCService](misc/img/JDBCService.png)
+
+### 8.3. Testing
 
 When testing the visual trace should show a success: 
 
