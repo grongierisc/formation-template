@@ -436,11 +436,17 @@ We have successfully connected with an extern database.
 
 ## 9.4. Exercise
 
-As an exercise, it could be interesting to modify BO.LocalBDD so that itreturns a boolean that will tell the BP to call BO.RemoteBDD depending on the value of that boolean.
+As an exercise, it could be interesting to modify BO.LocalBDD so that it returns a boolean that will tell the BP to call BO.RemoteBDD depending on the value of that boolean.
 
 **Hint**: This can be done by changing the type of reponse LocalBDD returns, by adding a new property to the context and using the `if` activity in our BP.
 
 ## 9.5. Solution
+
+First, we modify the type of response LocalBDD returns. In the `Formation/BO/LocalBDD.cls` we have:
+````objectscript
+
+
+
 
 **TODO**
 
