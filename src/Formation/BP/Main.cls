@@ -1,5 +1,5 @@
 /// 
-Class Formation.BP.InsertLocalBDD Extends Ens.BusinessProcessBPL
+Class Formation.BP.Main Extends Ens.BusinessProcessBPL
 {
 
 /// BPL Definition

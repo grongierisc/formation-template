@@ -10,11 +10,11 @@ XData ProductionDefinition
   </Item>
   <Item Name="EnsLib.RecordMap.Service.FileService" Category="" ClassName="EnsLib.RecordMap.Service.FileService" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
     <Setting Target="Host" Name="RecordMap">Formation.RM.Csv</Setting>
-    <Setting Target="Host" Name="TargetConfigNames">Formation.BP.InsertLocalBDD</Setting>
+    <Setting Target="Host" Name="TargetConfigNames">Formation.BP.Main</Setting>
     <Setting Target="Adapter" Name="FilePath">/tmp/iris/misc/</Setting>
     <Setting Target="Adapter" Name="FileSpec">*.csv</Setting>
   </Item>
-  <Item Name="Formation.BP.InsertLocalBDD" Category="" ClassName="Formation.BP.InsertLocalBDD" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+  <Item Name="Formation.BP.Main" Category="" ClassName="Formation.BP.Main" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
   </Item>
   <Item Name="Formation.BO.RemoteBDD" Category="" ClassName="Formation.BO.RemoteBDD" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
     <Setting Target="Adapter" Name="DSN">jdbc:postgresql://db:5432/DemoData</Setting>
