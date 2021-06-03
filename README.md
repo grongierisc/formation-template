@@ -473,8 +473,6 @@ We will now create a new process (copied from the one we made), where we will ad
 
 ![ExerciseContext](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ExerciseContext.png)
 
-VERY IMPORTANT : we need to uncheck **Asynchronous**, or the if activity will set off before receiving the answer off Call BO.
-
 This property will be filled with the value of the callresponse.Double of our operation call (we need to set the [Response Message Class] to our new message class):
 
 ![ExerciseBinding](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ExerciseBinding.png)
@@ -482,6 +480,8 @@ This property will be filled with the value of the callresponse.Double of our op
 We then add an `if` activity, with the `context.Double` property as condition:
 
 ![ExerciseIf](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ExerciseIf.png)
+
+VERY IMPORTANT : we need to uncheck **Asynchronous** in the settings of our LocallBDD Call, or the if activity will set off before receiving the boolean response.
 
 Finally we set up our call activity with as a target the RemoteBDD BO:
 
