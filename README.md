@@ -48,7 +48,7 @@
 
 This is the IRIS Framework.
 
-![FrameworkFull](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/FrameworkFull.png)
+![FrameworkFull](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/FrameworkFull.png)
 
 The components inside of IRIS represent a production. Inbound adapters and outbound adapters enable us to use different kind of format as input and output for our databse. The composite applications will give us access to the production through external applications like REST services.
 
@@ -64,7 +64,7 @@ Finally, we will see how to use composite applications to insert new objects in 
 
 The framework adapted to our purpose gives us:
 
-![FrameworkAdapted](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/FrameworkAdapted.png)
+![FrameworkAdapted](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/FrameworkAdapted.png)
 
 
 # 4. Prerequisites
@@ -96,21 +96,21 @@ We will open a Management Portal. It will give us access to an webpage where we 
 
 A part of the things we will be doing will be saved locally, but all the processes and productions are saved in the docker container. In order to persist all of our progress, we need to export every class that is created through the Management Portal with the InterSystems addon `ObjectScript`:
 
-![ExportProgress](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/ExportProgress.png)
+![ExportProgress](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ExportProgress.png)
 
 We will have to save our Production, Record Map, Business Processes and Data Transfromation this way. After that, when we close our docker container and compose it up again, we will still have all of our progress saved locally (it is, of course, to be done after every change through the portal). To make it accessible to IRIS again we need to compile the exported files (by saving them, InterSystems addons take care of the rest).
 # 6. Productions 
 We can now create our first production. For this, we will go through the [Interoperability] and [Configure] menus: 
 
-![ProductionMenu](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/ProductionMenu.png)
+![ProductionMenu](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ProductionMenu.png)
 
 We then have to press [New], select the [Formation] package and chose a name for our production: 
 
-![ProductionCreation](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/ProductionCreation.png)
+![ProductionCreation](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ProductionCreation.png)
 
 Immediatly after creating our production, we will need to click on [Production Settings] just above the [Operations] section. In the right sidebar menu, we will have to activate [Testing Enabled] in the [Development and Debugging] part of the [Settings] tab (don't forget to press [Apply]).
 
-![ProductionTesting](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/ProductionTesting.png)
+![ProductionTesting](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ProductionTesting.png)
 
 In this first production we will now add Business Operations.
 
@@ -215,7 +215,7 @@ As we can see, if the operation received a message of the type `Formation.Msg.Fo
 
 We now need to add this operation to the production. For this, we use the Management Portal. By pressing the [+] sign next to [Operations], we have access to the [Business Operation Wizard]. There, we chose the operation class we just created in the scrolling menu. 
 
-![OperationCreation](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/OperationCreation.png)
+![OperationCreation](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/OperationCreation.png)
 
 ## 7.5. Testing
 
@@ -223,7 +223,7 @@ Double clicking on the operation will enable us to activate it. After that, by s
 
 By doing so, we will send the operation a message of the type we declared earlier. If all goes well, the results should be as shown below: 
 
-![OperationTest](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/OperationTest.png)
+![OperationTest](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/OperationTest.png)
 
 Showing the visual trace will enable us to see what happened between the processes, services and operations. here, we can see the message being sent to the operation by the process, and the operation sending back a response (that is just an empty string).
 
@@ -233,23 +233,23 @@ Business Processes (BP) are the business logic of our production. They are used 
 
 Business Processes are created within the Management Portal:
 
-![BPMenu](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/BPMenu.png)
+![BPMenu](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BPMenu.png)
 
 ## 8.1. Simple BP
 
 We are now in the Business Process Designer. We are going to create a simple BP that will call our operation: 
 
-![BPAddingCall](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/BPAddingCall.gif)
+![BPAddingCall](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BPAddingCall.gif)
 
 A BP has a **Context**. It is composed of a request class, the class of the input, and of a response class, the class of the output. **Business Processes only have one input and one output**. It is also possible to add properties. 
 
 Since our BP will only be used to call our BO, we can put as request class the message class we created (we don't need an output as we just want to insert into the database).
 
-![BPContext](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/BPContext.png)
+![BPContext](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BPContext.png)
 
 We then chose the target of the call function : our BO. That operation, being **called** has a **callrequest** property. We need to bind that callrequest to the request of the BP (they both are of the class `Formation.Msg.FormationInsertRequest`), we do that by clicking on the call function and using the request builder: 
 
-![BPBindRequests](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/BPBindRequests.gif)
+![BPBindRequests](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BPBindRequests.gif)
 
 We can now save this BP (in the package ‘Formation.BP‘ and under the name ‘InsertLocalBDD‘ for example). Just like the operations, the processes can be instantiated and tested through the production configuration, for that they need to be compiled beforehand (on the Business Process Designer screen).
 
@@ -262,15 +262,15 @@ Our Process for now only passes the message to our Operation. We are going to co
 
 In order to read a file and put its content into a file, we need a Record Map (RM). There is a Record Mapper specialized for CSV files in the [Interoperability > Build] menu of the management portal: 
 
-![RMMenu](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/RMMenu.png)
+![RMMenu](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/RMMenu.png)
 
 We will create the mapper like this: 
 
-![RMCreation](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/RMCreation.png)
+![RMCreation](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/RMCreation.png)
 
 You should now have this Record Map: 
 
-![RMDetails](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/RMDetails.png)
+![RMDetails](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/RMDetails.png)
 
 Now that the Map is created, we have to generate it (with the Generate button). We now need to have a Data Transformation from the record map format and an insertion message.
 
@@ -278,11 +278,11 @@ Now that the Map is created, we have to generate it (with the Generate button). 
 
 We will find the Data Transformation (DT) Builder in the [Interoperability > Builder] menu. We will create our DT like this (if you can't find `Formation.RM.Csv.Record`, maybe you didn't generate the record map): 
 
-![DTCreation](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/DTCreation.png)
+![DTCreation](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/DTCreation.png)
 
 Now, we can map the different fields together:
 
-![DTMap](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/DTMap.gif)
+![DTMap](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/DTMap.gif)
 
 Don't forget to compile.
 
@@ -290,33 +290,33 @@ Don't forget to compile.
 
 The first thing we have to change is the BP's request class, since we need to have in input the Record Map we created.
 
-![BP2ChangeContext](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/BP2ChangeContext.png)
+![BP2ChangeContext](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BP2ChangeContext.png)
 
 We can then add our transformation (the name of the process doesn't change anything, from here we chose to name it `Main`): 
 
-![BP2AddingTransform](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/BP2AddingTransform.gif)
+![BP2AddingTransform](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BP2AddingTransform.gif)
 
 The transform activity will take the request of the BP (a Record of the CSV file, thanks top our Record Mapper), and transform it into a `FormationInsertRequest` message. In order to store that message to send it to the BO, we need to add a property to the context of the BP. 
 
-![BP2MsgContext](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/BP2MsgContext.png)
+![BP2MsgContext](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BP2MsgContext.png)
 
 We can now configure our transform function so that it takes it input as the input of the BP and saves its output in the newly created property. The source and target of the `RmToMsg` transformation are respectively `request` and `context.Msg`:
 
-![BP2RmToMsg](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/BP2RmToMsg.png)
+![BP2RmToMsg](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BP2RmToMsg.png)
 
 We need to do the same for `Call BO`. Its input, or `callrequest`, is the value stored in `context.msg`: 
 
-![BP2CallBO](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/BP2CallBO.gif)
+![BP2CallBO](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BP2CallBO.gif)
 
 In the end, the flow in the BP can be represented like this: 
 
-![BP2Diagram](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/BP2Diagram.png)
+![BP2Diagram](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BP2Diagram.png)
 
 ### 8.2.4. Configuring Production
 
 With the [+] sign, we can add our new process to the production (if not already done). We also need a generic service to use the record map, we use `EnsLib.RecordMap.Service.FileService` (we add it with the [+] button next to services). We then parameter this service: 
 
-![ServiceParam](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/ServiceParam.gif)
+![ServiceParam](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ServiceParam.gif)
 
 We should now be able to test our BP.
 
@@ -324,7 +324,7 @@ We should now be able to test our BP.
 
 We can now test the whole production: 
 
-![TestProductionCSV](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/TestProductionCSV.gif)
+![TestProductionCSV](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/TestProductionCSV.gif)
 
 In `System Explorer > SQL` menu, you can execute the command
 ````sql
@@ -393,7 +393,7 @@ Now, through the Management Portal, we will instanciate that operation (by addin
 
 We will also need to add the JavaGateway for the JDBC driver in the services. The full name of this service is `EnsLib.JavaGateway.Service`.
 
-![JDBCProduction](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/JDBCProduction.png)
+![JDBCProduction](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/JDBCProduction.png)
 
 We now need to configure our operation. Since we have set up a postgre container, and connected its port `5432`, the value we need in the following parameters are:
 
@@ -403,26 +403,26 @@ We now need to configure our operation. Since we have set up a postgre container
 >
 >JDBC Classpath: `/tmp/iris/postgresql-42.2.14.jar`
 
-![JDBCParam](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/JDBCParam.png)
+![JDBCParam](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/JDBCParam.png)
 
 Finally, we need to configure the credentials to have access to the remote database. For that, we need to open the Credential Viewer: 
 
-![JDBCCredentialMenu](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/JDBCCredentialMenu.png)
+![JDBCCredentialMenu](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/JDBCCredentialMenu.png)
 
 The login and password are both `DemoData`, as we set up in the `docker-compose.yml` file.
 
-![JDBCCredentialCreation](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/JDBCCredentialCreation.gif)
+![JDBCCredentialCreation](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/JDBCCredentialCreation.gif)
 
 Back to the production, we can add `"Postgre"` in the [Credential] field in the settings of our operation (it should be in the scrolling menu). Before being able to test it, we need to add the JGService to the operation. In the [Settings] tab, in the [Additional Settings]: 
 
-![JDBCService](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/JDBCService.png)
+![JDBCService](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/JDBCService.png)
 
 ## 9.3. Testing
 
 When testing the visual trace should show a success: 
 
 
-![JDBCTest](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/JDBCTest.png)
+![JDBCTest](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/JDBCTest.png)
 
 We have successfully connected with an extern database. 
 
@@ -536,14 +536,14 @@ Method OnProcessInput(pDocIn As %RegisteredObject, Output pDocOut As %Registered
 
 Back to the production configuration, we add the service the usual way. In the [Target Config Names], we put our BO LocalBDD: 
 
-![RESTServiceSetup](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/RESTServiceSetup.png)
+![RESTServiceSetup](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/RESTServiceSetup.png)
 
 To use this service, we need to publish it. For that, we use the [Edit Web Application] menu:
 
-![RESTServicePublish](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/RESTServicePublish.gif)
+![RESTServicePublish](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/RESTServicePublish.gif)
 
 ## 10.3. Testing
 
 Finally, we can test our service with any kind of REST client:
 
-![RESTTest](https://raw.githubusercontent.com/thewophile-beep/formation-template/tree/master/misc/img/RESTTest.gif)
+![RESTTest](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/RESTTest.gif)
