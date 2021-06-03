@@ -29,6 +29,8 @@
   - [7.5. Testing](#75-testing)
 - [8. Business Processes](#8-business-processes)
   - [8.1. Simple BP](#81-simple-bp)
+    - [8.1.1. Creating the process](#811-creating-the-process)
+    - [8.1.2. Modifying the context of a BP](#812-modifying-the-context-of-a-bp)
   - [8.2. BP reading CSV lines](#82-bp-reading-csv-lines)
     - [8.2.1. Creating a record map](#821-creating-a-record-map)
     - [8.2.2. Creating a Data Transformation](#822-creating-a-data-transformation)
@@ -39,6 +41,8 @@
   - [9.1. Creating our new operation](#91-creating-our-new-operation)
   - [9.2. Configuring the production](#92-configuring-the-production)
   - [9.3. Testing](#93-testing)
+  - [9.4. Exercise](#94-exercise)
+  - [9.5. Solution](#95-solution)
 - [10. REST service](#10-rest-service)
   - [10.1. Creating the service](#101-creating-the-service)
   - [10.2. Adding our BS](#102-adding-our-bs)
@@ -118,7 +122,7 @@ In this first production we will now add Business Operations.
 
 A Business Operation (BO) is a specific operation that will enable us to send requests from IRIS to an external application / system. It can also be used to directly save in IRIS what we want.
 
-We will create those operations in local, that is, in the `Formation/BO` file. Saving the files will compile them in IRIS. 
+We will create those operations in local, that is, in the `Formation/BO/` file. Saving the files will compile them in IRIS. 
 
 For our first operation we will save the content of a message in  the local database.
 
@@ -237,9 +241,13 @@ Business Processes are created within the Management Portal:
 
 ## 8.1. Simple BP
 
+### 8.1.1. Creating the process
+
 We are now in the Business Process Designer. We are going to create a simple BP that will call our operation: 
 
 ![BPAddingCall](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BPAddingCall.gif)
+
+### 8.1.2. Modifying the context of a BP
 
 A BP has a **Context**. It is composed of a request class, the class of the input, and of a response class, the class of the output. **Business Processes only have one input and one output**. It is also possible to add properties. 
 
@@ -251,7 +259,7 @@ We then chose the target of the call function : our BO. That operation, being **
 
 ![BPBindRequests](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BPBindRequests.gif)
 
-We can now save this BP (in the package ‘Formation.BP‘ and under the name ‘InsertLocalBDD‘ for example). Just like the operations, the processes can be instantiated and tested through the production configuration, for that they need to be compiled beforehand (on the Business Process Designer screen).
+We can now save this BP (in the package ‘Formation.BP‘ and under the name ‘InsertLocalBDD‘ or 'Main', for example). Just like the operations, the processes can be instantiated and tested through the production configuration, for that they need to be compiled beforehand (on the Business Process Designer screen).
 
 Our Process for now only passes the message to our Operation. We are going to complexify it so that the BP will take as input one line of a CSV file. 
 
@@ -284,7 +292,7 @@ Now, we can map the different fields together:
 
 ![DTMap](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/DTMap.gif)
 
-Don't forget to compile.
+(Don"t forget, we have to compile)
 
 ### 8.2.3. Adding the Data Transformation to the Business Process
 
@@ -296,7 +304,7 @@ We can then add our transformation (the name of the process doesn't change anyth
 
 ![BP2AddingTransform](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BP2AddingTransform.gif)
 
-The transform activity will take the request of the BP (a Record of the CSV file, thanks top our Record Mapper), and transform it into a `FormationInsertRequest` message. In order to store that message to send it to the BO, we need to add a property to the context of the BP. 
+The transform activity will take the request of the BP (a Record of the CSV file, thanks to our Record Mapper), and transform it into a `FormationInsertRequest` message. In order to store that message to send it to the BO, we need to add a property to the context of the BP. 
 
 ![BP2MsgContext](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BP2MsgContext.png)
 
@@ -322,7 +330,7 @@ We should now be able to test our BP.
 
 ### 8.2.5. Testing 
 
-We can now test the whole production: 
+We test the whole production this way: 
 
 ![TestProductionCSV](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/TestProductionCSV.gif)
 
@@ -341,7 +349,7 @@ In this section, we will create an operation to save our objects in an extern da
 
 ## 9.1. Creating our new operation
 
-Our new operation, in the file `Formation/BO/RemoteBDD` is as follows: 
+Our new operation, in the file `Formation/BO/RemoteBDD.cls` is as follows: 
 
 ````objectscript
 Include EnsSQLTypes
@@ -385,7 +393,7 @@ XData MessageMap
 }
 ````
 
-This operation is similar to the first one we created. When it will receive a message of the type `Formation.Msg.FormationInsertRequest`, it will use an adapter to save it into the an sql database.
+This operation is similar to the first one we created. When it will receive a message of the type `Formation.Msg.FormationInsertRequest`, it will use an adapter to execute SQL requests. Those requests will be sent to our postgre database.
 
 ## 9.2. Configuring the production
 
@@ -426,7 +434,15 @@ When testing the visual trace should show a success:
 
 We have successfully connected with an extern database. 
 
-As an exercise, it could be interesting to modify our BP and our BO.LocalBDD so that the operation returns a boolean that will tell the BP to call BO.RemoteBDD depending on the value of that boolean. This can be done by changing the type of reponse LocalBDD returns and by adding a new property to the context and using the `if` activity in our BP.
+## 9.4. Exercise
+
+As an exercise, it could be interesting to modify BO.LocalBDD so that itreturns a boolean that will tell the BP to call BO.RemoteBDD depending on the value of that boolean.
+
+**Hint**: This can be done by changing the type of reponse LocalBDD returns, by adding a new property to the context and using the `if` activity in our BP.
+
+## 9.5. Solution
+
+**TODO**
 
 # 10. REST service
 
@@ -434,7 +450,7 @@ In this part, we will create and use a REST Service.
 
 ## 10.1. Creating the service
 
-To create a REST service, we need a cless that extends %CSP.REST, in `Formation.REST.Dispatch.cls` we have:
+To create a REST service, we need a cless that extends %CSP.REST, in `Formation/REST/Dispatch.cls` we have:
 
 ````objectscript
 Class Formation.REST.Dispatch Extends %CSP.REST
