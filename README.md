@@ -436,13 +436,61 @@ We have successfully connected with an extern database.
 
 ## 9.4. Exercise
 
-As an exercise, it could be interesting to modify BO.LocalBDD so that itreturns a boolean that will tell the BP to call BO.RemoteBDD depending on the value of that boolean.
+As an exercise, it could be interesting to modify BO.LocalBDD so that it returns a boolean that will tell the BP to call BO.RemoteBDD depending on the value of that boolean.
 
 **Hint**: This can be done by changing the type of reponse LocalBDD returns, by adding a new property to the context and using the `if` activity in our BP.
 
 ## 9.5. Solution
 
-**TODO**
+First, we need to have a response from our LocalBDD operation. We are going to create a new message, in the `Formation/Msg/FormationInsertResponse.cls`:
+````objectscript
+Class Formation.Msg.FormationInsertResponse Extends Ens.Response
+{
+
+Property Double As %Boolean;
+
+}
+````
+
+Then, we change the response of LocalBDD by that response, and set the value of its boolean randomly (or not): 
+````objectscript
+Method InsertLocalBDD(pRequest As Formation.Msg.FormationInsertRequest, Output pResponse As Formation.Msg.FormationInsertResponse) As %Status
+{
+    set tStatus = $$$OK
+    
+    try{
+        set pResponse = ##class(Formation.Msg.FormationInsertResponse).%New()
+        if $RANDOM(10) < 5 {
+            set pResponse.Double = 1
+        } 
+        else {
+            set pResponse.Double = 0
+        }
+...
+````
+
+We will now create a new process (copied from the one we made), where we will add a new context property, of type `%Boolean`:
+
+![ExerciseContext](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ExerciseContext.png)
+
+VERY IMPORTANT : we need to uncheck **Asynchronous**, or the if activity will set off before receiving the answer off Call BO.
+
+This property will be filled with the value of the callresponse.Double of our operation call (we need to set the [Response Message Class] to our new message class):
+
+![ExerciseBinding](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ExerciseBinding.png)
+
+We then add an `if` activity, with the `context.Double` property as condition:
+
+![ExerciseIf](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ExerciseIf.png)
+
+Finally we set up our call activity with as a target the RemoteBDD BO:
+
+![ExerciseRemoteCall](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ExerciseRemoteCall.png)
+
+To complete the if activity, we need to drag another connector from the output of the `if` to the `join` triangle below. As we won't do anything if the boolean is false, we will leave this connector empty. 
+After compiling and instanciating, we should be able to test our new process. For that, we need to change the `Target Config Name` of our File Service.
+
+In the trace, we should have approximately half of objects read in the csv saved also in the remote database. 
 
 # 10. REST service
 
