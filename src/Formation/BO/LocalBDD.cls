@@ -8,7 +8,13 @@ Method InsertLocalBDD(pRequest As Formation.Msg.FormationInsertRequest, Output p
     set tStatus = $$$OK
     
     try{
-        set pResponse.Double = 1
+        set pResponse = ##class(Formation.Msg.FormationInsertResponse).%New()
+        if $RANDOM(10) < 5 {
+            set pResponse.Double = 1
+        } 
+        else {
+            set pResponse.Double = 0
+        }
         set tFormation = ##class(Formation.Table.Formation).%New()
         set tFormation.Name = pRequest.Formation.Nom
         set tFormation.Salle = pRequest.Formation.Salle
