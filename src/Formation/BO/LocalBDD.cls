@@ -3,12 +3,12 @@ Class Formation.BO.LocalBDD Extends Ens.BusinessOperation
 
 Parameter INVOCATION = "Queue";
 
-Method InsertLocalBDD(pRequest As Formation.Msg.FormationInsertRequest, Output pResponse As Ens.StringResponse) As %Status
+Method InsertLocalBDD(pRequest As Formation.Msg.FormationInsertRequest, Output pResponse As Formation.Msg.FormationInsertResponse) As %Status
 {
     set tStatus = $$$OK
     
     try{
-        set pResponse = ##class(Ens.Response).%New()
+        set pResponse.Double = 1
         set tFormation = ##class(Formation.Table.Formation).%New()
         set tFormation.Name = pRequest.Formation.Nom
         set tFormation.Salle = pRequest.Formation.Salle

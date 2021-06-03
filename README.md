@@ -442,7 +442,17 @@ As an exercise, it could be interesting to modify BO.LocalBDD so that it returns
 
 ## 9.5. Solution
 
-First, we modify the type of response LocalBDD returns. In the `Formation/BO/LocalBDD.cls` we have:
+First, we need to have a response from our LocalBDD operation. We are going to create a new message, in the `Formation/Msg/FormationInsertReposne.cls`:
+````objectscript
+Class Formation.Msg.FormationInsertResponse Extends Ens.Response
+{
+
+Property Double As %Boolean;
+
+}
+````
+
+Then, we change the response of LocalBDD by that response, and set the value of its boolean randomly (or not): 
 ````objectscript
 
 
