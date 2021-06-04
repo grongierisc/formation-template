@@ -90,7 +90,7 @@ From there, we should be able to build and compose our containers (with the `doc
 
 ## 5.2. Management Portal
 
-We will open a Management Portal. It will give us access to an webpage where we will be able to create our productions. The portal should be located at the url: http://localhost:52775/csp/sys/UtilHome.csp?$NAMESPACE=IRISAPP. You will need the following credentials: 
+We will open a Management Portal. It will give us access to an webpage where we will be able to create our production. The portal should be located at the url: http://localhost:52775/csp/sys/UtilHome.csp?$NAMESPACE=IRISAPP. You will need the following credentials: 
 
 >LOGIN: SuperUser
 >
@@ -292,8 +292,6 @@ Now, we can map the different fields together:
 
 ![DTMap](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/DTMap.gif)
 
-(Don"t forget, we have to compile)
-
 ### 8.2.3. Adding the Data Transformation to the Business Process
 
 The first thing we have to change is the BP's request class, since we need to have in input the Record Map we created.
@@ -438,7 +436,7 @@ We have successfully connected with an extern database.
 
 As an exercise, it could be interesting to modify BO.LocalBDD so that it returns a boolean that will tell the BP to call BO.RemoteBDD depending on the value of that boolean.
 
-**Hint**: This can be done by changing the type of reponse LocalBDD returns, by adding a new property to the context and using the `if` activity in our BP.
+**Hint**: This can be done by changing the type of reponse LocalBDD returns and by adding a new property to the context and using the `if` activity in our BP.
 
 ## 9.5. Solution
 
