@@ -47,6 +47,7 @@
   - [10.1. Creating the service](#101-creating-the-service)
   - [10.2. Adding our BS](#102-adding-our-bs)
   - [10.3. Testing](#103-testing)
+- [Conclusion](#conclusion)
 
 # 2. Framework
 
@@ -395,7 +396,7 @@ This operation is similar to the first one we created. When it will receive a me
 
 ## 9.2. Configuring the production
 
-Now, through the Management Portal, we will instanciate that operation (by adding it with the [+] sign in the production).
+Now, through the Management Portal, we will instantiate that operation (by adding it with the [+] sign in the production).
 
 We will also need to add the JavaGateway for the JDBC driver in the services. The full name of this service is `EnsLib.JavaGateway.Service`.
 
@@ -486,7 +487,7 @@ Finally we set up our call activity with as a target the RemoteBDD BO:
 ![ExerciseRemoteCall](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ExerciseRemoteCall.png)
 
 To complete the if activity, we need to drag another connector from the output of the `if` to the `join` triangle below. As we won't do anything if the boolean is false, we will leave this connector empty. 
-After compiling and instanciating, we should be able to test our new process. For that, we need to change the `Target Config Name` of our File Service.
+After compiling and instantiating, we should be able to test our new process. For that, we need to change the `Target Config Name` of our File Service.
 
 In the trace, we should have approximately half of objects read in the csv saved also in the remote database. 
 
@@ -609,3 +610,11 @@ To use this service, we need to publish it. For that, we use the [Edit Web Appli
 Finally, we can test our service with any kind of REST client:
 
 ![RESTTest](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/RESTTest.gif)
+
+# Conclusion
+
+Through this formation, we have created a production that is able to read lines from a csv file and save the read data into both the IRIS database and an extern database using JDBC. We also added a REST service in order to use the POST verb to save new objects.
+
+We have discovered the main elements of InterSystems' interoperability Framework.
+
+We have done so using docker, vscode and InterSystems' IRIS Management Portal.
