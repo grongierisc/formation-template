@@ -1,5 +1,5 @@
 /// RECORDMAP: Modified during compilation of RecordMap 'Formation.RM.Csv'
-/// on 2020-10-28 at 15:07:59.712 [2020-10-28 15:07:59.712 UTC]
+/// on 2021-05-31 at 07:55:30.512 [2021-05-31 07:55:30.512 UTC]
 /// by user SuperUser
 Class Formation.RM.Csv Extends EnsLib.RecordMap.RecordMap
 {
@@ -130,7 +130,6 @@ ClassMethod PutRecord(pStream As %IO.DeviceStream, pObject As %RegisteredObject,
 ClassMethod GetGeneratedClasses(Output pClasses As %String) As %Status
 {
 	Kill pClasses
-	Set pClasses("Formation.RM.Csv.Batch")=""
 	Set pClasses("Formation.RM.Csv.Record")=""
 	Set pClasses($classname())=""
 	Quit $$$OK
@@ -148,7 +147,7 @@ ClassMethod getType() As EnsLib.RecordMap.Model.DataType.RecordType [ CodeMode =
 
 XData RecordMap [ XMLNamespace = "http://www.intersystems.com/Ensemble/RecordMap" ]
 {
-<Record xmlns="http://www.intersystems.com/Ensemble/RecordMap" name="Formation.RM.Csv" type="delimited" char_encoding="UTF-8" targetClassname="Formation.RM.Csv.Record" batchClass="Formation.RM.Csv.Batch" complexBatchManaged="0" padFromLeft="0" recordTerminator="\x0a" allowEarlyTerminator="0">
+<Record xmlns="http://www.intersystems.com/Ensemble/RecordMap" name="Formation.RM.Csv" type="delimited" char_encoding="UTF-8" targetClassname="Formation.RM.Csv.Record" recordTerminator="\x0a">
   <Separators>
     <Separator>;</Separator>
   </Separators>

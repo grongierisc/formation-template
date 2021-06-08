@@ -1,5 +1,5 @@
 /// RECORDMAP: Generated from RecordMap 'Formation.RM.Csv'
-/// on 2020-10-28 at 15:07:59.624 [2020-10-28 15:07:59.624 UTC]
+/// on 2021-05-31 at 07:55:30.441 [2021-05-31 07:55:30.441 UTC]
 /// by user SuperUser
 Class Formation.RM.Csv.Record Extends (%Persistent, %XML.Adaptor, Ens.Request, EnsLib.RecordMap.Base) [ Inheritance = right, ProcedureBlock ]
 {
@@ -13,10 +13,6 @@ Property nom As %String;
 Property salle As %String;
 
 Parameter RECORDMAPGENERATED = 1;
-
-Relationship %ParentBatch As Formation.RM.Csv.Batch [ Cardinality = one, Inverse = Records ];
-
-Index %ParentBatchIdx On %ParentBatch;
 
 Storage Default
 {
@@ -35,9 +31,6 @@ Storage Default
 </Value>
 <Value name="5">
 <Value>nom</Value>
-</Value>
-<Value name="6">
-<Value>%ParentBatch</Value>
 </Value>
 </Data>
 <DataLocation>^Formation.RM.Csv.RecordD</DataLocation>
