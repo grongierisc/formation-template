@@ -1,7 +1,7 @@
 CREATE SCHEMA demodata;
 
 CREATE TABLE public.formation (
-	id int8 NULL,
+	id int8 NOT NULL,
 	nom varchar NULL,
 	salle varchar NULL
 );
