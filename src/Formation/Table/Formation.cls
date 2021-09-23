@@ -1,5 +1,5 @@
 /// Description
-Class Formation.Table.Formation Extends %Persistent
+Class Formation.Table.Formation Extends (%Persistent, %JSON.Adaptor)
 {
 
 /// Description
