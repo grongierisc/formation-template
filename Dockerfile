@@ -1,6 +1,6 @@
 ARG IMAGE=intersystemsdc/irishealth-community:2020.4.0.521.0-zpm
 ARG IMAGE=containers.intersystems.com/intersystems/irishealth-community:2020.1.408.0
-ARG IMAGE=intersystemsdc/irishealth-community:2020.4.0.547.0-zpm
+ARG IMAGE=intersystemsdc/irishealth-community:2021.2.0.617.0-zpm
 FROM $IMAGE
 # copy files
 COPY . /tmp/iris
