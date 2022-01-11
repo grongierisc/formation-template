@@ -1,22 +1,23 @@
-Include EnsSQLTypes
-
 Class Formation.BO.RemoteBDD Extends Ens.BusinessOperation
 {
 
-Parameter ADAPTER = "EnsLib.SQL.OutboundAdapter";
+Parameter ADAPTER = "EnsLib.HTTP.OutboundAdapter";
 
-Property Adapter As EnsLib.SQL.OutboundAdapter;
+Property Adapter As EnsLib.HTTP.OutboundAdapter;
 
 Parameter INVOCATION = "Queue";
 
-Method InsertRemoteBDD(pRequest As Ens.StringRequest, Output pResponse As Ens.StringResponse) As %Status
+Method GetInfo(pRequest As Ens.StringRequest, Output pResponse As Ens.StringResponse) As %Status
 {
 	set tStatus = $$$OK
 	
 	try{
 					
-		//Pour les tests, on truncate les tables avant insertion
-		$$$ThrowOnError(..Adapter.ExecuteUpdate(.nrows,"DROP TABLE IF EXISTS DemoData.ODS_Products"))
+        set tURL = ""
+        $$$ThrowOnError(..Adapter.GetURL(tURL,.tHttpResponse))
+
+        Set pResponse = ##class(Ens.StringContainer).%New({}.%FromJSON(tHttpResponse.Data).%ToJSON())
+
 		
 	}
 	catch exp
@@ -31,7 +32,7 @@ XData MessageMap
 {
 <MapItems>
 	<MapItem MessageType="Ens.StringRequest"> 
-		<Method>InsertRemoteBDD</Method>
+		<Method>GetInfo</Method>
 	</MapItem>
 </MapItems>
 }
