@@ -13,6 +13,39 @@
         "internalPort": 52773
       },
       "active": true,
-    }
+    },
+    "sqltools.connections": [
+      {
+        "previewLimit": 50,
+        "server": "localhost",
+        "port": 5432,
+        "driver": "PostgreSQL",
+        "name": "Postgres",
+        "database": "DemoData",
+        "username": "DemoData",
+        "password": "DemoData"
+      }
+    ],
+    "java.project.sourcePaths": [
+      "java/src",
+      "java/lib"
+    ],
+    "java.project.referencedLibraries": {
+      "include": [
+        "lib/**/*.jar",
+        "java/lib/intersystems-jdbc-3.3.0.jar",
+        "java/lib/intersystems-utils-3.3.0.jar",
+        "java/lib/gs1utils.jar"
+      ],
+      "exclude": [
+        "java/src/main/resources/gs1utils-1.0-SNAPSHOT.jar",
+        "java/src/main/resources/gson-2.8.5.jar",
+        "java/src/main/resources/intersystems-gateway-3.1.0.jar",
+        "java/target/formation-template.jar",
+        "java/lib/gs1utils-1.0-SNAPSHOT.jar"
+      ]
+    },
+    "java.project.outputPath": "java/target",
+    "java.configuration.updateBuildConfiguration": "automatic"
 
 }

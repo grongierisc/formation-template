@@ -1,0 +1,38 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>grongier.gs1utils</groupId>
+    <artifactId>pex</artifactId>
+    <packaging>jar</packaging>
+    <version>1.0-SNAPSHOT</version>
+    <name>gs1utils</name>
+    <url>http://maven.apache.org</url>
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+  <dependencies>
+    <dependency>
+        <groupId>se.injoin</groupId>
+        <artifactId>gs1utils</artifactId>
+        <version>1.0-SNAPSHOT</version>
+      <scope>system</scope>
+      <systemPath>${pom.basedir}/lib/gs1utils-1.0-SNAPSHOT.jar</systemPath>
+    </dependency>
+    <dependency>
+        <groupId>com.intersystems</groupId>
+        <artifactId>intersystems-jdbc</artifactId>
+        <version>3.3.0</version>
+      <scope>system</scope>
+      <systemPath>${pom.basedir}/lib/intersystems-jdbc-3.3.0.jar</systemPath>
+    </dependency>
+    <dependency>
+        <groupId>com.intersystems</groupId>
+        <artifactId>intersystems-utils</artifactId>
+        <version>3.3.0</version>
+      <scope>system</scope>
+      <systemPath>${pom.basedir}/lib/intersystems-utils-3.3.0.jar</systemPath>
+    </dependency>
+  </dependencies>
+</project>

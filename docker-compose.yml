@@ -25,3 +25,10 @@ services:
     - 5432:5432
     volumes:
       - ./misc:/docker-entrypoint-initdb.d/
+  jgw:
+    build:
+      context: java
+      dockerfile: Dockerfile
+    restart: always
+    ports: 
+      - 55556:55555
