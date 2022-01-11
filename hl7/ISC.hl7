@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+
+<Category name="ISC" base="2.3.1">
+
+<MessageType name='ORU_R01' structure='ORU_R01' returntype='base:ACK_R01' description='Unsolicited transmission of an observation message - Unsolicited transmission of an observation message'/>
+
+<MessageStructure name='ORU_R01' definition='base:MSH~{~[~base:PID~[~base:PD1~]~[~{~base:NK1~}~]~[~{~base:NTE~}~]~[~base:PV1~[~base:PV2~]~]~]~{~[~base:ORC~]~base:OBR~[~{~base:NTE~}~]~{~[~base:OBX~]~[~{~base:NTE~}~]~}~[~{~base:CTI~}~]~}~}~[~base:DSC~]'/>
+
+</Category>
