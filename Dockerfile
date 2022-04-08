@@ -1,11 +1,13 @@
 ARG IMAGE=intersystemsdc/irishealth-community:2020.4.0.521.0-zpm
 ARG IMAGE=containers.intersystems.com/intersystems/irishealth-community:2020.1.408.0
-ARG IMAGE=intersystemsdc/irishealth-community:2021.2.0.617.0-zpm
+ARG IMAGE=intersystemsdc/iris-community:latest
 FROM $IMAGE
 # copy files
 COPY . /tmp/iris
 
 USER root
+
+ENV DEBIAN_FRONTEND noninteractive
 
 # Update package and install sudo
 RUN apt-get update && apt-get install -y \
@@ -25,3 +27,7 @@ USER ${ISC_PACKAGE_MGRUSER}
 # load demo stuff
 RUN iris start IRIS \
 	&& iris session IRIS < /tmp/iris/iris.script && iris stop IRIS quietly
+
+ENV IRISUSERNAME "SuperUser"
+ENV IRISPASSWORD "SYS"
+ENV IRISNAMESPACE "IRISAPP"
