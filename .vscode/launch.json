@@ -5,6 +5,23 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python: Flask",
+            "type": "python",
+            "request": "launch",
+            "module": "flask",
+            "cwd": "${workspaceFolder}/src/python",
+            "env": {
+                "FLASK_APP": "/irisdev/app/src/python/app.py",
+                "FLASK_ENV": "development"
+            },
+            "args": [
+                "run",
+                "--no-debugger"
+            ],
+            "jinja": true,
+            "justMyCode": true
+        },
+        {
             "type": "objectscript",
             "request": "launch",
             "name": "XDebug"
@@ -15,6 +32,6 @@
             "name": "ObjectScript Attach",
             "processId": "${command:PickProcess}",
             "system": true
-          }
+        }
     ]
 }
