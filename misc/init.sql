@@ -1,9 +1,10 @@
-CREATE SCHEMA demodata;
+
+DROP TABLE formation;
 
 CREATE TABLE public.formation (
 	id int8 NULL,
-	nom varchar NULL,
-	salle varchar NULL
+	nom varchar(50) NULL,
+	salle varchar(50) NULL
 );
 
 INSERT INTO public.formation
