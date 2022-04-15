@@ -1,3 +1,5 @@
+iris.cls("Grongier.PEX.Utils").RegisterComponent("formation.bo.FileOperation","FileOperation","/irisdev/app/src/python",1,"Python.TestOp")
+ 
  # 1. **Ensemble / Interoperability Formation**
 
  The goal of this formation is to learn InterSystems' interoperability framework, and particularly the use of: 

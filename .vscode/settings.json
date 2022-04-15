@@ -13,6 +13,21 @@
         "internalPort": 52773
       },
       "active": true,
-    }
+    },
+    "objectscript.export": {
+      "folder": "src"
+    },
+    "sqltools.connections": [
+      {
+        "previewLimit": 50,
+        "server": "localhost",
+        "port": 5432,
+        "driver": "PostgreSQL",
+        "name": "DemoData",
+        "database": "DemoData",
+        "username": "DemoData",
+        "password": "DemoData"
+      }
+    ]
 
 }
