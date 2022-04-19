@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request, make_response
 from grongier.pex import Director
+import iris
 
 from obj import Formation
 from msg import FormationRequest

@@ -2,6 +2,7 @@ import grongier.pex
 import datetime
 import iris
 import os
+import psycopg2
 
 from msg import FormationIrisRequest
 from msg import FormationRequest
@@ -51,4 +52,29 @@ class IrisOperation(grongier.pex.BusinessOperation):
             """
             iris.sql.exec(sql,request.formation.name,request.formation.room)
         
+        return 
+
+class PostgresOperation(grongier.pex.BusinessOperation):
+
+    def OnInit(self):
+        if not hasattr(self,'FileName'):
+            self.FileName = "/tmp/test.txt"
+
+        self.conn = psycopg2.connect(
+        host="db",
+        database="DemoData",
+        user="DemoData",
+        password="DemoData",
+        port="5432")
+        self.conn.autocommit = True
+        return 1
+
+    def OnTearDown(self):
+        self.conn.close()
+
+    def OnMessage(self,request):
+        cur = self.conn.cursor()
+        if isinstance(request,FormationRequest):
+            sql = "INSERT INTO public.formation ( id,nom,salle ) VALUES ( %s , %s , %s )"
+            cur.execute(sql,(request.formation.id,request.formation.nom,request.formation.salle))
         return 

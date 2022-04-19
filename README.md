@@ -30,24 +30,22 @@
   - [7.5. Testing](#75-testing)
 - [8. Business Processes](#8-business-processes)
   - [8.1. Simple BP](#81-simple-bp)
-    - [8.1.1. Creating the process](#811-creating-the-process)
-    - [8.1.2. Modifying the context of a BP](#812-modifying-the-context-of-a-bp)
-  - [8.2. BP reading CSV lines](#82-bp-reading-csv-lines)
-    - [8.2.1. Creating a record map](#821-creating-a-record-map)
-    - [8.2.2. Creating a Data Transformation](#822-creating-a-data-transformation)
-    - [8.2.3. Adding the Data Transformation to the Business Process](#823-adding-the-data-transformation-to-the-business-process)
-    - [8.2.4. Configuring Production](#824-configuring-production)
-    - [8.2.5. Testing](#825-testing)
-- [9. Getting access to an extern database using JDBC](#9-getting-access-to-an-extern-database-using-jdbc)
-  - [9.1. Creating our new operation](#91-creating-our-new-operation)
-  - [9.2. Configuring the production](#92-configuring-the-production)
+  - [8.2. Adding the process to the production](#82-Adding-the-process-to-the-production)
+  - [8.3. Testing](#83-testing)
+- [9. Business Service](#9-business-service)
+  - [9.1. Simple BS](#91-simple-bs)
+  - [9.2. Adding the service to the production](#92-Adding-the-service-to-the-production)
   - [9.3. Testing](#93-testing)
-  - [9.4. Exercise](#94-exercise)
-  - [9.5. Solution](#95-solution)
-- [10. REST service](#10-rest-service)
-  - [10.1. Creating the service](#101-creating-the-service)
-  - [10.2. Adding our BS](#102-adding-our-bs)
+- [10. Getting access to an extern database using JDBC](#10-getting-access-to-an-extern-database-using-jdbc)
+  - [10.1. Creating our new operation](#101-creating-our-new-operation)
+  - [10.2. Configuring the production](#102-configuring-the-production)
   - [10.3. Testing](#103-testing)
+  - [10.4. Exercise](#104-exercise)
+  - [10.5. Solution](#105-solution)
+- [11. REST service](#11-rest-service)
+  - [11.1. Creating the service](#111-creating-the-service)
+  - [11.2. Adding our BS](#1112-adding-our-bs)
+  - [11.3. Testing](#113-testing)
 - [Conclusion](#conclusion)
 
 # 2. Framework
@@ -272,9 +270,10 @@ Double clicking on the operation will enable us to activate it. After that, by s
 By doing so, we will send the operation a message of the type we declared earlier. If all goes well, showing the visual trace will enable us to see what happened between the processes, services and operations. here, we can see the message being sent to the operation by the process, and the operation sending back a response (that is just an empty string).
 
 For IrisOperation you must first access Iris database system and copy/paste `misc/init.iris.sql` to create the table we will be using.
+You should get a result like this :
 ![IrisOperation](https://github.com/LucasEnard/formation-template/blob/python/misc/img/PythonIrisOperationTest.png)
 
-For FileOperation it is to be noted that you must fill the %settings available on the Management Portal as follow ( and you can add in the settings the `filename` if you have followed the `filename` note from [7.3. Creating our operations](#73-creating-our-operations) ) :
+For FileOperation it is to be noted that you must fill the %settings available on the Management Portal as follow ( and you can add in the settings the `filename` if you have followed the `filename` note from [7.3.](#73-creating-our-operations) ) :
 ![Settings for FileOperation](https://github.com/LucasEnard/formation-template/blob/python/misc/img/SettingsFileOperation.png)
 
 You should get a result like this :
@@ -286,117 +285,114 @@ You should get a result like this :
 
 Business Processes (BP) are the business logic of our production. They are used to process requests or relay those requests to other components of the production.
 
-Business Processes are created within the Management Portal:
-
-![BPMenu](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BPMenu.png)
+Business Processes are created in VSCode.
 
 ## 8.1. Simple BP
 
-### 8.1.1. Creating the process
+We now have to create a Business Process to process the information coming from our future services and dispatch it accordingly. We are going to create a simple BP that will call our operations.
 
-We are now in the Business Process Designer. We are going to create a simple BP that will call our operation: 
+Since our BP will only redirect information we will call it `bp/Router` and it will be like this :
+```python
+import grongier.pex
 
-![BPAddingCall](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BPAddingCall.gif)
-
-### 8.1.2. Modifying the context of a BP
-
-A BP has a **Context**. It is composed of a request class, the class of the input, and of a response class, the class of the output. **Business Processes only have one input and one output**. It is also possible to add properties. 
-
-Since our BP will only be used to call our BO, we can put as request class the message class we created (we don't need an output as we just want to insert into the database).
-
-![BPContext](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BPContext.png)
-
-We then chose the target of the call function : our BO. That operation, being **called** has a **callrequest** property. We need to bind that callrequest to the request of the BP (they both are of the class `Formation.Msg.FormationInsertRequest`), we do that by clicking on the call function and using the request builder: 
-
-![BPBindRequests](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BPBindRequests.gif)
-
-We can now save this BP (in the package ‘Formation.BP‘ and under the name ‘InsertLocalBDD‘ or 'Main', for example). Just like the operations, the processes can be instantiated and tested through the production configuration, for that they need to be compiled beforehand (on the Business Process Designer screen).
-
-Our Process for now only passes the message to our Operation. We are going to complexify it so that the BP will take as input one line of a CSV file. 
+from msg import FormationRequest, FormationIrisRequest
+from obj import FormationIris
 
 
-## 8.2. BP reading CSV lines
+class Router(grongier.pex.BusinessProcess):
 
-### 8.2.1. Creating a record map
+    def OnRequest(self, request):
+        if isinstance(request,FormationRequest):
+            msg = FormationIrisRequest()
+            msg.formation = FormationIris()
+            msg.formation.name = request.formation.nom
+            msg.formation.room = request.formation.salle
+            self.SendRequestSync('Python.FileOperation',request)
+            self.SendRequestSync('Python.IrisOperation',msg)
 
-In order to read a file and put its content into a file, we need a Record Map (RM). There is a Record Mapper specialized for CSV files in the [Interoperability > Build] menu of the management portal: 
-
-![RMMenu](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/RMMenu.png)
-
-We will create the mapper like this: 
-
-![RMCreation](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/RMCreation.png)
-
-You should now have this Record Map: 
-
-![RMDetails](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/RMDetails.png)
-
-Now that the Map is created, we have to generate it (with the Generate button). We now need to have a Data Transformation from the record map format and an insertion message.
-
-### 8.2.2. Creating a Data Transformation
-
-We will find the Data Transformation (DT) Builder in the [Interoperability > Builder] menu. We will create our DT like this (if you can't find `Formation.RM.Csv.Record`, maybe you didn't generate the record map): 
-
-![DTCreation](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/DTCreation.png)
-
-Now, we can map the different fields together:
-
-![DTMap](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/DTMap.gif)
-
-### 8.2.3. Adding the Data Transformation to the Business Process
-
-The first thing we have to change is the BP's request class, since we need to have in input the Record Map we created.
-
-![BP2ChangeContext](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BP2ChangeContext.png)
-
-We can then add our transformation (the name of the process doesn't change anything, from here we chose to name it `Main`): 
-
-![BP2AddingTransform](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BP2AddingTransform.gif)
-
-The transform activity will take the request of the BP (a Record of the CSV file, thanks to our Record Mapper), and transform it into a `FormationInsertRequest` message. In order to store that message to send it to the BO, we need to add a property to the context of the BP. 
-
-![BP2MsgContext](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BP2MsgContext.png)
-
-We can now configure our transform function so that it takes it input as the input of the BP and saves its output in the newly created property. The source and target of the `RmToMsg` transformation are respectively `request` and `context.Msg`:
-
-![BP2RmToMsg](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BP2RmToMsg.png)
-
-We need to do the same for `Call BO`. Its input, or `callrequest`, is the value stored in `context.msg`: 
-
-![BP2CallBO](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BP2CallBO.gif)
-
-In the end, the flow in the BP can be represented like this: 
-
-![BP2Diagram](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BP2Diagram.png)
-
-### 8.2.4. Configuring Production
-
-With the [+] sign, we can add our new process to the production (if not already done). We also need a generic service to use the record map, we use `EnsLib.RecordMap.Service.FileService` (we add it with the [+] button next to services). We then parameter this service: 
-
-![ServiceParam](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ServiceParam.gif)
-
-We should now be able to test our BP.
-
-### 8.2.5. Testing 
-
-We test the whole production this way: 
-
-![TestProductionCSV](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/TestProductionCSV.gif)
-
-In `System Explorer > SQL` menu, you can execute the command
-````sql
-SELECT 
-ID, Name, Salle
-FROM Formation_Table.Formation
-````
-to see the objects we just saved.
+        return 
+```
+As we can see, if the IrisOperation receive a message of the type `msg.FormationRequest`, the information hold by the message will be send directly to `Python.FileOperation` with the `SendRequestSync` function to be written down on our .txt. We will also create a `msg.FormationIrisRequest` in order to call `Python.IrisOperation` the same way.
 
 
-# 9. Getting access to an extern database using JDBC
+## 8.2. Adding the process to the production
+
+We now need to add the process to the production. For this, we use the Management Portal. By pressing the [+] sign next to [Processes], we have access to the [Business Process Wizard]. There, we chose the process class we just created in the scrolling menu. 
+
+## 8.3. Testing
+
+Double clicking on the process will enable us to activate it. After that, by selecting the process and going in the [Actions] tabs in the right sidebar menu, we should be able to test the process (if not see the production creation part to activate testings / you may need to start the production if stopped).
+
+By doing so, we will send the process a message of the type `msg.FormationRequest`.
+![RouterTest](https://github.com/LucasEnard/formation-template/blob/python/misc/img/PythonRouterTest.png)
+
+If all goes well, showing the visual trace will enable us to see what happened between the process, services and processes. here, we can see the messages being sent to the operations by the process, and the operations sending back a response.
+![RouterResults](https://github.com/LucasEnard/formation-template/blob/python/misc/img/PythonRouterResults.png)
+
+# 9. Business Service
+
+Business Service (BS) are the ins of our production. They are used to gather information and send them to our routers.
+
+## 9.1. Simple BS
+
+We now have to create a Business Service to read a CSV and send each line as a `msg.FormationRequest` to the router.
+
+Since our BS will read a csv we will call it `bs/ServiceCSV` and it will be like this :
+```python
+import grongier.pex
+
+from dataclass_csv import DataclassReader
+
+from obj import Formation
+from msg import FormationRequest
+
+class ServiceCSV(grongier.pex.BusinessService):
+
+    def getAdapterType():
+        """
+        Name of the registred adaptor
+        """
+        return "Ens.InboundAdapter"
+    
+    def OnInit(self):
+        if hasattr(self,'Path'):
+            self.Path = self.Path
+        else:
+            self.Path = '/irisdev/app/misc/'
+        return
+
+    def OnProcessInput(self,request):
+
+        filename='formation.csv'
+        with open(self.Path+filename) as formation_csv:
+            reader = DataclassReader(formation_csv, Formation,delimiter=";")
+            for row in reader:
+                msg = FormationRequest()
+                msg.formation = row
+                self.SendRequestSync('Python.Router',msg)
+
+        return
+```
+As we can see, the ServiceCSV gets an InboundAdapter that will allow it to function on it's own and to call OnProcessInput every 5 seconds ( parameter that can be changed in the basic settings of the settings of the service on the Management Portal)
+
+Every 5 seconds, the service will open the `formation.csv` to read each line and create a `msg.FormationRequest` that will be send to the `Python.Router`.
+
+
+## 9.2. Adding the service to the production
+
+We now need to add the service to the production. For this, we use the Management Portal. By pressing the [+] sign next to [Services], we have access to the [Business service Wizard]. There, we chose the service class we just created in the scrolling menu. 
+
+## 9.3. Testing
+
+Double clicking on the process will enable us to activate it. As explained before, nothing more has to be done here since the service will start on his own every 5 seconds.
+If all goes well, showing the visual trace will enable us to see what happened between the process, services and processes. here, we can see the messages being sent to the process by the service, the messages to the operations by the process, and the operations sending back a response.
+![RouterResults](https://github.com/LucasEnard/formation-template/blob/python/misc/img/PythonServiceCSVResults.png)
+
+# 10. Getting access to an extern database using JDBC
 
 In this section, we will create an operation to save our objects in an extern database. We will be using the JDBC API, as well as the other docker container that we set up, with postgre on it. 
 
-## 9.1. Creating our new operation
+## 10.1. Creating our new operation
 
 Our new operation, in the file `Formation/BO/RemoteBDD.cls` is as follows: 
 
@@ -444,7 +440,7 @@ XData MessageMap
 
 This operation is similar to the first one we created. When it will receive a message of the type `Formation.Msg.FormationInsertRequest`, it will use an adapter to execute SQL requests. Those requests will be sent to our postgre database.
 
-## 9.2. Configuring the production
+## 10.2. Configuring the production
 
 Now, through the Management Portal, we will instantiate that operation (by adding it with the [+] sign in the production).
 
@@ -474,7 +470,7 @@ Back to the production, we can add `"Postgre"` in the [Credential] field in the 
 
 ![JDBCService](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/JDBCService.png)
 
-## 9.3. Testing
+## 10.3. Testing
 
 When testing the visual trace should show a success: 
 
@@ -483,13 +479,13 @@ When testing the visual trace should show a success:
 
 We have successfully connected with an extern database. 
 
-## 9.4. Exercise
+## 10.4. Exercise
 
 As an exercise, it could be interesting to modify BO.LocalBDD so that it returns a boolean that will tell the BP to call BO.RemoteBDD depending on the value of that boolean.
 
 **Hint**: This can be done by changing the type of reponse LocalBDD returns and by adding a new property to the context and using the `if` activity in our BP.
 
-## 9.5. Solution
+## 10.5. Solution
 
 First, we need to have a response from our LocalBDD operation. We are going to create a new message, in the `Formation/Msg/FormationInsertResponse.cls`:
 ````objectscript
@@ -541,11 +537,11 @@ After compiling and instantiating, we should be able to test our new process. Fo
 
 In the trace, we should have approximately half of objects read in the csv saved also in the remote database. 
 
-# 10. REST service
+# 11. REST service
 
 In this part, we will create and use a REST Service.
 
-## 10.1. Creating the service
+## 11.1. Creating the service
 
 To create a REST service, we need a cless that extends %CSP.REST, in `Formation/REST/Dispatch.cls` we have:
 
@@ -615,7 +611,7 @@ This class contains a route to import an object, bound to the POST verb:
 ````
 The import method will create a message that will be sent to a Business Service.
 
-## 10.2. Adding our BS
+## 11.2. Adding our BS
 
 We are going to create a generic class that will route all of its sollicitations towards `TargetConfigNames`. This target will be configured when we will instantiate this service. In the `Formation/BS/RestInput.cls` file we have:
 
@@ -655,7 +651,7 @@ To use this service, we need to publish it. For that, we use the [Edit Web Appli
 
 ![RESTServicePublish](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/RESTServicePublish.gif)
 
-## 10.3. Testing
+## 11.3. Testing
 
 Finally, we can test our service with any kind of REST client:
 
