@@ -263,7 +263,7 @@ As we can see, if the IrisOperation receive a message of the type `msg.Formation
 
 We now need to add these operations to the production. For this, we use the Management Portal. By pressing the [+] sign next to [Operations], we have access to the [Business Operation Wizard]. There, we chose the operation classes we just created in the scrolling menu. 
 
-![OperationCreation](https://raw.githubusercontent.com/LucasEnard/formation-template/master/misc/img/PythonOperationCreation.png)
+![OperationCreation](https://github.com/LucasEnard/formation-template/blob/python/misc/img/PythonOperationCreation.png)
 
 ## 7.5. Testing
 
@@ -272,13 +272,13 @@ Double clicking on the operation will enable us to activate it. After that, by s
 By doing so, we will send the operation a message of the type we declared earlier. If all goes well, showing the visual trace will enable us to see what happened between the processes, services and operations. here, we can see the message being sent to the operation by the process, and the operation sending back a response (that is just an empty string).
 
 For IrisOperation you must first access Iris database system and copy/paste `misc/init.iris.sql` to create the table we will be using.
-![IrisOperation](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/PythonIrisOperationTest.png)
+![IrisOperation](https://github.com/LucasEnard/formation-template/blob/python/misc/img/PythonIrisOperationTest.png)
 
 For FileOperation it is to be noted that you must fill the %settings available on the Management Portal as follow ( and you can add in the settings the `filename` if you have followed the `filename` note from [7.3. Creating our operations](#73-creating-our-operations) ) :
-![Settings for FileOperation](https://raw.githubusercontent.com/LucasEnard/formation-template/master/misc/img/SettingsFileOperation.png)
+![Settings for FileOperation](https://github.com/LucasEnard/formation-template/blob/python/misc/img/SettingsFileOperation.png)
 
 You should get a result like this :
-![FileOperation](https://raw.githubusercontent.com/LucasEnard/formation-template/master/misc/img/ResultsFileOperation.png)
+![FileOperation](https://github.com/LucasEnard/formation-template/blob/python/misc/img/ResultsFileOperation.png)
 
 
 
