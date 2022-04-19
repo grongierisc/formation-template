@@ -6,3 +6,9 @@ class Formation:
     id:int = None
     nom:str = None
     salle:str = None
+
+@dataclass
+class FormationIris:
+
+    name:str = None
+    room:str = None

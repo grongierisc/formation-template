@@ -2,8 +2,8 @@ import grongier.pex
 
 from dataclass_csv import DataclassReader
 
-from msg.obj.Formation import Formation
-from msg.Formation import FormationRequest
+from obj import Formation
+from msg import FormationRequest
 
 class ServiceCSV(grongier.pex.BusinessService):
 
@@ -31,6 +31,21 @@ class ServiceCSV(grongier.pex.BusinessService):
                 self.SendRequestSync('Python.Router',msg)
 
         return
+
+class FlaskService(grongier.pex.BusinessService):
+
+    def OnInit(self):
+        
+        if not hasattr(self,'Target'):
+            self.Target = "Python.Router"
+        
+        self.LastPostName = ""
+        
+        return 1
+
+    def OnProcessInput(self,request):
+
+        return self.SendRequestSync(self.Target,request)
 
 if __name__ == "__main__":
 

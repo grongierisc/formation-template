@@ -1,7 +1,7 @@
 import grongier.pex
 
-from msg.Formation import FormationRequest, FormationIrisRequest
-from msg.obj.FormationIris import FormationIris
+from msg import FormationRequest, FormationIrisRequest
+from obj import FormationIris
 
 
 class Router(grongier.pex.BusinessProcess):

@@ -20,12 +20,13 @@
   - [5.1. Docker containers](#51-docker-containers)
   - [5.2. Management Portal](#52-management-portal)
   - [5.3. Saving progress](#53-saving-progress)
+  - [5.4. Exporting progress](#54-Part-about-vscode-inside-container-and-irisscript)
 - [6. Productions](#6-productions)
 - [7. Operations](#7-operations)
-  - [7.1. Creating our storage class](#71-creating-our-storage-class)
-  - [7.2. Creating our message class](#72-creating-our-message-class)
-  - [7.3. Creating our operation](#73-creating-our-operation)
-  - [7.4. Adding the operation to the production](#74-adding-the-operation-to-the-production)
+  - [7.1. Creating our storage classes](#71-creating-our-storage-classes)
+  - [7.2. Creating our message classes](#72-creating-our-message-classes)
+  - [7.3. Creating our operations](#73-creating-our-operations)
+  - [7.4. Adding the operations to the production](#74-adding-the-operations-to-the-production)
   - [7.5. Testing](#75-testing)
 - [8. Business Processes](#8-business-processes)
   - [8.1. Simple BP](#81-simple-bp)
@@ -77,6 +78,7 @@ The framework adapted to our purpose gives us:
 For this formation, you'll need:
 * VSCode: https://code.visualstudio.com/
 * The InterSystems addons suite for vscode: https://intersystems-community.github.io/vscode-objectscript/installation/
+* The PostGre addon for VSCode.
 * Docker: https://docs.docker.com/get-docker/
 * The docker addon for VSCode.
 # 5. Setting up 
@@ -99,11 +101,15 @@ We will open a Management Portal. It will give us access to an webpage where we 
 
 ## 5.3. Saving progress
 
-A part of the things we will be doing will be saved locally, but all the processes and productions are saved in the docker container. In order to persist all of our progress, we need to export every class that is created through the Management Portal with the InterSystems addon `ObjectScript`:
+A part of the things we will be doing will be saved locally, but productions are saved in the docker container. In order to persist all of our progress, we need to export every class that is created through the Management Portal with the InterSystems addon `ObjectScript`:
 
 ![ExportProgress](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ExportProgress.png)
 
-We will have to save our Production, Record Map, Business Processes and Data Transfromation this way. After that, when we close our docker container and compose it up again, we will still have all of our progress saved locally (it is, of course, to be done after every change through the portal). To make it accessible to IRIS again we need to compile the exported files (by saving them, InterSystems addons take care of the rest).
+We will have to save our Production(,Record Map, Business Processes and Data Transfromation) this way. After that, when we close our docker container and compose it up again, we will still have all of our progress saved locally (it is, of course, to be done after every change through the portal). To make it accessible to IRIS again we need to compile the exported files (by saving them, InterSystems addons take care of the rest).
+
+## 5.4. Part about vscode inside container and iris.script
+
+
 # 6. Productions 
 We can now create our first production. For this, we will go through the [Interoperability] and [Configure] menus: 
 
@@ -123,114 +129,158 @@ In this first production we will now add Business Operations.
 
 A Business Operation (BO) is a specific operation that will enable us to send requests from IRIS to an external application / system. It can also be used to directly save in IRIS what we want.
 
-We will create those operations in local, that is, in the `Formation/BO/` file. Saving the files will compile them in IRIS. 
+We will create those operations in local, that is, in the `python/bo/` file. Saving the files will compile them in IRIS. 
 
-For our first operation we will save the content of a message in  the local database.
+For our first operation we will save the content of a message in the local database.
 
 We need to have a way of storing this message first. 
 
-## 7.1. Creating our storage class
+## 7.1. Creating our storage classes
 
-Storage classes in IRIS extends the type `%Persistent`. They will be saved in the intern database.
+Storage classes are `dataclass`. We will need to use `misc/init.iris.sql` and `misc/init.sql` in order to create in IRIS the Table `iris.Formation`
 
-In our `Formation/Table/Formation.cls` file we have: 
-```objectscript
-Class Formation.Table.Formation Extends %Persistent
-{
+In our `python/obj.py` file we have: 
+```python
+from dataclasses import dataclass
 
-Property Name As %String;
+@dataclass
+class Formation:
 
-Property Salle As %String;
+    id:int = None
+    nom:str = None
+    salle:str = None
 
-}
+@dataclass
+class FormationIris:
+
+    name:str = None
+    room:str = None
 ```
 
-Note that when saving, additional lines are automatically added to the file. They are mandatory and are added by the InterSystems addons.
+The Formation class will be used as a Python object to read a csv and write in a texte file later on, while the FormationIris class will be used as a way to interact with the Iris database.
 
-## 7.2. Creating our message class
+## 7.2. Creating our message classes
 
-This message will contain a `Formation` object, located in the `Formation/Obj/Formation.cls` file: 
-```objectscript
-Class Formation.Obj.Formation Extends (%SerialObject, %XML.Adaptor)
-{
+These messages will contain a `Formation` object or a `FormationIris` object, located in the `obj.py` file created in [7.1](#71-creating-our-storage-classes)
 
-Property Nom As %String;
+Note that messages, requests and responses all inherit from the `grongier.pex.Message` class.
 
-Property Salle As %String;
+In our `python/msg.py` file we have: 
+```python
+from dataclasses import dataclass
+import grongier.pex
 
-}
+from obj import Formation,FormationIris
+
+@dataclass
+class FormationRequest(grongier.pex.Message):
+
+    formation:Formation = None
+
+@dataclass
+class FormationIrisRequest(grongier.pex.Message):
+
+    formation:FormationIris = None
 ```
 
-The `Message` class will use that `Formation` object, `src/Formation/Msg/FormationInsertRequest.cls`:
-```objectscript
-Class Formation.Msg.FormationInsertRequest Extends Ens.Request
-{
+Again, the FormationRequest class will be used as a message to read a csv and write in a texte file later on, while the FormationIrisRequest class will be used as a message to interact with the Iris database.
 
-Property Formation As Formation.Obj.Formation;
+## 7.3. Creating our operations
 
-}
+Now that we have all the elements we need, we can create our operations.
+Note that any Business Operation inherit from the `grongier.pex.BusinessOperation` class.
+In the `python/bo.py` file we have: 
+```python
+import grongier.pex
+import datetime
+import os
+
+from msg import FormationIrisRequest
+from msg import FormationRequest
+
+class FileOperation(grongier.pex.BusinessOperation):
+
+    def OnInit(self):
+        if hasattr(self,'Path'):
+            os.chdir(self.Path)
+
+    def OnMessage(self, pRequest):
+        if isinstance(pRequest,FormationRequest):
+            id = salle = nom = ""
+
+            if (pRequest.formation is not None):
+                id = str(pRequest.formation.id)
+                salle = pRequest.formation.salle
+                nom = pRequest.formation.nom
+
+            line = id+" : "+salle+" : "+nom+" : "
+
+            filename = 'toto.csv'
+
+            self.PutLine(filename, line)
+            self.PutLine(filename, " * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *")
+
+        return 
+
+
+    @staticmethod
+    def PutLine(filename,string):
+        try:
+            with open(filename, "a",encoding="utf-8") as outfile:
+                outfile.write(string)
+        except Exception as e:
+            raise e
+
+class IrisOperation(grongier.pex.BusinessOperation):
+
+    def OnMessage(self, request):
+        if isinstance(request,FormationIrisRequest):
+            sql = """
+            INSERT INTO iris.formation
+            ( name, room )
+            VALUES( ?, ? )
+            """
+            iris.sql.exec(sql,request.formation.name,request.formation.room)
+        
+        return 
 ```
 
-## 7.3. Creating our operation
+There is for now no MessageMap method to launch depending on the type of the request (the message sent to the operation) therefore it is needed to use, if necessary to protect the code, multiple if conditions on the message type using for example `isinstance()` as seen in our `bo.py` file.
 
-Now that we have all the elements we need, we can create our operation, in the `Formation/BO/LocalBDD.cls` file: 
-```objectscript
-Class Formation.BO.LocalBDD Extends Ens.BusinessOperation
-{
-
-Parameter INVOCATION = "Queue";
-
-Method InsertLocalBDD(pRequest As Formation.Msg.FormationInsertRequest, Output pResponse As Ens.StringResponse) As %Status
-{
-    set tStatus = $$$OK
-    
-    try{
-        set pResponse = ##class(Ens.Response).%New()
-        set tFormation = ##class(Formation.Table.Formation).%New()
-        set tFormation.Name = pRequest.Formation.Nom
-        set tFormation.Salle = pRequest.Formation.Salle
-        $$$ThrowOnError(tFormation.%Save())
-    }
-    catch exp
-    {
-        Set tStatus = exp.AsStatus()
-    }
-
-    Quit tStatus
-}
-
-XData MessageMap
-{
-<MapItems>
-    <MapItem MessageType="Formation.Msg.FormationInsertRequest"> 
-        <Method>InsertLocalBDD</Method>
-    </MapItem>
-</MapItems>
-}
-
-}
-
+As we can see, if the FileOperation receive a message of the type `msg.FormationRequest`, the information hold by the message will be written down on the `toto.csv` file.
+Note that you could make `filename` a variable with a base value of `toto.csv` that can be change directly onto the management portal by doing :
+```python
+    def OnInit(self):
+        if hasattr(self,'Path'):
+            os.chdir(self.Path)
+        if not hasattr(self,'Filename'):
+          self.Filename = 'toto.csv'
 ```
 
-The MessageMap gives us the method to launch depending on the type of the request (the message sent to the operation).
+As we can see, if the IrisOperation receive a message of the type `msg.FormationIrisRequest`, the information hold by the message will be transformed into an SQL querry and executed by the `iris.sql.exec` IrisPython function. This method will save the message in the IRIS local database.
 
-As we can see, if the operation received a message of the type `Formation.Msg.FormationInsertRequest`, the `InsertLocalBDD` method will be called. This method will save the message in the IRIS local database.
+## 7.4. Adding the operations to the production
 
-## 7.4. Adding the operation to the production
+We now need to add these operations to the production. For this, we use the Management Portal. By pressing the [+] sign next to [Operations], we have access to the [Business Operation Wizard]. There, we chose the operation classes we just created in the scrolling menu. 
 
-We now need to add this operation to the production. For this, we use the Management Portal. By pressing the [+] sign next to [Operations], we have access to the [Business Operation Wizard]. There, we chose the operation class we just created in the scrolling menu. 
-
-![OperationCreation](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/OperationCreation.png)
+![OperationCreation](https://raw.githubusercontent.com/LucasEnard/formation-template/master/misc/img/PythonOperationCreation.png)
 
 ## 7.5. Testing
 
 Double clicking on the operation will enable us to activate it. After that, by selecting the operation and going in the [Actions] tabs in the right sidebar menu, we should be able to test the operation (if not see the production creation part to activate testings / you may need to start the production if stopped).
 
-By doing so, we will send the operation a message of the type we declared earlier. If all goes well, the results should be as shown below: 
+By doing so, we will send the operation a message of the type we declared earlier. If all goes well, showing the visual trace will enable us to see what happened between the processes, services and operations. here, we can see the message being sent to the operation by the process, and the operation sending back a response (that is just an empty string).
 
-![OperationTest](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/OperationTest.png)
+For IrisOperation you must first access Iris database system and copy/paste `misc/init.iris.sql` to create the table we will be using.
+![IrisOperation](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/PythonIrisOperationTest.png)
 
-Showing the visual trace will enable us to see what happened between the processes, services and operations. here, we can see the message being sent to the operation by the process, and the operation sending back a response (that is just an empty string).
+For FileOperation it is to be noted that you must fill the %settings available on the Management Portal as follow ( and you can add in the settings the `filename` if you have followed the `filename` note from [7.3. Creating our operations](#73-creating-our-operations) ) :
+![Settings for FileOperation](https://raw.githubusercontent.com/LucasEnard/formation-template/master/misc/img/SettingsFileOperation.png)
+
+You should get a result like this :
+![FileOperation](https://raw.githubusercontent.com/LucasEnard/formation-template/master/misc/img/ResultsFileOperation.png)
+
+
 
 # 8. Business Processes
 

@@ -1,8 +1,7 @@
 from dataclasses import dataclass
 import grongier.pex
 
-from msg.obj.Formation import Formation
-from msg.obj.FormationIris import FormationIris
+from obj import Formation,FormationIris
 
 @dataclass
 class FormationRequest(grongier.pex.Message):

@@ -1,8 +1,8 @@
 from flask import Flask, jsonify, request, make_response
 from grongier.pex import Director
 
-from msg.obj.Formation import Formation
-from msg.Formation import FormationRequest
+from obj import Formation
+from msg import FormationRequest
 
 
 app = Flask(__name__)
