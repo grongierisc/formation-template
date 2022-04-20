@@ -45,8 +45,7 @@
   - [10.6. Solution](#106-solution)
 - [11. REST service](#11-rest-service)
   - [11.1. Creating the service](#111-creating-the-service)
-  - [11.2. Adding our BS](#1112-adding-our-bs)
-  - [11.3. Testing](#113-testing)
+  - [11.2. Testing](#112-testing)
 - [Conclusion](#conclusion)
 
 # 2. Framework
@@ -107,7 +106,8 @@ A part of the things we will be doing will be saved locally, but productions are
 We will have to save our Production(,Record Map, Business Processes and Data Transfromation) this way. After that, when we close our docker container and compose it up again, we will still have all of our progress saved locally (it is, of course, to be done after every change through the portal). To make it accessible to IRIS again we need to compile the exported files (by saving them, InterSystems addons take care of the rest).
 
 ## 5.4. Part about vscode inside container and iris.script
-
+WIP TALK ABOUT register.py and iris in bash inside container and iris.script
+talk about getting into the container
 
 # 6. Productions 
 We can now create our first production. For this, we will go through the [Interoperability] and [Configure] menus: 
@@ -135,7 +135,7 @@ For our first operation we will save the content of a message in the local datab
 We need to have a way of storing this message first. 
 
 ## 7.1. Creating our storage classes
-
+WIP AVEC IRIS.SQL
 Storage classes are `dataclass`. We will need to use `misc/init.iris.sql` and `misc/init.sql` in order to create in IRIS the Table `iris.Formation`
 
 In our `python/obj.py` file we have: 
@@ -270,7 +270,7 @@ Double clicking on the operation will enable us to activate it. After that, by s
 
 By doing so, we will send the operation a message of the type we declared earlier. If all goes well, showing the visual trace will enable us to see what happened between the processes, services and operations. here, we can see the message being sent to the operation by the process, and the operation sending back a response (that is just an empty string).
 
-For IrisOperation you must first access Iris database system and copy/paste `misc/init.iris.sql` to create the table we will be using.
+For IrisOperation you must first access Iris database system and copy/paste WIP `misc/init.iris.sql` to create the table we will be using.
 You should get a result like this :
 ![IrisOperation](https://github.com/LucasEnard/formation-template/blob/python/misc/img/PythonIrisOperationTest.png)
 
@@ -319,6 +319,7 @@ As we can see, if the IrisOperation receive a message of the type `msg.Formation
 ## 8.2. Adding the process to the production
 
 We now need to add the process to the production. For this, we use the Management Portal. By pressing the [+] sign next to [Processes], we have access to the [Business Process Wizard]. There, we chose the process class we just created in the scrolling menu. 
+WIP add screen ???
 
 ## 8.3. Testing
 
@@ -400,6 +401,8 @@ Once you are in the terminal enter :
 ```
 pip3 install psycopg2-binary
 ```
+
+WIP talk about docker script ?? install auto ??
 
 ## 10.2. Creating our new operation
 
@@ -539,7 +542,7 @@ class Router(grongier.pex.BusinessProcess):
         return 
 ```
 
-VERY IMPORTANT : we need to make sure we use **SendRequestSync** and not **SendRequestAsync** in the the call of our operations, or else the activity will set off before receiving the boolean response.
+VERY IMPORTANT : we need to make sure we use **SendRequestSync** and not **SendRequestAsync** in the call of our operations, or else the activity will set off before receiving the boolean response.
 
 In the visual trace, after testing, we should have approximately half of objects read in the csv saved also in the remote database. 
 Note that to test you can just start the `bs.ServiceCSV` and it will automatically send request to the router that will then dispatch properly the requests.
@@ -551,123 +554,106 @@ In this part, we will create and use a REST Service.
 
 ## 11.1. Creating the service
 
-To create a REST service, we need a cless that extends %CSP.REST, in `Formation/REST/Dispatch.cls` we have:
+To create a REST service, we will need a service that will link our API to our porduction, for this we create a simple service in `python/bs.py' :
+WIP
+```python
+class FlaskService(grongier.pex.BusinessService):
 
-````objectscript
-Class Formation.REST.Dispatch Extends %CSP.REST
-{
+    def OnInit(self):
+        
+        if not hasattr(self,'Target'):
+            self.Target = "Python.Router"
+        
+        return 1
 
-/// Ignore any writes done directly by the REST method.
-Parameter IgnoreWrites = 0;
+    def OnProcessInput(self,request):
 
-/// By default convert the input stream to Unicode
-Parameter CONVERTINPUTSTREAM = 1;
+        return self.SendRequestSync(self.Target,request)
+```
+OnProcessInpout this service will simply tranfer the request to the Router.
 
-/// The default response charset is utf-8
-Parameter CHARSET = "utf-8";
+To create a REST service, we will need Flask to create an API that will manage the `get`and `post` function:
+We need to create a new file as `python/app.py`:
+WIP
+```python
+from flask import Flask, jsonify, request, make_response
+from grongier.pex import Director
+import iris
 
-Parameter HandleCorsRequest = 1;
+from obj import Formation
+from msg import FormationRequest
 
-XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
-{
-<Routes>
-  <!-- Get this spec -->
-  <Route Url="/import" Method="post" Call="import" />
-</Routes>
-}
 
-/// Get this spec
-ClassMethod import() As %Status
-{
-  set tSc = $$$OK
+app = Flask(__name__)
 
-  Try {
+# ----------------------------------------------------------------
+### CRUD FOR Person
+# ----------------------------------------------------------------
 
-      set tBsName = "Formation.BS.RestInput"
-      set tMsg = ##class(Formation.Msg.FormationInsertRequest).%New()
+# GET Infos
+@app.route("/", methods=["GET"])
+def getInfo():
+    info = {'version':'1.0.6'}
+    return jsonify(info)
 
-      set body = $zcvt(%request.Content.Read(),"I","UTF8")
-      set dyna = {}.%FromJSON(body)
+@app.route("/training/", methods=["GET"])
+def getAlltraining():
+    payload = {}
+    return jsonify(payload)
 
-      set tFormation = ##class(Formation.Obj.Formation).%New()
-      set tFormation.Nom = dyna.nom
-      set tFormation.Salle = dyna.salle
+@app.route("/training/", methods=["POST"])
+def postPerson():
+    payload = {} 
 
-      set tMsg.Formation = tFormation
-      
-      $$$ThrowOnError(##class(Ens.Director).CreateBusinessService(tBsName,.tService))
-      
-      $$$ThrowOnError(tService.ProcessInput(tMsg,.output))
+    formation = Formation(request.get_json()['id'],request.get_json()['nom'],request.get_json()['salle'])
+    msg = FormationRequest(formation=formation)
 
-  } Catch ex {
-      set tSc = ex.AsStatus()
-  }
+    tService = Director.CreateBusinessService("Python.FlaskService")
+    response = tService.dispatchProcessInput(msg)
 
-  Quit tSc
-}
 
-}
-````
+    return jsonify(payload)
 
-This class contains a route to import an object, bound to the POST verb: 
+# GET person with id
+@app.route("/training/<int:id>", methods=["GET"])
+def getPerson(id):
+    payload = {}
+    return jsonify(payload)
 
-````xml
-<Routes>
-  <!-- Get this spec -->
-  <Route Url="/import" Method="post" Call="import" />
-</Routes>
-````
-The import method will create a message that will be sent to a Business Service.
+# PUT to update person with id
+@app.route("/training/<int:id>", methods=["PUT"])
+def updatePerson(id):
 
-## 11.2. Adding our BS
-
-We are going to create a generic class that will route all of its sollicitations towards `TargetConfigNames`. This target will be configured when we will instantiate this service. In the `Formation/BS/RestInput.cls` file we have:
-
-```objectscript
-Class Formation.BS.RestInput Extends Ens.BusinessService
-{
-
-Property TargetConfigNames As %String(MAXLEN = 1000) [ InitialExpression = "BuisnessProcess" ];
-
-Parameter SETTINGS = "TargetConfigNames:Basic:selector?multiSelect=1&context={Ens.ContextSearch/ProductionItems?targets=1&productionName=@productionId}";
-
-Method OnProcessInput(pDocIn As %RegisteredObject, Output pDocOut As %RegisteredObject) As %Status
-{
-    set status = $$$OK
-
-    try {
-
-        for iTarget=1:1:$L(..TargetConfigNames, ",") {
-		    set tOneTarget=$ZStrip($P(..TargetConfigNames,",",iTarget),"<>W")  Continue:""=tOneTarget
-		    $$$ThrowOnError(..SendRequestSync(tOneTarget,pDocIn,.pDocOut))
-	    }
-    } catch ex {
-        set status = ex.AsStatus()
+    payload = {
     }
+    return jsonify(payload)
 
-    Quit status
-}
+# DELETE person with id
+@app.route("/training/<int:id>", methods=["DELETE"])
+def deletePerson(id):
+    payload = {}  
+    return jsonify(payload)
 
-}
+
+# ----------------------------------------------------------------
+### MAIN PROGRAM
+# ----------------------------------------------------------------
+
+if __name__ == '__main__':
+    app.run('0.0.0.0', port = "8081")
 ```
 
-Back to the production configuration, we add the service the usual way. In the [Target Config Names], we put our BO LocalBDD: 
+WIP Note that the Flask API will use a Director to create an instance of our FlaskService from earlier and then send the right request.
 
-![RESTServiceSetup](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/RESTServiceSetup.png)
+## 11.2. Testing
 
-To use this service, we need to publish it. For that, we use the [Edit Web Application] menu:
-
-![RESTServicePublish](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/RESTServicePublish.gif)
-
-## 11.3. Testing
-
-Finally, we can test our service with any kind of REST client:
+Finally, we can test our service with any kind of REST client after having reloaded the Router service:
 
 ![RESTTest](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/RESTTest.gif)
 
 # Conclusion
 
-Through this formation, we have created a production that is able to read lines from a csv file and save the read data into both the IRIS database and an extern database using JDBC. We also added a REST service in order to use the POST verb to save new objects.
+Through this formation, we have created a production that is able to read lines from a csv file and save the read data into a local txt, the IRIS database and an extern database using JDBC. We also added a REST service in order to use the POST verb to save new objects.
 
 We have discovered the main elements of InterSystems' interoperability Framework.
 

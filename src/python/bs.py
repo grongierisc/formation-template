@@ -37,8 +37,6 @@ class FlaskService(grongier.pex.BusinessService):
         if not hasattr(self,'Target'):
             self.Target = "Python.Router"
         
-        self.LastPostName = ""
-        
         return 1
 
     def OnProcessInput(self,request):
