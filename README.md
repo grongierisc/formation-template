@@ -18,9 +18,9 @@
 - [4. Prerequisites](#4-prerequisites)
 - [5. Setting up](#5-setting-up)
   - [5.1. Docker containers](#51-docker-containers)
-  - [5.2. Management Portal](#52-management-portal)
+  - [5.2. Management Portal and VSCode](#52-management-portal-and-vscode)
   - [5.3. Saving progress](#53-saving-progress)
-  - [5.4. WIP Exporting progress](#54-Part-about-vscode-inside-container-and-irisscript)
+  - [5.4. Register components](#54-register-components)
 - [6. Productions](#6-productions)
 - [7. Operations](#7-operations)
   - [7.1. Creating our storage classes](#71-creating-our-storage-classes)
@@ -91,13 +91,19 @@ In order to have access to the InterSystems images, we need to go to the followi
 
 From there, we should be able to build and compose our containers (with the `docker-compose.yml` and `Dockerfile` files given).
 
-## 5.2. Management Portal
+## 5.2. Management Portal and VSCode
 
-We will open a Management Portal. It will give us access to a webpage where we will be able to create our production. The portal should be located at the url: http://localhost:52775/csp/sys/UtilHome.csp?$NAMESPACE=IRISAPP. You will need the following credentials: 
+This repository is ready for [VS Code](https://code.visualstudio.com/).
 
->LOGIN: SuperUser
->
->PASSWORD: SYS
+Open the locally-cloned `formation-template` folder in VS Code.
+
+If prompted (bottom right corner), install the recommended extensions.
+
+When prompted, reopen the folder inside the container so you will be able to use the python components within it. The first time you do this it may take several minutes while the container is readied.
+
+By opening the folder remote you enable VS Code and any terminals you open within it to use the python components within the container. Configure these to use `/usr/irissys/bin/irispython`
+
+<img width="1614" alt="PythonInterpreter" src="https://user-images.githubusercontent.com/47849411/145864423-2de24aaa-036c-4beb-bda0-3a73fe15ccbd.png">
 
 ## 5.3. Saving progress
 
@@ -107,9 +113,30 @@ A part of the things we will be doing will be saved locally, but productions are
 
 We will have to save our Production this way. After that, when we close our docker container and compose it up again, we will still have all of our progress saved locally (it is, of course, to be done after every change through the portal). To make it accessible to IRIS again we need to compile the exported files (by saving them, InterSystems addons take care of the rest).
 
-## 5.4. Part about vscode inside container and iris.script
-WIP TALK ABOUT register.py and iris in bash inside container and iris.script
-talk about getting into the container
+## 5.4. Register components
+
+In order to register the components we are creating in python to the production it is needed to use the `RegisterComponent` function from the `Grongier.PEX.Utils` module.
+
+For this you can either add your components in the `./iris.script` file but you will need to rebuild everytime you add a component.<br>We advise you to use the build-in python console to add manually the component at first when you are working on the project and then add them in the `iris.script` if you want to come back later ( or you will have to do it every time you rebuild the container )
+
+You will find those commands in the `misc/register.py` file.<br>To use them you nedd to firstly create the component then you can start a terminal in VSCode ( it will be automatically in the container if you followed step [5.2.](#52-management-portal-and-vscode)) and enter :
+'''
+/usr/irissys/bin/irispython
+'''
+To launch an IrisPython console.
+
+Then enter :
+```
+import iris
+```
+
+Now you can register your component using :
+```
+iris.cls("Grongier.PEX.Utils").RegisterComponent("bo","FileOperation","/irisdev/app/src/python/",1,"Python.FileOperation")
+```
+This line will register the class `FileOperation` inside the file `bo` at `/irisdev/app/src/python/` (which is the right path if you follow this course) using the name `Python.FileOperation`in the management portal.
+
+It is to be noted that if you don't change to name of the file or the class, if a component was registered you can modify it on VSCode without the need to register it again. Just don't forget to restart it in the management portal.
 
 # 6. Productions 
 We can now create our first production. For this, we will go through the [Interoperability] and [Configure] menus: 
@@ -259,6 +286,16 @@ As we can see, if the `FileOperation` receive a message of the type `msg.Formati
 
 As we can see, if the `IrisOperation` receive a message of the type `msg.FormationIrisRequest`, the information hold by the message will be transformed into an SQL querry and executed by the `iris.sql.exec` IrisPython function. This method will save the message in the IRIS local database.
 
+Don't forget to register your component :
+Following [5.4.](#54-register-components) and using:
+```
+iris.cls("Grongier.PEX.Utils").RegisterComponent("bo","FileOperation","/irisdev/app/src/python/",1,"Python.FileOperation")
+```
+And:
+```
+iris.cls("Grongier.PEX.Utils").RegisterComponent("bo","IrisOperation","/irisdev/app/src/python/",1,"Python.IrisOperation")
+```
+
 ## 7.4. Adding the operations to the production
 
 We now need to add these operations to the production. For this, we use the Management Portal. By pressing the [+] sign next to [Operations], we have access to the [Business Operation Wizard]. There, we chose the operation classes we just created in the scrolling menu. 
@@ -270,10 +307,11 @@ We now need to add these operations to the production. For this, we use the Mana
 Double clicking on the operation will enable us to activate it. After that, by selecting the operation and going in the [Actions] tabs in the right sidebar menu, we should be able to test the operation (if not see the production creation part to activate testings / you may need to start the production if stopped).
 
 By doing so, we will send the operation a message of the type we declared earlier. If all goes well, showing the visual trace will enable us to see what happened between the processes, services and operations. <br>Here, we can see the message being sent to the operation by the process, and the operation sending back a response (that is just an empty string).
-
-For IrisOperation you must first access Iris database system and copy/paste WIP `misc/init.iris.sql` to create the table we will be using.
 You should get a result like this :
 ![IrisOperation](https://github.com/LucasEnard/formation-template/blob/python/misc/img/PythonIrisOperationTest.png)
+
+WIP talk about iris.script and autoimport<br>
+For IrisOperation you must first access Iris database system and copy/paste `misc/init.iris.sql` to create the table we will be using.
 
 For FileOperation it is to be noted that you must fill the %settings available on the Management Portal as follow ( and you can add in the settings the `filename` if you have followed the `filename` note from [7.3.](#73-creating-our-operations) ) :
 ![Settings for FileOperation](https://github.com/LucasEnard/formation-template/blob/python/misc/img/SettingsFileOperation.png)
@@ -318,11 +356,15 @@ class Router(grongier.pex.BusinessProcess):
 ```
 As we can see, if the IrisOperation receive a message of the type `msg.FormationRequest`, the information hold by the message will be send directly to `Python.FileOperation` with the `SendRequestSync` function to be written down on our .txt. We will also create a `msg.FormationIrisRequest` in order to call `Python.IrisOperation` the same way.
 
+Don't forget to register your component :
+Following [5.4.](#54-register-components) and using:
+```
+iris.cls("Grongier.PEX.Utils").RegisterComponent("bp","Router","/irisdev/app/src/python/",1,"Python.Router")
+```
 
 ## 8.2. Adding the process to the production
 
 We now need to add the process to the production. For this, we use the Management Portal. By pressing the [+] sign next to [Processes], we have access to the [Business Process Wizard]. There, we chose the process class we just created in the scrolling menu. 
-WIP add screen ???
 
 ## 8.3. Testing
 
@@ -382,6 +424,11 @@ As we can see, the ServiceCSV gets an InboundAdapter that will allow it to funct
 
 Every 5 seconds, the service will open the `formation.csv` to read each line and create a `msg.FormationRequest` that will be send to the `Python.Router`.
 
+Don't forget to register your component :
+Following [5.4.](#54-register-components) and using:
+```
+iris.cls("Grongier.PEX.Utils").RegisterComponent("bs","ServiceCSV","/irisdev/app/src/python/",1,"Python.ServiceCSV")
+```
 
 ## 9.2. Adding the service to the production
 
@@ -465,6 +512,12 @@ As you can see here the connection is written directly into the code, to improve
         self.conn.autocommit = True
 
         return 1
+```
+
+Don't forget to register your component :
+Following [5.4.](#54-register-components) and using:
+```
+iris.cls("Grongier.PEX.Utils").RegisterComponent("bo","PostgresOperation","/irisdev/app/src/python/",1,"Python.PostgresOperation")
 ```
 
 ## 10.3. Configuring the production
@@ -578,6 +631,12 @@ class FlaskService(grongier.pex.BusinessService):
         return self.SendRequestSync(self.Target,request)
 ```
 OnProcessInput this service will simply tranfer the request to the Router.
+
+Don't forget to register your component :
+Following [5.4.](#54-register-components) and using:
+```
+iris.cls("Grongier.PEX.Utils").RegisterComponent("bs","FlaskService","/irisdev/app/src/python/",1,"Python.FlaskService")
+```
 
 To create a REST service, we will need Flask to create an API that will manage the `get` and `post` function:
 We need to create a new file as `python/app.py`:
