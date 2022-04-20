@@ -44,8 +44,9 @@
   - [10.5. Exercise](#105-exercise)
   - [10.6. Solution](#106-solution)
 - [11. REST service](#11-rest-service)
-  - [11.1. Creating the service](#111-creating-the-service)
-  - [11.2. Testing](#112-testing)
+  - [11.1. Prerequisites](#111-prerequisites)
+  - [11.2. Creating the service](#112-creating-the-service)
+  - [11.3. Testing](#113-testing)
 - [Conclusion](#conclusion)
 
 # 2. Framework
@@ -68,6 +69,7 @@ Finally, we will see how to use composite applications to insert new objects in 
 
 The framework adapted to our purpose gives us:
 
+WIP changer l'image pour coller à la formation
 ![FrameworkAdapted](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/FrameworkAdapted.png)
 
 
@@ -91,7 +93,7 @@ From there, we should be able to build and compose our containers (with the `doc
 
 ## 5.2. Management Portal
 
-We will open a Management Portal. It will give us access to an webpage where we will be able to create our production. The portal should be located at the url: http://localhost:52775/csp/sys/UtilHome.csp?$NAMESPACE=IRISAPP. You will need the following credentials: 
+We will open a Management Portal. It will give us access to a webpage where we will be able to create our production. The portal should be located at the url: http://localhost:52775/csp/sys/UtilHome.csp?$NAMESPACE=IRISAPP. You will need the following credentials: 
 
 >LOGIN: SuperUser
 >
@@ -103,7 +105,7 @@ A part of the things we will be doing will be saved locally, but productions are
 
 ![ExportProgress](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ExportProgress.png)
 
-We will have to save our Production(,Record Map, Business Processes and Data Transfromation) this way. After that, when we close our docker container and compose it up again, we will still have all of our progress saved locally (it is, of course, to be done after every change through the portal). To make it accessible to IRIS again we need to compile the exported files (by saving them, InterSystems addons take care of the rest).
+We will have to save our Production this way. After that, when we close our docker container and compose it up again, we will still have all of our progress saved locally (it is, of course, to be done after every change through the portal). To make it accessible to IRIS again we need to compile the exported files (by saving them, InterSystems addons take care of the rest).
 
 ## 5.4. Part about vscode inside container and iris.script
 WIP TALK ABOUT register.py and iris in bash inside container and iris.script
@@ -128,7 +130,7 @@ In this first production we will now add Business Operations.
 
 A Business Operation (BO) is a specific operation that will enable us to send requests from IRIS to an external application / system. It can also be used to directly save in IRIS what we want.
 
-We will create those operations in local, that is, in the `python/bo/` file. Saving the files will compile them in IRIS. 
+We will create those operations in local, that is, in the `python/bo.py` file. Saving the files will compile them in IRIS. 
 
 For our first operation we will save the content of a message in the local database.
 
@@ -246,8 +248,7 @@ class IrisOperation(grongier.pex.BusinessOperation):
 
 There is for now no MessageMap method to launch depending on the type of the request (the message sent to the operation) therefore it is needed to use, if necessary to protect the code, multiple if conditions on the message type using for example `isinstance()` as seen in our `bo.py` file.
 
-As we can see, if the FileOperation receive a message of the type `msg.FormationRequest`, the information hold by the message will be written down on the `toto.csv` file.
-Note that you could make `filename` a variable with a base value of `toto.csv` that can be change directly onto the management portal by doing :
+As we can see, if the `FileOperation` receive a message of the type `msg.FormationRequest`, the information hold by the message will be written down on the `toto.csv` file.<br>Note that you could make `filename` a variable with a base value of `toto.csv` that can be change directly onto the management portal by doing :
 ```python
     def OnInit(self):
         if hasattr(self,'Path'):
@@ -256,7 +257,7 @@ Note that you could make `filename` a variable with a base value of `toto.csv` t
           self.Filename = 'toto.csv'
 ```
 
-As we can see, if the IrisOperation receive a message of the type `msg.FormationIrisRequest`, the information hold by the message will be transformed into an SQL querry and executed by the `iris.sql.exec` IrisPython function. This method will save the message in the IRIS local database.
+As we can see, if the `IrisOperation` receive a message of the type `msg.FormationIrisRequest`, the information hold by the message will be transformed into an SQL querry and executed by the `iris.sql.exec` IrisPython function. This method will save the message in the IRIS local database.
 
 ## 7.4. Adding the operations to the production
 
@@ -268,7 +269,7 @@ We now need to add these operations to the production. For this, we use the Mana
 
 Double clicking on the operation will enable us to activate it. After that, by selecting the operation and going in the [Actions] tabs in the right sidebar menu, we should be able to test the operation (if not see the production creation part to activate testings / you may need to start the production if stopped).
 
-By doing so, we will send the operation a message of the type we declared earlier. If all goes well, showing the visual trace will enable us to see what happened between the processes, services and operations. here, we can see the message being sent to the operation by the process, and the operation sending back a response (that is just an empty string).
+By doing so, we will send the operation a message of the type we declared earlier. If all goes well, showing the visual trace will enable us to see what happened between the processes, services and operations. <br>Here, we can see the message being sent to the operation by the process, and the operation sending back a response (that is just an empty string).
 
 For IrisOperation you must first access Iris database system and copy/paste WIP `misc/init.iris.sql` to create the table we will be using.
 You should get a result like this :
@@ -280,6 +281,8 @@ For FileOperation it is to be noted that you must fill the %settings available o
 You should get a result like this :
 ![FileOperation](https://github.com/LucasEnard/formation-template/blob/python/misc/img/ResultsFileOperation.png)
 
+WIP ajouter screenshot pour IrisOperation et FileOperation (avec le nom de la table créée et le fichier txt créé)
+et comment accéder avec bash + cat toto.csv
 
 
 # 8. Business Processes
@@ -292,7 +295,7 @@ Business Processes are created in VSCode.
 
 We now have to create a Business Process to process the information coming from our future services and dispatch it accordingly. We are going to create a simple BP that will call our operations.
 
-Since our BP will only redirect information we will call it `bp/Router` and it will be like this :
+Since our BP will only redirect information we will call it `Router` and it will be in the file `python/bp.py` like this :
 ```python
 import grongier.pex
 
@@ -339,7 +342,7 @@ Business Service (BS) are the ins of our production. They are used to gather inf
 
 We now have to create a Business Service to read a CSV and send each line as a `msg.FormationRequest` to the router.
 
-Since our BS will read a csv we will call it `bs/ServiceCSV` and it will be like this :
+Since our BS will read a csv we will call it `ServiceCSV` and it will be in the file `python/bs.py` like this :
 ```python
 import grongier.pex
 
@@ -395,9 +398,7 @@ If all goes well, showing the visual trace will enable us to see what happened b
 In this section, we will create an operation to save our objects in an extern database. We will be using the JDBC API, as well as the other docker container that we set up, with postgre on it. 
 
 ## 10.1. Prerequisites
-In order to use postgre we will need to install psycopg2 which is a python module allowing use to connect to the postegre database with a simple command.
-To do this you will need to be inside the docker container to install psycopg2 on iris python.
-Once you are in the terminal enter :
+In order to use postgre we will need to install psycopg2 which is a python module allowing us to connect to the postegre database with a simple command.<br>To do this you will need to be inside the docker container to install psycopg2 on iris python.<br>Once you are in the terminal enter :
 ```
 pip3 install psycopg2-binary
 ```
@@ -438,8 +439,7 @@ class PostgresOperation(grongier.pex.BusinessOperation):
 It is to be noted that it is better if you put the `import psycopg2` at the beginning of the file with the other imports for clarity.
 This operation is similar to the first one we created. When it will receive a message of the type `msg.FormationRequest`, it will use the psycopg module to execute SQL requests. Those requests will be sent to our postgre database.
 
-As you can see here the connection is written directly into the code, to improve our code we could do as before for the other operations and make, `host`, `database` and the other connection information, variables with a base value of `db`and `DemoData` etc that can be change directly onto the management portal.
-To do this we can change our `OnInit` function by :
+As you can see here the connection is written directly into the code, to improve our code we could do as before for the other operations and make, `host`, `database` and the other connection information, variables with a base value of `db`and `DemoData` etc that can be change directly onto the management portal.<br>To do this we can change our `OnInit` function by :
 ```python
     def OnInit(self):
         if hasattr(self,'Path'):
@@ -499,8 +499,7 @@ class FormationIrisResponse(grongier.pex.Message):
     bool:Boolean = None
 ````
 
-Then, we change the response of bo.IrisOperation by that response, and set the value of its boolean randomly (or not).
-In the `python/bo.py`you need to add two imports and change the IrisOperation class:
+Then, we change the response of bo.IrisOperation by that response, and set the value of its boolean randomly (or not).<br>In the `python/bo.py`you need to add two imports and change the IrisOperation class:
 ````python
 import random
 from msg import FormationIrisResponse
@@ -544,17 +543,25 @@ class Router(grongier.pex.BusinessProcess):
 
 VERY IMPORTANT : we need to make sure we use **SendRequestSync** and not **SendRequestAsync** in the call of our operations, or else the activity will set off before receiving the boolean response.
 
-In the visual trace, after testing, we should have approximately half of objects read in the csv saved also in the remote database. 
-Note that to test you can just start the `bs.ServiceCSV` and it will automatically send request to the router that will then dispatch properly the requests.
+In the visual trace, after testing, we should have approximately half of objects read in the csv saved also in the remote database.<br>
+Note that to test you can just start the `bs.ServiceCSV` and it will automatically send request to the router that will then dispatch properly the requests.<br>
 Also note that you must double click on a service and press reload or restart if you want your saved changes on VSCode to apply.
 
 # 11. REST service
 
 In this part, we will create and use a REST Service.
 
-## 11.1. Creating the service
+## 11.1. Prerequisites
+In order to use Flask we will need to install flask which is a python module allowing us to easily create a REST service.
+To do this you will need to be inside the docker container to install flask on iris python.
+Once you are in the terminal enter :
+```
+pip3 install flask
+```
 
-To create a REST service, we will need a service that will link our API to our porduction, for this we create a simple service in `python/bs.py' :
+## 11.2. Creating the service
+
+To create a REST service, we will need a service that will link our API to our porduction, for this we create a new simple service in `python/bs.py` just after the `ServiceCSV` class.
 WIP
 ```python
 class FlaskService(grongier.pex.BusinessService):
@@ -570,9 +577,9 @@ class FlaskService(grongier.pex.BusinessService):
 
         return self.SendRequestSync(self.Target,request)
 ```
-OnProcessInpout this service will simply tranfer the request to the Router.
+OnProcessInput this service will simply tranfer the request to the Router.
 
-To create a REST service, we will need Flask to create an API that will manage the `get`and `post` function:
+To create a REST service, we will need Flask to create an API that will manage the `get` and `post` function:
 We need to create a new file as `python/app.py`:
 WIP
 ```python
@@ -645,9 +652,11 @@ if __name__ == '__main__':
 
 WIP Note that the Flask API will use a Director to create an instance of our FlaskService from earlier and then send the right request.
 
-## 11.2. Testing
+## 11.3. Testing
 
 Finally, we can test our service with any kind of REST client after having reloaded the Router service:
+
+WIP gif with the wrong http link.
 
 ![RESTTest](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/RESTTest.gif)
 
