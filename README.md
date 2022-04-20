@@ -20,7 +20,7 @@
   - [5.1. Docker containers](#51-docker-containers)
   - [5.2. Management Portal](#52-management-portal)
   - [5.3. Saving progress](#53-saving-progress)
-  - [5.4. Exporting progress](#54-Part-about-vscode-inside-container-and-irisscript)
+  - [5.4. WIP Exporting progress](#54-Part-about-vscode-inside-container-and-irisscript)
 - [6. Productions](#6-productions)
 - [7. Operations](#7-operations)
   - [7.1. Creating our storage classes](#71-creating-our-storage-classes)
@@ -37,11 +37,12 @@
   - [9.2. Adding the service to the production](#92-Adding-the-service-to-the-production)
   - [9.3. Testing](#93-testing)
 - [10. Getting access to an extern database using JDBC](#10-getting-access-to-an-extern-database-using-jdbc)
-  - [10.1. Creating our new operation](#101-creating-our-new-operation)
-  - [10.2. Configuring the production](#102-configuring-the-production)
-  - [10.3. Testing](#103-testing)
-  - [10.4. Exercise](#104-exercise)
-  - [10.5. Solution](#105-solution)
+  - [10.1. Prerequisites](#101-prerequisites)
+  - [10.2. Creating our new operation](#102-creating-our-new-operation)
+  - [10.3. Configuring the production](#103-configuring-the-production)
+  - [10.4. Testing](#104-testing)
+  - [10.5. Exercise](#105-exercise)
+  - [10.6. Solution](#106-solution)
 - [11. REST service](#11-rest-service)
   - [11.1. Creating the service](#111-creating-the-service)
   - [11.2. Adding our BS](#1112-adding-our-bs)
@@ -76,9 +77,9 @@ The framework adapted to our purpose gives us:
 For this formation, you'll need:
 * VSCode: https://code.visualstudio.com/
 * The InterSystems addons suite for vscode: https://intersystems-community.github.io/vscode-objectscript/installation/
-* The PostGre addon for VSCode.
 * Docker: https://docs.docker.com/get-docker/
 * The docker addon for VSCode.
+* [postgre requisites](#101-prerequisites)
 # 5. Setting up 
 
 
@@ -386,91 +387,91 @@ We now need to add the service to the production. For this, we use the Managemen
 
 Double clicking on the process will enable us to activate it. As explained before, nothing more has to be done here since the service will start on his own every 5 seconds.
 If all goes well, showing the visual trace will enable us to see what happened between the process, services and processes. here, we can see the messages being sent to the process by the service, the messages to the operations by the process, and the operations sending back a response.
-![RouterResults](https://github.com/LucasEnard/formation-template/blob/python/misc/img/PythonServiceCSVResults.png)
+![ServiceCSVResults](https://github.com/LucasEnard/formation-template/blob/python/misc/img/PythonServiceCSVResults.png)
 
 # 10. Getting access to an extern database using JDBC
 
 In this section, we will create an operation to save our objects in an extern database. We will be using the JDBC API, as well as the other docker container that we set up, with postgre on it. 
 
-## 10.1. Creating our new operation
+## 10.1. Prerequisites
+In order to use postgre we will need to install psycopg2 which is a python module allowing use to connect to the postegre database with a simple command.
+To do this you will need to be inside the docker container to install psycopg2 on iris python.
+Once you are in the terminal enter :
+```
+pip3 install psycopg2-binary
+```
 
-Our new operation, in the file `Formation/BO/RemoteBDD.cls` is as follows: 
+## 10.2. Creating our new operation
 
-````objectscript
-Include EnsSQLTypes
+Our new operation needs to be added after the two other one in the file `python/bo.py`.
+Our new operation and the imports are as follows: 
 
-Class Formation.BO.RemoteBDD Extends Ens.BusinessOperation
-{
+````python
+import psycopg2
 
-Parameter ADAPTER = "EnsLib.SQL.OutboundAdapter";
+class PostgresOperation(grongier.pex.BusinessOperation):
 
-Property Adapter As EnsLib.SQL.OutboundAdapter;
+    def OnInit(self):
+        self.conn = psycopg2.connect(
+        host="db",
+        database="DemoData",
+        user="DemoData",
+        password="DemoData",
+        port="5432")
+        self.conn.autocommit = True
 
-Parameter INVOCATION = "Queue";
+        return 1
 
-Method InsertRemoteBDD(pRequest As Formation.Msg.FormationInsertRequest, Output pResponse As Ens.StringResponse) As %Status
-{
-	set tStatus = $$$OK
-	
-	try{
-		set pResponse = ##class(Ens.Response).%New()
-		set ^inc = $I(^inc)
-		set tInsertSql = "INSERT INTO public.formation (id, nom, salle) VALUES(?, ?, ?)"
-		$$$ThrowOnError(..Adapter.ExecuteUpdate(.nrows,tInsertSql,^inc,pRequest.Formation.Nom, pRequest.Formation.Salle ))
-	}
-	catch exp
-	{
-		Set tStatus = exp.AsStatus()
-	}
+    def OnTearDown(self):
+        self.conn.close()
 
-	Quit tStatus
-}
-
-XData MessageMap
-{
-<MapItems>
-	<MapItem MessageType="Formation.Msg.FormationInsertRequest"> 
-		<Method>InsertRemoteBDD</Method>
-	</MapItem>
-</MapItems>
-}
-
-}
+    def OnMessage(self,request):
+        cursor = self.conn.cursor()
+        if isinstance(request,FormationRequest):
+            sql = "INSERT INTO public.formation ( id,nom,salle ) VALUES ( %s , %s , %s )"
+            cursor.execute(sql,(request.formation.id,request.formation.nom,request.formation.salle))
+        return 
 ````
+It is to be noted that it is better if you put the `import psycopg2` at the beginning of the file with the other imports for clarity.
+This operation is similar to the first one we created. When it will receive a message of the type `msg.FormationRequest`, it will use the psycopg module to execute SQL requests. Those requests will be sent to our postgre database.
 
-This operation is similar to the first one we created. When it will receive a message of the type `Formation.Msg.FormationInsertRequest`, it will use an adapter to execute SQL requests. Those requests will be sent to our postgre database.
+As you can see here the connection is written directly into the code, to improve our code we could do as before for the other operations and make, `host`, `database` and the other connection information, variables with a base value of `db`and `DemoData` etc that can be change directly onto the management portal.
+To do this we can change our `OnInit` function by :
+```python
+    def OnInit(self):
+        if hasattr(self,'Path'):
+            os.chdir(self.Path)
+        if not hasattr(self,'Host'):
+          self.Host = 'db'
+        if not hasattr(self,'Database'):
+          self.Database = 'DemoData'
+        if not hasattr(self,'User'):
+          self.User = 'DemoData'
+        if not hasattr(self,'Password'):
+          self.Password = 'DemoData'
+        if not hasattr(self,'Port'):
+          self.Port = '5432'
 
-## 10.2. Configuring the production
+        self.conn = psycopg2.connect(
+        host=self.Host,
+        database=self.Database,
+        user=self.User,
+        password=self.Password,
+        port=self.Port)
 
-Now, through the Management Portal, we will instantiate that operation (by adding it with the [+] sign in the production).
+        self.conn.autocommit = True
 
-We will also need to add the JavaGateway for the JDBC driver in the services. The full name of this service is `EnsLib.JavaGateway.Service`.
+        return 1
+```
 
-![JDBCProduction](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/JDBCProduction.png)
+## 10.3. Configuring the production
 
-We now need to configure our operation. Since we have set up a postgre container, and connected its port `5432`, the value we need in the following parameters are:
+We now need to add the operation to the production. For this, we use the Management Portal. By pressing the [+] sign next to [Operations], we have access to the [Business Operation Wizard]. There, we chose the operation class we just created in the scrolling menu. 
 
->DSN: `jdbc:postgresql://db:5432/DemoData`
->
->JDBC Driver: `org.postgresql.Driver`
->
->JDBC Classpath: `/tmp/iris/postgresql-42.2.14.jar`
+Afterward, if you wish to change the connection, you can simply add in the %settings in -Python in the parameter window of the operation the parameter you wish to change.
+See the second image of [7.5. Testing](#75-testing) for more details.
 
-![JDBCParam](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/JDBCParam.png)
-
-Finally, we need to configure the credentials to have access to the remote database. For that, we need to open the Credential Viewer: 
-
-![JDBCCredentialMenu](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/JDBCCredentialMenu.png)
-
-The login and password are both `DemoData`, as we set up in the `docker-compose.yml` file.
-
-![JDBCCredentialCreation](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/JDBCCredentialCreation.gif)
-
-Back to the production, we can add `"Postgre"` in the [Credential] field in the settings of our operation (it should be in the scrolling menu). Before being able to test it, we need to add the JGService to the operation. In the [Settings] tab, in the [Additional Settings]: 
-
-![JDBCService](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/JDBCService.png)
-
-## 10.3. Testing
+## 10.4. Testing
 
 When testing the visual trace should show a success: 
 
@@ -479,63 +480,70 @@ When testing the visual trace should show a success:
 
 We have successfully connected with an extern database. 
 
-## 10.4. Exercise
+## 10.5. Exercise
 
-As an exercise, it could be interesting to modify BO.LocalBDD so that it returns a boolean that will tell the BP to call BO.RemoteBDD depending on the value of that boolean.
+As an exercise, it could be interesting to modify bo.IrisOperation so that it returns a boolean that will tell the bp.Router to call bo.PostgresOperation depending on the value of that boolean.
 
-**Hint**: This can be done by changing the type of reponse LocalBDD returns and by adding a new property to the context and using the `if` activity in our BP.
+**Hint**: This can be done by changing the type of reponse bo.IrisOperation returns and by adding to that new type of message/response a new boolean property and using the `if` activity in our bp.Router.
 
-## 10.5. Solution
+## 10.6. Solution
 
-First, we need to have a response from our LocalBDD operation. We are going to create a new message, in the `Formation/Msg/FormationInsertResponse.cls`:
-````objectscript
-Class Formation.Msg.FormationInsertResponse Extends Ens.Response
-{
+First, we need to have a response from our bo.IrisOperation . We are going to create a new message after the other two, in the `python/msg.py`:
+````python
+@dataclass
+class FormationIrisResponse(grongier.pex.Message):
 
-Property Double As %Boolean;
-
-}
+    bool:Boolean = None
 ````
 
-Then, we change the response of LocalBDD by that response, and set the value of its boolean randomly (or not): 
-````objectscript
-Method InsertLocalBDD(pRequest As Formation.Msg.FormationInsertRequest, Output pResponse As Formation.Msg.FormationInsertResponse) As %Status
-{
-    set tStatus = $$$OK
-    
-    try{
-        set pResponse = ##class(Formation.Msg.FormationInsertResponse).%New()
-        if $RANDOM(10) < 5 {
-            set pResponse.Double = 1
-        } 
-        else {
-            set pResponse.Double = 0
-        }
-...
+Then, we change the response of bo.IrisOperation by that response, and set the value of its boolean randomly (or not).
+In the `python/bo.py`you need to add two imports and change the IrisOperation class:
+````python
+import random
+from msg import FormationIrisResponse
+
+class IrisOperation(grongier.pex.BusinessOperation):
+
+    def OnMessage(self, request):
+        if isinstance(request,FormationIrisRequest):
+            resp = FormationIrisResponse()
+            resp.bool = (random.random() < 0.5)
+            sql = """
+            INSERT INTO iris.formation
+            ( name, room )
+            VALUES( ?, ? )
+            """
+            iris.sql.exec(sql,request.formation.name,request.formation.room)
+            return resp
+        
+        return 
 ````
 
-We will now create a new process (copied from the one we made), where we will add a new context property, of type `%Boolean`:
+We will now change our process `bp.Router` in `python/bp.py` , where we will make it so that if the response from the IrisOperation has a boolean equal to True it will call the PostgesOperation.
+Here is the new code :
+```python
+class Router(grongier.pex.BusinessProcess):
 
-![ExerciseContext](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ExerciseContext.png)
+    def OnRequest(self, request):
+        if isinstance(request,FormationRequest):
+            msg = FormationIrisRequest()
+            msg.formation = FormationIris()
+            msg.formation.name = request.formation.nom
+            msg.formation.room = request.formation.salle
+            self.SendRequestSync('Python.FileOperation',request)
+            formIrisResp = self.SendRequestSync('Python.IrisOperation',msg)
 
-This property will be filled with the value of the callresponse.Double of our operation call (we need to set the [Response Message Class] to our new message class):
+            if formIrisResp.bool:
+                self.SendRequestSync('Python.PostgresOperation',request)
 
-![ExerciseBinding](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ExerciseBinding.png)
+        return 
+```
 
-We then add an `if` activity, with the `context.Double` property as condition:
+VERY IMPORTANT : we need to make sure we use **SendRequestSync** and not **SendRequestAsync** in the the call of our operations, or else the activity will set off before receiving the boolean response.
 
-![ExerciseIf](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ExerciseIf.png)
-
-VERY IMPORTANT : we need to uncheck **Asynchronous** in the settings of our LocallBDD Call, or the if activity will set off before receiving the boolean response.
-
-Finally we set up our call activity with as a target the RemoteBDD BO:
-
-![ExerciseRemoteCall](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ExerciseRemoteCall.png)
-
-To complete the if activity, we need to drag another connector from the output of the `if` to the `join` triangle below. As we won't do anything if the boolean is false, we will leave this connector empty. 
-After compiling and instantiating, we should be able to test our new process. For that, we need to change the `Target Config Name` of our File Service.
-
-In the trace, we should have approximately half of objects read in the csv saved also in the remote database. 
+In the visual trace, after testing, we should have approximately half of objects read in the csv saved also in the remote database. 
+Note that to test you can just start the `bs.ServiceCSV` and it will automatically send request to the router that will then dispatch properly the requests.
+Also note that you must double click on a service and press reload or restart if you want your saved changes on VSCode to apply.
 
 # 11. REST service
 

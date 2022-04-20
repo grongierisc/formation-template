@@ -14,9 +14,7 @@ class ServiceCSV(grongier.pex.BusinessService):
         return "Ens.InboundAdapter"
     
     def OnInit(self):
-        if hasattr(self,'Path'):
-            self.Path = self.Path
-        else:
+        if not hasattr(self,'Path'):
             self.Path = '/irisdev/app/misc/'
         return
 

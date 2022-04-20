@@ -4,8 +4,11 @@ import iris
 import os
 import psycopg2
 
+import random
+
 from msg import FormationIrisRequest
 from msg import FormationRequest
+from msg import FormationIrisResponse
 
 class FileOperation(grongier.pex.BusinessOperation):
 
@@ -45,14 +48,17 @@ class IrisOperation(grongier.pex.BusinessOperation):
 
     def OnMessage(self, request):
         if isinstance(request,FormationIrisRequest):
+            resp = FormationIrisResponse()
+            resp.bool = (random.random() < 0.5)
             sql = """
             INSERT INTO iris.formation
             ( name, room )
             VALUES( ?, ? )
             """
             iris.sql.exec(sql,request.formation.name,request.formation.room)
+            return resp
         
-        return 
+        return
 
 class PostgresOperation(grongier.pex.BusinessOperation):
 
@@ -67,14 +73,15 @@ class PostgresOperation(grongier.pex.BusinessOperation):
         password="DemoData",
         port="5432")
         self.conn.autocommit = True
+
         return 1
 
     def OnTearDown(self):
         self.conn.close()
 
     def OnMessage(self,request):
-        cur = self.conn.cursor()
+        cursor = self.conn.cursor()
         if isinstance(request,FormationRequest):
             sql = "INSERT INTO public.formation ( id,nom,salle ) VALUES ( %s , %s , %s )"
-            cur.execute(sql,(request.formation.id,request.formation.nom,request.formation.salle))
+            cursor.execute(sql,(request.formation.id,request.formation.nom,request.formation.salle))
         return 

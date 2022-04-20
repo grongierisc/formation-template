@@ -13,6 +13,8 @@ class Router(grongier.pex.BusinessProcess):
             msg.formation.name = request.formation.nom
             msg.formation.room = request.formation.salle
             self.SendRequestSync('Python.FileOperation',request)
-            self.SendRequestSync('Python.IrisOperation',msg)
+            formIrisResp = self.SendRequestSync('Python.IrisOperation',msg)
+            if formIrisResp.bool:
+                self.SendRequestSync('Python.PostgresOperation',request)
 
         return 
