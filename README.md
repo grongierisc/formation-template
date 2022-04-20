@@ -1,6 +1,6 @@
  # 1. **Ensemble / Interoperability Formation**
 
- The goal of this formation is to learn InterSystems' interoperability framework, and particularly the use of: 
+ The goal of this formation is to learn InterSystems' interoperability framework using python, and particularly the use of: 
 * Productions
 * Messages
 * Business Operations
@@ -22,7 +22,7 @@
   - [5.3. Saving progress](#53-saving-progress)
   - [5.4. Register components](#54-register-components)
 - [6. Productions](#6-productions)
-- [7. Operations](#7-operations)
+- [7. Business Operations](#7-business-operations)
   - [7.1. Creating our storage classes](#71-creating-our-storage-classes)
   - [7.2. Creating our message classes](#72-creating-our-message-classes)
   - [7.3. Creating our operations](#73-creating-our-operations)
@@ -30,11 +30,11 @@
   - [7.5. Testing](#75-testing)
 - [8. Business Processes](#8-business-processes)
   - [8.1. Simple BP](#81-simple-bp)
-  - [8.2. Adding the process to the production](#82-Adding-the-process-to-the-production)
+  - [8.2. Adding the process to the production](#82-adding-the-process-to-the-production)
   - [8.3. Testing](#83-testing)
 - [9. Business Service](#9-business-service)
   - [9.1. Simple BS](#91-simple-bs)
-  - [9.2. Adding the service to the production](#92-Adding-the-service-to-the-production)
+  - [9.2. Adding the service to the production](#92-adding-the-service-to-the-production)
   - [9.3. Testing](#93-testing)
 - [10. Getting access to an extern database using JDBC](#10-getting-access-to-an-extern-database-using-jdbc)
   - [10.1. Prerequisites](#101-prerequisites)
@@ -80,7 +80,9 @@ For this formation, you'll need:
 * The InterSystems addons suite for vscode: https://intersystems-community.github.io/vscode-objectscript/installation/
 * Docker: https://docs.docker.com/get-docker/
 * The docker addon for VSCode.
-* [postgre requisites](#101-prerequisites)
+* [Postgre requisites](#101-prerequisites)
+* [Flask requisites](#111-prerequisites)
+
 # 5. Setting up 
 
 
@@ -119,7 +121,7 @@ In order to register the components we are creating in python to the production 
 
 For this you can either add your components in the `./iris.script` file but you will need to rebuild everytime you add a component.<br>We advise you to use the build-in python console to add manually the component at first when you are working on the project and then add them in the `iris.script` if you want to come back later ( or you will have to do it every time you rebuild the container )
 
-You will find those commands in the `misc/register.py` file.<br>To use them you nedd to firstly create the component then you can start a terminal in VSCode ( it will be automatically in the container if you followed step [5.2.](#52-management-portal-and-vscode)) and enter :
+You will find those commands in the `misc/register.py` file.<br>To use them you need to firstly create the component then you can start a terminal in VSCode ( it will be automatically in the container if you followed step [5.2.](#52-management-portal-and-vscode)) and enter :
 '''
 /usr/irissys/bin/irispython
 '''
@@ -134,12 +136,18 @@ Now you can register your component using :
 ```
 iris.cls("Grongier.PEX.Utils").RegisterComponent("bo","FileOperation","/irisdev/app/src/python/",1,"Python.FileOperation")
 ```
-This line will register the class `FileOperation` inside the file `bo` at `/irisdev/app/src/python/` (which is the right path if you follow this course) using the name `Python.FileOperation`in the management portal.
+This line will register the class `FileOperation` inside the file `bo` at `/irisdev/app/src/python/` (which is the right path if you follow this course) using the name `Python.FileOperation` in the management portal.
 
 It is to be noted that if you don't change to name of the file or the class, if a component was registered you can modify it on VSCode without the need to register it again. Just don't forget to restart it in the management portal.
 
 # 6. Productions 
-We can now create our first production. For this, we will go through the [Interoperability] and [Configure] menus: 
+
+A production is the base of all our work on Iris, it must be seen as the shell of our [framework](#2-framework) that will hold the services, processes and operations.
+Everything in the production is going to inherit functions, They are the `OnInit` function that resolve at the creation of an instance of this class and the `OnTearDown` function that resolve when the instance is killed.
+This will be useful to set variables or close a used open file for writing.
+
+We can now create our first production.<br>
+For this, we will go through the [Interoperability] and [Configure] menus: 
 
 ![ProductionMenu](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ProductionMenu.png)
 
@@ -153,19 +161,20 @@ Immediatly after creating our production, we will need to click on [Production S
 
 In this first production we will now add Business Operations.
 
-# 7. Operations
+# 7. Business Operations
 
 A Business Operation (BO) is a specific operation that will enable us to send requests from IRIS to an external application / system. It can also be used to directly save in IRIS what we want.
+BO aslo have an `OnMessage` function that will be called everytime this instance receive a message from any source, this will allow us to receive information from a source and do something with it.
 
-We will create those operations in local, that is, in the `python/bo.py` file. Saving the files will compile them in IRIS. 
+We will create those operations in local in VSCode, that is, in the `python/bo.py` file.<br>Saving the files will compile them in IRIS. 
 
-For our first operation we will save the content of a message in the local database.
+For our first operations we will save the content of a message in the local database and write the same information localy in a .txt file.
 
 We need to have a way of storing this message first. 
 
 ## 7.1. Creating our storage classes
-WIP AVEC IRIS.SQL
-Storage classes are `dataclass`. We will need to use `misc/init.iris.sql` and `misc/init.sql` in order to create in IRIS the Table `iris.Formation`
+
+We will use `dataclass` to hold information in our messages.
 
 In our `python/obj.py` file we have: 
 ```python
@@ -179,13 +188,13 @@ class Formation:
     salle:str = None
 
 @dataclass
-class FormationIris:
+class Training:
 
     name:str = None
     room:str = None
 ```
 
-The Formation class will be used as a Python object to read a csv and write in a texte file later on, while the FormationIris class will be used as a way to interact with the Iris database.
+The Formation class will be used as a Python object to read a csv and write in a texte file later on, while the Training class will be used as a way to interact with the Iris database.
 
 ## 7.2. Creating our message classes
 
@@ -206,12 +215,12 @@ class FormationRequest(grongier.pex.Message):
     formation:Formation = None
 
 @dataclass
-class FormationIrisRequest(grongier.pex.Message):
+class TrainingIrisRequest(grongier.pex.Message):
 
     formation:FormationIris = None
 ```
 
-Again, the FormationRequest class will be used as a message to read a csv and write in a texte file later on, while the FormationIrisRequest class will be used as a message to interact with the Iris database.
+Again, the `FormationRequest` class will be used as a message to read a csv and write in a texte file later on, while the `TrainingIrisRequest` class will be used as a message to interact with the Iris database.
 
 ## 7.3. Creating our operations
 
@@ -219,18 +228,19 @@ Now that we have all the elements we need, we can create our operations.
 Note that any Business Operation inherit from the `grongier.pex.BusinessOperation` class.
 In the `python/bo.py` file we have: 
 ```python
-import grongier.pex
-import datetime
+from grongier.pex import BusinessOperation
 import os
+import iris
 
-from msg import FormationIrisRequest
-from msg import FormationRequest
+from msg import TrainingIrisRequest,FormationRequest
 
-class FileOperation(grongier.pex.BusinessOperation):
+class FileOperation(BusinessOperation):
 
     def OnInit(self):
         if hasattr(self,'Path'):
             os.chdir(self.Path)
+        else:
+            os.chdir("/tmp")
 
     def OnMessage(self, pRequest):
         if isinstance(pRequest,FormationRequest):
@@ -259,38 +269,41 @@ class FileOperation(grongier.pex.BusinessOperation):
         except Exception as e:
             raise e
 
-class IrisOperation(grongier.pex.BusinessOperation):
+class IrisOperation(BusinessOperation):
 
     def OnMessage(self, request):
-        if isinstance(request,FormationIrisRequest):
+        if isinstance(request,TrainingirisRequest):
             sql = """
-            INSERT INTO iris.formation
+            INSERT INTO iris.training
             ( name, room )
             VALUES( ?, ? )
             """
-            iris.sql.exec(sql,request.formation.name,request.formation.room)
+            iris.sql.exec(sql,request.training.name,request.training.room)
         
         return 
 ```
 
-There is for now no MessageMap method to launch depending on the type of the request (the message sent to the operation) therefore it is needed to use, if necessary to protect the code, multiple if conditions on the message type using for example `isinstance()` as seen in our `bo.py` file.
+It is needed to use, if necessary to protect the code, multiple if conditions on the message type using for example `isinstance()` as seen in our `bo.py` file.<br>That way, if a wrong message arrive to our operation, nothing will happen.
 
-As we can see, if the `FileOperation` receive a message of the type `msg.FormationRequest`, the information hold by the message will be written down on the `toto.csv` file.<br>Note that you could make `filename` a variable with a base value of `toto.csv` that can be change directly onto the management portal by doing :
+As we can see, if the `FileOperation` receive a message of the type `msg.FormationRequest`, the information hold by the message will be written down on the `toto.csv` file.<br>Note that `Path` is already a parameter of the operation and you could make `filename` a variable with a base value of `toto.csv` that can be change directly onto the management portal by doing :
 ```python
     def OnInit(self):
         if hasattr(self,'Path'):
             os.chdir(self.Path)
+        else:
+            os.chdir("/tmp")
         if not hasattr(self,'Filename'):
           self.Filename = 'toto.csv'
 ```
 
-As we can see, if the `IrisOperation` receive a message of the type `msg.FormationIrisRequest`, the information hold by the message will be transformed into an SQL querry and executed by the `iris.sql.exec` IrisPython function. This method will save the message in the IRIS local database.
+As we can see, if the `IrisOperation` receive a message of the type `msg.TrainingIrisRequest`, the information hold by the message will be transformed into an SQL querry and executed by the `iris.sql.exec` IrisPython function. This method will save the message in the IRIS local database.
 
 Don't forget to register your component :
 Following [5.4.](#54-register-components) and using:
 ```
 iris.cls("Grongier.PEX.Utils").RegisterComponent("bo","FileOperation","/irisdev/app/src/python/",1,"Python.FileOperation")
 ```
+
 And:
 ```
 iris.cls("Grongier.PEX.Utils").RegisterComponent("bo","IrisOperation","/irisdev/app/src/python/",1,"Python.IrisOperation")
@@ -298,7 +311,7 @@ iris.cls("Grongier.PEX.Utils").RegisterComponent("bo","IrisOperation","/irisdev/
 
 ## 7.4. Adding the operations to the production
 
-We now need to add these operations to the production. For this, we use the Management Portal. By pressing the [+] sign next to [Operations], we have access to the [Business Operation Wizard]. There, we chose the operation classes we just created in the scrolling menu. 
+We now need to add these operations to the production. For this, we use the Management Portal. By pressing the [+] sign next to [Operations], we have access to the [Business Operation Wizard].<br>There, we chose the operation classes we just created in the scrolling menu. 
 
 ![OperationCreation](https://github.com/LucasEnard/formation-template/blob/python/misc/img/PythonOperationCreation.png)
 
@@ -327,7 +340,8 @@ et comment accéder avec bash + cat toto.csv
 
 Business Processes (BP) are the business logic of our production. They are used to process requests or relay those requests to other components of the production.
 
-Business Processes are created in VSCode.
+We will create those process in local in VSCode, that is, in the `python/bp.py` file.<br>Saving the files will compile them in IRIS. 
+
 
 ## 8.1. Simple BP
 
@@ -335,26 +349,26 @@ We now have to create a Business Process to process the information coming from 
 
 Since our BP will only redirect information we will call it `Router` and it will be in the file `python/bp.py` like this :
 ```python
-import grongier.pex
+from grongier.pex import BusinessProcess
 
-from msg import FormationRequest, FormationIrisRequest
-from obj import FormationIris
+from msg import FormationRequest, TrainingIrisRequest
+from obj import Training
 
 
-class Router(grongier.pex.BusinessProcess):
+class Router(BusinessProcess):
 
     def OnRequest(self, request):
         if isinstance(request,FormationRequest):
-            msg = FormationIrisRequest()
-            msg.formation = FormationIris()
-            msg.formation.name = request.formation.nom
-            msg.formation.room = request.formation.salle
+            msg = TrainingIrisRequest()
+            msg.training = Training()
+            msg.training.name = request.formation.nom
+            msg.training.room = request.formation.salle
             self.SendRequestSync('Python.FileOperation',request)
             self.SendRequestSync('Python.IrisOperation',msg)
 
         return 
 ```
-As we can see, if the IrisOperation receive a message of the type `msg.FormationRequest`, the information hold by the message will be send directly to `Python.FileOperation` with the `SendRequestSync` function to be written down on our .txt. We will also create a `msg.FormationIrisRequest` in order to call `Python.IrisOperation` the same way.
+As we can see, if the IrisOperation receive a message of the type `msg.FormationRequest`, the information hold by the message will be send directly to `Python.FileOperation` with the `SendRequestSync` function to be written down on our .txt. We will also create a `msg.TrainingIrisRequest` in order to call `Python.IrisOperation` the same way.
 
 Don't forget to register your component :
 Following [5.4.](#54-register-components) and using:
@@ -380,20 +394,22 @@ If all goes well, showing the visual trace will enable us to see what happened b
 
 Business Service (BS) are the ins of our production. They are used to gather information and send them to our routers.
 
+We will create those services in local in VSCode, that is, in the `python/bs.py` file.<br>Saving the files will compile them in IRIS.
+
 ## 9.1. Simple BS
 
 We now have to create a Business Service to read a CSV and send each line as a `msg.FormationRequest` to the router.
 
 Since our BS will read a csv we will call it `ServiceCSV` and it will be in the file `python/bs.py` like this :
 ```python
-import grongier.pex
+from grongier.pex import BusinessService
 
 from dataclass_csv import DataclassReader
 
 from obj import Formation
 from msg import FormationRequest
 
-class ServiceCSV(grongier.pex.BusinessService):
+class ServiceCSV(BusinessService):
 
     def getAdapterType():
         """
@@ -450,17 +466,14 @@ In order to use postgre we will need to install psycopg2 which is a python modul
 pip3 install psycopg2-binary
 ```
 
-WIP talk about docker script ?? install auto ??
-
 ## 10.2. Creating our new operation
 
 Our new operation needs to be added after the two other one in the file `python/bo.py`.
 Our new operation and the imports are as follows: 
-
 ````python
 import psycopg2
 
-class PostgresOperation(grongier.pex.BusinessOperation):
+class PostgresOperation(BusinessOperation):
 
     def OnInit(self):
         self.conn = psycopg2.connect(
@@ -547,7 +560,7 @@ As an exercise, it could be interesting to modify bo.IrisOperation so that it re
 First, we need to have a response from our bo.IrisOperation . We are going to create a new message after the other two, in the `python/msg.py`:
 ````python
 @dataclass
-class FormationIrisResponse(grongier.pex.Message):
+class TrainingirisResponse(Message):
 
     bool:Boolean = None
 ````
@@ -555,39 +568,38 @@ class FormationIrisResponse(grongier.pex.Message):
 Then, we change the response of bo.IrisOperation by that response, and set the value of its boolean randomly (or not).<br>In the `python/bo.py`you need to add two imports and change the IrisOperation class:
 ````python
 import random
-from msg import FormationIrisResponse
+from msg import TrainingIrisResponse
 
-class IrisOperation(grongier.pex.BusinessOperation):
+class IrisOperation(BusinessOperation):
 
     def OnMessage(self, request):
-        if isinstance(request,FormationIrisRequest):
-            resp = FormationIrisResponse()
+        if isinstance(request,TrainingIrisRequest):
+            resp = TrainingIrisResponse()
             resp.bool = (random.random() < 0.5)
             sql = """
-            INSERT INTO iris.formation
+            INSERT INTO iris.training
             ( name, room )
             VALUES( ?, ? )
             """
-            iris.sql.exec(sql,request.formation.name,request.formation.room)
+            iris.sql.exec(sql,request.training.name,request.training.room)
             return resp
         
-        return 
+        return
 ````
 
 We will now change our process `bp.Router` in `python/bp.py` , where we will make it so that if the response from the IrisOperation has a boolean equal to True it will call the PostgesOperation.
 Here is the new code :
 ```python
-class Router(grongier.pex.BusinessProcess):
+class Router(BusinessProcess):
 
     def OnRequest(self, request):
         if isinstance(request,FormationRequest):
-            msg = FormationIrisRequest()
-            msg.formation = FormationIris()
-            msg.formation.name = request.formation.nom
-            msg.formation.room = request.formation.salle
+            msg = TrainingIrisRequest()
+            msg.training = Training()
+            msg.training.name = request.formation.nom
+            msg.training.room = request.formation.salle
             self.SendRequestSync('Python.FileOperation',request)
             formIrisResp = self.SendRequestSync('Python.IrisOperation',msg)
-
             if formIrisResp.bool:
                 self.SendRequestSync('Python.PostgresOperation',request)
 
@@ -617,14 +629,14 @@ pip3 install flask
 To create a REST service, we will need a service that will link our API to our porduction, for this we create a new simple service in `python/bs.py` just after the `ServiceCSV` class.
 WIP
 ```python
-class FlaskService(grongier.pex.BusinessService):
+class FlaskService(BusinessService):
 
     def OnInit(self):
         
         if not hasattr(self,'Target'):
             self.Target = "Python.Router"
         
-        return 1
+        return
 
     def OnProcessInput(self,request):
 

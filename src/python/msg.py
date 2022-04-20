@@ -1,20 +1,20 @@
 from dataclasses import dataclass
 from xmlrpc.client import Boolean
-import grongier.pex
+from grongier.pex import Message
 
-from obj import Formation,FormationIris
+from obj import Formation,Training
 
 @dataclass
-class FormationRequest(grongier.pex.Message):
+class FormationRequest(Message):
 
     formation:Formation = None
 
 @dataclass
-class FormationIrisRequest(grongier.pex.Message):
+class TrainingIrisRequest(Message):
 
-    formation:FormationIris = None
+    training:Training = None
 
 @dataclass
-class FormationIrisResponse(grongier.pex.Message):
+class TrainingIrisResponse(Message):
 
     bool:Boolean = None

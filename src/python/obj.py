@@ -8,7 +8,7 @@ class Formation:
     salle:str = None
 
 @dataclass
-class FormationIris:
+class Training:
 
     name:str = None
     room:str = None

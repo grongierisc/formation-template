@@ -1,17 +1,17 @@
-import grongier.pex
+from grongier.pex import BusinessProcess
 
-from msg import FormationRequest, FormationIrisRequest
-from obj import FormationIris
+from msg import FormationRequest, TrainingIrisRequest
+from obj import Training
 
 
-class Router(grongier.pex.BusinessProcess):
+class Router(BusinessProcess):
 
     def OnRequest(self, request):
         if isinstance(request,FormationRequest):
-            msg = FormationIrisRequest()
-            msg.formation = FormationIris()
-            msg.formation.name = request.formation.nom
-            msg.formation.room = request.formation.salle
+            msg = TrainingIrisRequest()
+            msg.training = Training()
+            msg.training.name = request.formation.nom
+            msg.training.room = request.formation.salle
             self.SendRequestSync('Python.FileOperation',request)
             formIrisResp = self.SendRequestSync('Python.IrisOperation',msg)
             if formIrisResp.bool:

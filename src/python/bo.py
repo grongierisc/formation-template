@@ -1,20 +1,19 @@
-import grongier.pex
-import datetime
+from grongier.pex import BusinessOperation
 import iris
 import os
 import psycopg2
 
 import random
 
-from msg import FormationIrisRequest
-from msg import FormationRequest
-from msg import FormationIrisResponse
+from msg import TrainingIrisRequest,FormationRequest,TrainingIrisResponse
 
-class FileOperation(grongier.pex.BusinessOperation):
+class FileOperation(BusinessOperation):
 
     def OnInit(self):
         if hasattr(self,'Path'):
             os.chdir(self.Path)
+        else:
+            os.chdir("/tmp")
 
     def OnMessage(self, pRequest):
         if isinstance(pRequest,FormationRequest):
@@ -27,8 +26,7 @@ class FileOperation(grongier.pex.BusinessOperation):
 
             line = id+" : "+salle+" : "+nom+" : "
 
-            #filename = '/tmp/toto.csv'
-            filename = '/tmp/toto.csv'
+            filename = 'toto.csv'
 
             self.PutLine(filename, line)
             self.PutLine(filename, " * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *")
@@ -44,23 +42,23 @@ class FileOperation(grongier.pex.BusinessOperation):
         except Exception as e:
             raise e
 
-class IrisOperation(grongier.pex.BusinessOperation):
+class IrisOperation(BusinessOperation):
 
     def OnMessage(self, request):
-        if isinstance(request,FormationIrisRequest):
-            resp = FormationIrisResponse()
+        if isinstance(request,TrainingIrisRequest):
+            resp = TrainingIrisResponse()
             resp.bool = (random.random() < 0.5)
             sql = """
-            INSERT INTO iris.formation
+            INSERT INTO iris.training
             ( name, room )
             VALUES( ?, ? )
             """
-            iris.sql.exec(sql,request.formation.name,request.formation.room)
+            iris.sql.exec(sql,request.training.name,request.training.room)
             return resp
         
         return
 
-class PostgresOperation(grongier.pex.BusinessOperation):
+class PostgresOperation(BusinessOperation):
 
     def OnInit(self):
         if not hasattr(self,'FileName'):
@@ -74,7 +72,7 @@ class PostgresOperation(grongier.pex.BusinessOperation):
         port="5432")
         self.conn.autocommit = True
 
-        return 1
+        return 
 
     def OnTearDown(self):
         self.conn.close()

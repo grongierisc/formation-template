@@ -1,11 +1,11 @@
-import grongier.pex
+from grongier.pex import BusinessService
 
 from dataclass_csv import DataclassReader
 
 from obj import Formation
 from msg import FormationRequest
 
-class ServiceCSV(grongier.pex.BusinessService):
+class ServiceCSV(BusinessService):
 
     def getAdapterType():
         """
@@ -30,14 +30,14 @@ class ServiceCSV(grongier.pex.BusinessService):
 
         return
 
-class FlaskService(grongier.pex.BusinessService):
+class FlaskService(BusinessService):
 
     def OnInit(self):
         
         if not hasattr(self,'Target'):
             self.Target = "Python.Router"
         
-        return 1
+        return
 
     def OnProcessInput(self,request):
 
