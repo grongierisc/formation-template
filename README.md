@@ -47,7 +47,13 @@
   - [11.1. Prerequisites](#111-prerequisites)
   - [11.2. Creating the service](#112-creating-the-service)
   - [11.3. Testing](#113-testing)
-- [Conclusion](#conclusion)
+- [12. Global exercise](#12-global-exercise)
+  - [12.1. Instructions](#121-instructions)
+  - [12.2. Hints](#122-hints)
+    - [12.2.1. Small hints](#1221-small-hints)
+    - [12.2.2. Medium hints](#1222-medium-hints)
+  - [12.3. Solutions](#123-solutions)
+- [13. Conclusion](#13-conclusion)
 
 # 2. Framework
 
@@ -169,7 +175,7 @@ BO also have an `OnMessage` function that will be called everytime this instance
 
 We will create those operations in local in VSCode, that is, in the `python/bo.py` file.<br>Saving this file will compile them in IRIS. 
 
-For our first operations we will save the content of a message in the local database and write the same information localy in a .txt file.
+For our first operations we will save the content of a message in the local database and write the same information locally in a .txt file.
 
 We need to have a way of storing this message first. 
 
@@ -757,7 +763,30 @@ WIP gif with the wrong http link.
 
 ![RESTTest](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/RESTTest.gif)
 
-# Conclusion
+
+# 12. Global exercise
+
+WIP
+
+Now that we are familliar with all the important concepts of the Iris DataPlatform and its [Framework](#2-framework) it is time to try ourselves on a global exercise that will make us create a new BS and BP, modify greatly our BO and also explore new concept in Python.
+
+## 12.1. Instructions
+Using this **endpoint** : ` WIP endpoint` we have to **fetch** information about ` WIP type of info`.
+Then, we must ` WIP simple process like avg on data and router` before writing it down on a csv file locally.
+
+If needed, it is advised to seek guidance by rereading through the whole formation or the parts needed or by seeking help using the [hints](#122-hints) below.
+
+When everything is done and tested, or if the hints aren't enough to complete the exercise, the [solution](#123-solutions) step-by-step is present to walk us through the whole procedure.
+
+## 12.2. Hints
+In this part we can find hints to do the exercise, the [small hints](#1221-small-hints) are a light guidance on how to accomplish our task and the [medium hints](#1222-medium-hints) are a small walk-through of the exercise.
+
+### 12.2.1. Small hints
+### 12.2.2. Medium hints
+## 12.3. Solutions
+
+
+# 13. Conclusion
 
 Through this formation, we have created a fully fonctional production using only IrisPython that is able to read lines from a csv file and save the read data into a local txt, the IRIS database and an extern database using JDBC. <br>We also added a REST service in order to use the POST verb to save new objects.
 
