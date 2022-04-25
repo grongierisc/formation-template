@@ -4,7 +4,7 @@ ARG IMAGE=intersystemsdc/iris-community:latest
 FROM $IMAGE
 # copy files
 COPY . /tmp/iris
-
+COPY requirements.txt /opt/irisapp/requirements.txt
 USER root
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -24,6 +24,7 @@ WORKDIR /opt/irisapp
 RUN chown ${ISC_PACKAGE_MGRUSER}:${ISC_PACKAGE_IRISGROUP} /opt/irisapp
 USER ${ISC_PACKAGE_MGRUSER}
 
+RUN pip install -r requirements.txt
 # load demo stuff
 RUN iris start IRIS \
 	&& iris session IRIS < /tmp/iris/iris.script && iris stop IRIS quietly

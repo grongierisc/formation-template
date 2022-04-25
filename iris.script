@@ -16,6 +16,8 @@
     zw $SYSTEM.OBJ.ImportDir("/tmp/iris/src", "*.cls", "cubk", .tErrors, 1)
     zpm "install pex-embbeded-python"
 
+    DO $SYSTEM.SQL.Schema.ImportDDL("misc/init.iris.sql",,"IRIS")
+
     zw ##class(Grongier.PEX.Utils).RegisterComponent("bo","FileOperation","/irisdev/app/src/python/",1,"Python.FileOperation")
     zw ##class(Grongier.PEX.Utils).RegisterComponent("bo","IrisOperation","/irisdev/app/src/python/",1,"Python.IrisOperation")
     zw ##class(Grongier.PEX.Utils).RegisterComponent("bp","Router","/irisdev/app/src/python/",1,"Python.Router")

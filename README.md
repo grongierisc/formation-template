@@ -61,13 +61,13 @@ This is the IRIS Framework.
 
 ![FrameworkFull](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/FrameworkFull.png)
 
-The components inside of IRIS represent a production. Inbound adapters and outbound adapters enable us to use different kind of format as input and output for our databse. The composite applications will give us access to the production through external applications like REST services.
+The components inside of IRIS represent a production. Inbound adapters and outbound adapters enable us to use different kind of format as input and output for our databse. <br>The composite applications will give us access to the production through external applications like REST services.
 
 The arrows between them all of this components are **messages**. They can be requests or responses.
 
 # 3. Adapting the framework
 
-In our case, we will read lines in a csv file and save it into the IRIS database. 
+In our case, we will read lines from a csv file and save it into the IRIS database and in a .txt file. 
 
 We will then add an operation that will enable us to save objects in an extern database too, using JDBC. This database will be located in a docker container, using postgre.
 
@@ -250,22 +250,24 @@ class FileOperation(BusinessOperation):
         else:
             os.chdir("/tmp")
 
-    def OnMessage(self, pRequest):
-        if isinstance(pRequest,FormationRequest):
-            id = salle = nom = ""
+    def WriteFormation(self, pRequest:FormationRequest):
+        id = salle = nom = ""
 
-            if (pRequest.formation is not None):
-                id = str(pRequest.formation.id)
-                salle = pRequest.formation.salle
-                nom = pRequest.formation.nom
+        if (pRequest.formation is not None):
+            id = str(pRequest.formation.id)
+            salle = pRequest.formation.salle
+            nom = pRequest.formation.nom
 
-            line = id+" : "+salle+" : "+nom+" : "
+        line = id+" : "+salle+" : "+nom+" : "
 
-            filename = 'toto.csv'
+        filename = 'toto.csv'
 
-            self.PutLine(filename, line)
-            self.PutLine(filename, " * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *")
+        self.PutLine(filename, line)
+        self.PutLine(filename, " * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *")
 
+        return 
+
+    def OnMessage(self, request):
         return 
 
 
@@ -277,21 +279,24 @@ class FileOperation(BusinessOperation):
         except Exception as e:
             raise e
 
+
 class IrisOperation(BusinessOperation):
 
-    def OnMessage(self, request):
-        if isinstance(request,TrainingirisRequest):
-            sql = """
-            INSERT INTO iris.training
-            ( name, room )
-            VALUES( ?, ? )
-            """
-            iris.sql.exec(sql,request.training.name,request.training.room)
+    def InsertTraining(self, request:TrainingIrisRequest):
+        sql = """
+        INSERT INTO iris.training
+        ( name, room )
+        VALUES( ?, ? )
+        """
+        iris.sql.exec(sql,request.training.name,request.training.room)
+        return
         
-        return 
+    def OnMessage(self, request):
+        return
 ```
 
-It is needed to use, if necessary to protect the code, multiple **if** conditions on the message type using for example `isinstance()` as seen in our `bo.py` file.<br>That way, if a message that was not foreseen arrive to our operation no code will be run.
+When one of the operation receive a message/request, it will automatically dispatch the message/request to the correct function depending of the type of message/request specified in the signature of each function.
+If the type of the message/request is not handled, it will be forwarded to the `OnMessage` function.
 
 As we can see, if the `FileOperation` receive a message of the type `msg.FormationRequest`, the information hold by the message will be written down on the `toto.csv` file.<br>Note that `Path` is already a parameter of the operation and you could make `filename` a variable with a base value of `toto.csv` that can be change directly onto the management portal by doing :
 ```python
@@ -342,8 +347,7 @@ For FileOperation it is to be noted that you must fill the Path in the `%setting
 You should get a result like this :
 ![FileOperation](https://user-images.githubusercontent.com/77791586/164474286-0eaa6f27-e56f-4a87-b12a-9dab57c21506.png)
 
-WIP ajouter screenshot pour IrisOperation et FileOperation (avec le nom de la table créée et le fichier txt créé)
-et comment accéder avec bash + cat toto.csv<br>
+WIP ajouter screenshot
 In order to see if our operations worked it is needed for us to acces the toto.csv file and the Iris DataBase to see the changes.<br>
 To access the toto.csv you will need to open a terminal inside the container then type:
 ```
@@ -356,7 +360,7 @@ cat toto.csv
 To access the Iris DataBase you will need to access the management portal and seek [System Explorer] then [SQL] then [Go].
 Now you can enter in the [Execute Query] :
 ```
-SELECT * FROM WIP
+SELECT * FROM ( WIP with iris script etc)
 ```
 
 
@@ -364,7 +368,7 @@ SELECT * FROM WIP
 # 8. Business Processes
 
 **Business Processes** (BP) are the business logic of our production. They are used to process requests or relay those requests to other components of the production.<br>
-BP also have an `OnRequest` function that will be called everytime this instance receive a request from any source, this will allow us to (WIP)receive information and process it in anyway and disptach it to the right BO.
+BP also have an `OnRequest` function that will be called everytime this instance receive a request from any source, this will allow us to receive information and process it in anyway and disptach it to the right BO.
 
 We will create those process in local in VSCode, that is, in the `python/bp.py` file.<br>Saving this file will compile them in IRIS. 
 
@@ -394,7 +398,8 @@ class Router(BusinessProcess):
 
         return 
 ```
-As we can see, if the IrisOperation receive a message of the type `msg.FormationRequest`, the information hold by the message will be send directly to `Python.FileOperation` with the `SendRequestSync` function to be written down on our .txt. <br>We will also create a `msg.TrainingIrisRequest` in order to call `Python.IrisOperation` the same way.
+The Router will receive a request of the type `FormationRequest` and will send a message of the type `TrainingIrisRequest` to the `IrisOperation` operation.
+If the message/request is not an instance of the type we are looking for, we will just do nothing and not dispatch it.
 
 Don't forget to register your component :
 Following [5.4.](#54-register-components) and using:
@@ -453,7 +458,6 @@ class ServiceCSV(BusinessService):
         return
 
     def OnProcessInput(self,request):
-
         filename='formation.csv'
         with open(self.Path+filename) as formation_csv:
             reader = DataclassReader(formation_csv, Formation,delimiter=";")
@@ -504,6 +508,9 @@ import psycopg2
 class PostgresOperation(BusinessOperation):
 
     def OnInit(self):
+        if not hasattr(self,'FileName'):
+            self.FileName = "/tmp/test.txt"
+
         self.conn = psycopg2.connect(
         host="db",
         database="DemoData",
@@ -512,17 +519,19 @@ class PostgresOperation(BusinessOperation):
         port="5432")
         self.conn.autocommit = True
 
-        return 1
+        return 
 
     def OnTearDown(self):
         self.conn.close()
 
-    def OnMessage(self,request):
+    def InsertTraining(self,request:FormationRequest):
         cursor = self.conn.cursor()
-        if isinstance(request,FormationRequest):
-            sql = "INSERT INTO public.formation ( id,nom,salle ) VALUES ( %s , %s , %s )"
-            cursor.execute(sql,(request.formation.id,request.formation.nom,request.formation.salle))
+        sql = "INSERT INTO public.formation ( id,nom,salle ) VALUES ( %s , %s , %s )"
+        cursor.execute(sql,(request.formation.id,request.formation.nom,request.formation.salle))
         return 
+    
+    def OnMessage(self,request):
+        return
 ````
 It is to be noted that it is better if you put the `import psycopg2` at the beginning of the file with the other imports for clarity.
 This operation is similar to the first one we created. When it will receive a message of the type `msg.FormationRequest`, it will use the psycopg module to execute SQL requests. Those requests will be sent to our postgre database.
@@ -600,18 +609,18 @@ from msg import TrainingIrisResponse
 
 class IrisOperation(BusinessOperation):
 
-    def OnMessage(self, request):
-        if isinstance(request,TrainingIrisRequest):
-            resp = TrainingIrisResponse()
-            resp.bool = (random.random() < 0.5)
-            sql = """
-            INSERT INTO iris.training
-            ( name, room )
-            VALUES( ?, ? )
-            """
-            iris.sql.exec(sql,request.training.name,request.training.room)
-            return resp
+    def InsertTraining(self, request:TrainingIrisRequest):
+        resp = TrainingIrisResponse()
+        resp.bool = (random.random() < 0.5)
+        sql = """
+        INSERT INTO iris.training
+        ( name, room )
+        VALUES( ?, ? )
+        """
+        iris.sql.exec(sql,request.training.name,request.training.room)
+        return resp
         
+    def OnMessage(self, request):
         return
 ````
 

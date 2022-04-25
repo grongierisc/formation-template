@@ -15,22 +15,24 @@ class FileOperation(BusinessOperation):
         else:
             os.chdir("/tmp")
 
-    def OnMessage(self, pRequest):
-        if isinstance(pRequest,FormationRequest):
-            id = salle = nom = ""
+    def WriteFormation(self, pRequest:FormationRequest):
+        id = salle = nom = ""
 
-            if (pRequest.formation is not None):
-                id = str(pRequest.formation.id)
-                salle = pRequest.formation.salle
-                nom = pRequest.formation.nom
+        if (pRequest.formation is not None):
+            id = str(pRequest.formation.id)
+            salle = pRequest.formation.salle
+            nom = pRequest.formation.nom
 
-            line = id+" : "+salle+" : "+nom+" : "
+        line = id+" : "+salle+" : "+nom+" : "
 
-            filename = 'toto.csv'
+        filename = 'toto.csv'
 
-            self.PutLine(filename, line)
-            self.PutLine(filename, " * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *")
+        self.PutLine(filename, line)
+        self.PutLine(filename, " * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *")
 
+        return 
+
+    def OnMessage(self, request):
         return 
 
 
@@ -44,18 +46,18 @@ class FileOperation(BusinessOperation):
 
 class IrisOperation(BusinessOperation):
 
-    def OnMessage(self, request):
-        if isinstance(request,TrainingIrisRequest):
-            resp = TrainingIrisResponse()
-            resp.bool = (random.random() < 0.5)
-            sql = """
-            INSERT INTO iris.training
-            ( name, room )
-            VALUES( ?, ? )
-            """
-            iris.sql.exec(sql,request.training.name,request.training.room)
-            return resp
+    def InsertTraining(self, request:TrainingIrisRequest):
+        resp = TrainingIrisResponse()
+        resp.bool = (random.random() < 0.5)
+        sql = """
+        INSERT INTO iris.training
+        ( name, room )
+        VALUES( ?, ? )
+        """
+        iris.sql.exec(sql,request.training.name,request.training.room)
+        return resp
         
+    def OnMessage(self, request):
         return
 
 class PostgresOperation(BusinessOperation):
@@ -77,9 +79,11 @@ class PostgresOperation(BusinessOperation):
     def OnTearDown(self):
         self.conn.close()
 
-    def OnMessage(self,request):
+    def InsertTraining(self,request:FormationRequest):
         cursor = self.conn.cursor()
-        if isinstance(request,FormationRequest):
-            sql = "INSERT INTO public.formation ( id,nom,salle ) VALUES ( %s , %s , %s )"
-            cursor.execute(sql,(request.formation.id,request.formation.nom,request.formation.salle))
+        sql = "INSERT INTO public.formation ( id,nom,salle ) VALUES ( %s , %s , %s )"
+        cursor.execute(sql,(request.formation.id,request.formation.nom,request.formation.salle))
         return 
+    
+    def OnMessage(self,request):
+        return

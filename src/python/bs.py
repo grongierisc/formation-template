@@ -19,7 +19,6 @@ class ServiceCSV(BusinessService):
         return
 
     def OnProcessInput(self,request):
-
         filename='formation.csv'
         with open(self.Path+filename) as formation_csv:
             reader = DataclassReader(formation_csv, Formation,delimiter=";")
