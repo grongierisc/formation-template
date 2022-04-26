@@ -21,4 +21,5 @@ class TrainingIrisResponse(Message):
 
 @dataclass
 class PatientRequest(Message):
+    
     patient:Patient = None
