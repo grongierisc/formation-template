@@ -1,6 +1,6 @@
 from grongier.pex import BusinessProcess
 
-from msg import FormationRequest, TrainingIrisRequest
+from msg import FormationRequest, TrainingIrisRequest,PatientRequest
 from obj import Training
 
 
@@ -16,5 +16,14 @@ class Router(BusinessProcess):
             formIrisResp = self.SendRequestSync('Python.IrisOperation',msg)
             if formIrisResp.bool:
                 self.SendRequestSync('Python.PostgresOperation',request)
+
+        return 
+
+class PatientProcess(BusinessProcess):
+
+    def OnRequest(self, request):
+        if isinstance(request,PatientRequest):
+            request.patient.avg = statistics.mean(list(map(lambda x: int(x['steps']),request.patient.infos)))
+            self.SendRequestSync('Python.FileOperation',request)
 
         return 

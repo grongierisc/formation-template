@@ -5,7 +5,9 @@ import psycopg2
 
 import random
 
-from msg import TrainingIrisRequest,FormationRequest,TrainingIrisResponse
+import statistics
+
+from msg import TrainingIrisRequest,FormationRequest,TrainingIrisResponse,PatientRequest
 
 class FileOperation(BusinessOperation):
 
@@ -32,6 +34,23 @@ class FileOperation(BusinessOperation):
 
         return 
 
+    def WritePatient(self, pRequest:PatientRequest):
+        name = ""
+        avg = 0
+
+        if (pRequest.patient is not None):
+            name = str(pRequest.patient.name)
+            avg = pRequest.patient.avg
+
+        line = name + " avg nb steps : " + avg
+
+        filename = 'Patients.csv'
+
+        self.PutLine(filename, line)
+        self.PutLine(filename, " * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *")
+
+        return 
+        
     def OnMessage(self, request):
         return 
 

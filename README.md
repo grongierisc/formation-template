@@ -780,18 +780,75 @@ WIP
 Now that we are familliar with all the important concepts of the Iris DataPlatform and its [Framework](#2-framework) it is time to try ourselves on a global exercise that will make us create a new BS and BP, modify greatly our BO and also explore new concept in Python.
 
 ## 12.1. Instructions
-Using this **endpoint** : ` WIP endpoint` we have to **fetch** information about ` WIP type of info`.
-Then, we must ` WIP simple process like avg on data and router` before writing it down on a csv file locally.
+Using this **endpoint** : `https://lucasenard.github.io/Data/patients.json` we have to automatically **get** information about `patients and their number of steps`.
+Then, we must calculate the average number of steps per patient before writing it down on a csv file locally.
 
 If needed, it is advised to seek guidance by rereading through the whole formation or the parts needed or by seeking help using the [hints](#122-hints) below.
 
 When everything is done and tested, or if the hints aren't enough to complete the exercise, the [solution](#123-solutions) step-by-step is present to walk us through the whole procedure.
 
 ## 12.2. Hints
-In this part we can find hints to do the exercise, the [small hints](#1221-small-hints) are a light guidance on how to accomplish our task and the [medium hints](#1222-medium-hints) are a small walk-through of the exercise.
+In this part we can find hints to do the exercise, the [hints](#1221-hints) are an increasing guidance on how to accomplish different task.
 
-### 12.2.1. Small hints
-### 12.2.2. Medium hints
+### 12.2.1. hints
+
+#### bs
+##### Get information
+
+To get the information from the endpoint it is advised to search for the `requests` module of python.
+
+##### Get information with requests
+
+An online python website or any local python file can be used to use requests and print the output and it's type to go further and understand what we get.
+
+##### Get information with requests and using it
+
+It is advised to create a new message type and object type to hold information and send it to a process to calculate the average.
+
+#### bp
+##### Average and dict
+
+`statistics` is a native library that can be used to do math.
+
+##### Average and dict hint
+
+The native `map` function in python can allow you to seperate information within a list or a dict for example.
+
+Don't forget to transform the result of `map` back to a list using the `list` native function.
+
+##### Average and dict with map
+
+Using an online python website or any local python file it is possible to calculate average of a list of lists or a list of dict doing :
+```python
+l1 = [[0,5],[8,9],[5,10],[3,25]]
+l2 = [["info",12],["bidule",9],[3,3],["patient1",90]]
+l3 = [{"info1":"7","info2":0},{"info1":"15","info2":0},{"info1":"27","info2":0},{"info1":"7","info2":0}]
+
+#avg of the first columns of the first list (0/8/5/3)
+avgl1_0 = statistics.mean(list(map(lambda x: x[0]),l1))
+
+#avg of the second columns of the first list (5/9/10/25)
+avgl1_1 = statistics.mean(list(map(lambda x: x[1]),l1))
+
+#avg of 12/9/3/90
+avgl2_1 = statistics.mean(list(map(lambda x: x[1]),l2))
+
+#avg of 7/15/27/7
+avgl3_info1 = statistics.mean(list(map(lambda x: int(x["info1"])),l3))
+
+print(avgl1_0)
+print(avgl1_1)
+print(avgl2_1)
+print(avgl3_info1)
+```
+
+##### Average and dict the answer
+
+If your patient as an atribute infos which is a dict of date and number of steps, you can calculate is avergae nb of steps using :
+```python
+statistics.mean(list(map(lambda x: int(x['steps']),request.patient.infos)))
+```
+
 ## 12.3. Solutions
 
 

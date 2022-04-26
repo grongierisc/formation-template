@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from xmlrpc.client import Boolean
 from grongier.pex import Message
 
-from obj import Formation,Training
+from obj import Formation,Training,Patient
 
 @dataclass
 class FormationRequest(Message):
@@ -18,3 +18,7 @@ class TrainingIrisRequest(Message):
 class TrainingIrisResponse(Message):
 
     bool:Boolean = None
+
+@dataclass
+class PatientRequest(Message):
+    patient:Patient = None

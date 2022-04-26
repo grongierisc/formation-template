@@ -12,3 +12,9 @@ class Training:
 
     name:str = None
     room:str = None
+
+@dataclass
+class Patient:
+    name:str = None
+    avg:int = None
+    infos:List(str,str) = None
