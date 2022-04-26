@@ -1,7 +1,10 @@
+import statistics
 from grongier.pex import BusinessProcess
 
 from msg import FormationRequest, TrainingIrisRequest,PatientRequest
 from obj import Training
+
+import statistics
 
 
 class Router(BusinessProcess):

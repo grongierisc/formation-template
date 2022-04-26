@@ -50,9 +50,23 @@
 - [12. Global exercise](#12-global-exercise)
   - [12.1. Instructions](#121-instructions)
   - [12.2. Hints](#122-hints)
-    - [12.2.1. Small hints](#1221-small-hints)
-    - [12.2.2. Medium hints](#1222-medium-hints)
+    - [12.2.1. hints](#1221-hints)
+      - [bs](#bs)
+        - [Get information](#get-information)
+        - [Get information with requests](#get-information-with-requests)
+        - [Get information with requests and using it](#get-information-with-requests-and-using-it)
+        - [Get information solution](#get-information-solution)
+      - [bp](#bp)
+        - [Average and dict](#average-and-dict)
+        - [Average and dict hint](#average-and-dict-hint)
+        - [Average and dict with map](#average-and-dict-with-map)
+        - [Average and dict the answer](#average-and-dict-the-answer)
+      - [bo](#bo)
   - [12.3. Solutions](#123-solutions)
+    - [obj & msg](#obj--msg)
+    - [bs](#bs-1)
+    - [bp](#bp-1)
+    - [bo](#bo-1)
 - [13. Conclusion](#13-conclusion)
 
 # 2. Framework
@@ -805,6 +819,18 @@ An online python website or any local python file can be used to use requests an
 
 It is advised to create a new message type and object type to hold information and send it to a process to calculate the average.
 
+##### Get information solution
+
+Solution on how to use request to get data and in our case, partially what to do with it.
+```python
+r = requests.get(https://lucasenard.github.io/Data/patients.json)
+data = r.json()
+for key,val in data.items():
+    ...
+```
+
+Again, in an online python website or any local oython file, it is possible to print key, val and their type to understand what can be done with them.
+
 #### bp
 ##### Average and dict
 
@@ -844,13 +870,122 @@ print(avgl3_info1)
 
 ##### Average and dict the answer
 
-If your patient as an atribute infos which is a dict of date and number of steps, you can calculate is avergae nb of steps using :
+If your request hold a patient which as an atribute infos which is a dict of date and number of steps, you can calculate is avergae nb of steps using :
 ```python
 statistics.mean(list(map(lambda x: int(x['steps']),request.patient.infos)))
 ```
+#### bo
+
+It is advised to use something really similar to `bo.Fileoperation.WriteFormation`
+
+Something like `bo.Fileoperation.WritePatient`
 
 ## 12.3. Solutions
 
+### obj & msg
+
+In our `obj.py` we can add :
+```python
+@dataclass
+class Patient:
+    name:str = None
+    avg:int = None
+    infos = None
+```
+
+In our `msg.py` we can add :
+```python
+from obj import Formation,Training,Patient
+
+@dataclass
+class PatientRequest(Message):
+    patient:Patient = None
+```
+We will hold the information in a single obj and we will put the dict out of the get requests directly into the `infos` attribute.
+The avg will be calculated in the process.
+
+### bs
+
+In our `bs.py` we can add :
+```python
+import requests
+
+class PatientService(BusinessService):
+
+        def getAdapterType():
+            """
+            Name of the registred adaptor
+            """
+            return "Ens.InboundAdapter"
+
+        def OnInit(self):
+            if not hasattr(self,'Target'):
+                self.Target = "Python.PatientProcess"
+
+            if not hasattr(self,'ApiUrl'):
+                self.ApiUrl = "https://lucasenard.github.io/Data/patients.json"
+        
+            return
+
+        def OnProcessInput(self,request):
+            r = requests.get(self.ApiUrl)
+            if r.status_code == 200:
+
+                dat = r.json()
+
+                for key,val in dat.items():
+
+                    patient = Patient()
+                    patient.name = key
+                    patient.infos = val
+
+                    msg = PatientRequest()
+                    msg.patient = patient
+
+                    self.SendRequestSync(self.Target,msg)
+            return 
+```
+It is advised to make the target and the api url variables ( see OnInit )
+After get the information in the `r` variable, it is needed to extract the information in json, which will make `dat`a dict, using dat.items it is possible to iterate on the patient and its info directly.
+
+### bp
+In our `bp.py` we can add :
+```python
+import statistic
+
+class PatientProcess(BusinessProcess):
+
+    def OnRequest(self, request):
+        if isinstance(request,PatientRequest):
+            request.patient.avg = statistics.mean(list(map(lambda x: int(x['steps']),request.patient.infos)))
+            self.SendRequestSync('Python.FileOperation',request)
+
+        return 
+```
+
+This fills the `avg` variable of our patient with the right information ( see the hint on the bp for more information )
+
+
+### bo
+In our `bo.py` we can add, inside the class `FileOperation` :
+```python
+    def WritePatient(self, pRequest:PatientRequest):
+        name = ""
+        avg = 0
+
+        if (pRequest.patient is not None):
+            name = pRequest.patient.name
+            avg = pRequest.patient.avg
+
+        line = name + " avg nb steps : " + avg
+
+        filename = 'Patients.csv'
+
+        self.PutLine(filename, line)
+        self.PutLine(filename, " * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *")
+
+        return 
+```
 
 # 13. Conclusion
 

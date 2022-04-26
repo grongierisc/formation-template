@@ -5,7 +5,6 @@ import psycopg2
 
 import random
 
-import statistics
 
 from msg import TrainingIrisRequest,FormationRequest,TrainingIrisResponse,PatientRequest
 
@@ -39,7 +38,7 @@ class FileOperation(BusinessOperation):
         avg = 0
 
         if (pRequest.patient is not None):
-            name = str(pRequest.patient.name)
+            name = pRequest.patient.name
             avg = pRequest.patient.avg
 
         line = name + " avg nb steps : " + avg
