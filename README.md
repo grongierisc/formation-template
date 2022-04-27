@@ -89,7 +89,7 @@ Finally, we will see how to use composite applications to insert new objects in 
 
 The framework adapted to our purpose gives us:
 
-WIP changer l'image pour coller à la formation
+WIP
 ![FrameworkAdapted](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/FrameworkAdapted.png)
 
 
@@ -139,7 +139,6 @@ We will have to save our Production this way. After that, when we close our dock
 
 In order to register the components we are creating in python to the production it is needed to use the `RegisterComponent` function from the `Grongier.PEX.Utils` module.
 
-WIP remplissage register componenent iris script auto ??
 For this we advise you to use the build-in python console to add manually the component at first when you are working on the project.
 
 You will find those commands in the `misc/register.py` file.<br>To use them you need to firstly create the component then you can start a terminal in VSCode ( it will be automatically in the container if you followed step [5.2.](#52-management-portal-and-vscode)) and enter :
@@ -348,10 +347,21 @@ We now need to add these operations to the production. For this, we use the Mana
 Double clicking on the operation will enable us to activate it. After that, by selecting the operation and going in the [Actions] tabs in the right sidebar menu, we should be able to test the operation (if not see the production creation part to activate testings / you may need to start the production if stopped).
 
 By doing so, we will send the operation a message of the type we declared earlier. If all goes well, showing the visual trace will enable us to see what happened between the processes, services and operations. <br>Here, we can see the message being sent to the operation by the process, and the operation sending back a response (that is just an empty string).
+
+For IrisOperation it is to be noted that the table must be created before use.
+To access the Iris DataBase you will need to access the management portal and seek [System Explorer] then [SQL] then [Go].
+Now you can enter in the [Execute Query] :
+```
+CREATE TABLE iris.training (
+	name varchar(50) NULL,
+	room varchar(50) NULL
+);
+```
+
 You should get a result like this :
 ![IrisOperation](https://user-images.githubusercontent.com/77791586/164474137-f21b78f1-fbe6-493f-8f50-f2729f81295d.png)
 
-For IrisOperation it is to be noted that the table was automatically created in the Iris DataBase when the building was done.
+
 
 For FileOperation it is to be noted that you must fill the Path in the `%settings` available on the Management Portal as follow ( and you can add in the settings the `Filename` if you have followed the `Filename` note from [7.3.](#73-creating-our-operations) ) :
 ![Settings for FileOperation](https://user-images.githubusercontent.com/77791586/164474207-f31805ff-b36c-49be-972a-dc8d32ce495c.png)
@@ -372,7 +382,7 @@ cat toto.csv
 To access the Iris DataBase you will need to access the management portal and seek [System Explorer] then [SQL] then [Go].
 Now you can enter in the [Execute Query] :
 ```
-SELECT * FROM ( WIP with iris script )
+SELECT * FROM iris.training
 ```
 
 
@@ -781,11 +791,21 @@ We made the POST formation functional in the code above, it is now your task, if
 
 ## 11.3. Testing
 
-Finally, we can test our service with any kind of REST client after having reloaded the Router service:
+Finally, we can test our service with any kind of REST client after having reloaded the Router service.
 
-WIP gif with the wrong http link.
+Using any REST service as RESTer for Mozilla, it is needed to fill the headers like this:
+![RESTHeaders](https://user-images.githubusercontent.com/77791586/165522396-154a4ef4-535b-44d7-bcdd-a4bfd2f574d3.png)
 
-![RESTTest](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/RESTTest.gif)
+
+The body like this:
+![RESTBody](https://user-images.githubusercontent.com/77791586/165522641-b4e772e0-bad3-495e-9a1f-ffe3210053a9.png)
+
+The authorization like this:
+![RESTAuthorization](https://user-images.githubusercontent.com/77791586/165522730-bb89797a-0dd1-4691-b1e8-b7c491b53a6a.png)
+
+
+Finally, the results should be something like this:
+![RESTResults](https://user-images.githubusercontent.com/77791586/165522839-feec14c0-07fa-4d3f-a435-c9a06a544785.png)
 
 
 # 12. Global exercise

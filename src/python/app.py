@@ -1,6 +1,5 @@
-from flask import Flask, jsonify, request, make_response
+from flask import Flask, jsonify, request
 from grongier.pex import Director
-import iris
 
 from obj import Formation
 from msg import FormationRequest
@@ -46,8 +45,7 @@ def getPerson(id):
 @app.route("/training/<int:id>", methods=["PUT"])
 def updatePerson(id):
 
-    payload = {
-    }
+    payload = {}
     return jsonify(payload)
 
 # DELETE person with id
