@@ -24,12 +24,11 @@ class FileOperation(BusinessOperation):
             salle = pRequest.formation.salle
             nom = pRequest.formation.nom
 
-        line = id+" : "+salle+" : "+nom+" : "
+        line = id+" : "+salle+" : "+nom+"\n"
 
         filename = 'toto.csv'
 
         self.PutLine(filename, line)
-        self.PutLine(filename, " * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *")
 
         return 
 
@@ -41,13 +40,11 @@ class FileOperation(BusinessOperation):
             name = pRequest.patient.name
             avg = pRequest.patient.avg
 
-        line = name + " avg nb steps : " + avg
+        line = name + " avg nb steps : " + str(avg) +"\n"
 
         filename = 'Patients.csv'
 
         self.PutLine(filename, line)
-        self.PutLine(filename, " * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *")
-
         return 
         
     def OnMessage(self, request):
@@ -57,7 +54,7 @@ class FileOperation(BusinessOperation):
     @staticmethod
     def PutLine(filename,string):
         try:
-            with open(filename, "a",encoding="utf-8") as outfile:
+            with open(filename, "a",encoding="utf-8",newline="") as outfile:
                 outfile.write(string)
         except Exception as e:
             raise e

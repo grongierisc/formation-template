@@ -100,8 +100,8 @@ For this formation, you'll need:
 * The InterSystems addons suite for vscode: https://intersystems-community.github.io/vscode-objectscript/installation/
 * Docker: https://docs.docker.com/get-docker/
 * The docker addon for VSCode.
-* [Postgre requisites](#101-prerequisites)
-* [Flask requisites](#111-prerequisites)
+* Automatically done : [Postgre requisites](#101-prerequisites)
+* Automatically done : [Flask requisites](#111-prerequisites)
 
 # 5. Setting up 
 
@@ -139,8 +139,8 @@ We will have to save our Production this way. After that, when we close our dock
 
 In order to register the components we are creating in python to the production it is needed to use the `RegisterComponent` function from the `Grongier.PEX.Utils` module.
 
-WIP iris script ??
-For this you can either add your components in the `./iris.script` file but you will need to rebuild everytime you add a component.<br>We advise you to use the build-in python console to add manually the component at first when you are working on the project and then add them in the `iris.script` if you want to come back later ( or you will have to do it every time you rebuild the container )
+WIP remplissage iris script auto ??
+For this we advise you to use the build-in python console to add manually the component at first when you are working on the project.
 
 You will find those commands in the `misc/register.py` file.<br>To use them you need to firstly create the component then you can start a terminal in VSCode ( it will be automatically in the container if you followed step [5.2.](#52-management-portal-and-vscode)) and enter :
 ```
@@ -272,12 +272,11 @@ class FileOperation(BusinessOperation):
             salle = pRequest.formation.salle
             nom = pRequest.formation.nom
 
-        line = id+" : "+salle+" : "+nom+" : "
+        line = id+" : "+salle+" : "+nom+"\n"
 
         filename = 'toto.csv'
 
         self.PutLine(filename, line)
-        self.PutLine(filename, " * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *")
 
         return 
 
@@ -288,7 +287,7 @@ class FileOperation(BusinessOperation):
     @staticmethod
     def PutLine(filename,string):
         try:
-            with open(filename, "a",encoding="utf-8") as outfile:
+            with open(filename, "a",encoding="utf-8",newline="") as outfile:
                 outfile.write(string)
         except Exception as e:
             raise e
@@ -327,7 +326,7 @@ Then, we would call `self.Filename` instead of coding it directly inside the ope
 
 As we can see, if the `IrisOperation` receive a message of the type `msg.TrainingIrisRequest`, the information hold by the message will be transformed into an SQL querry and executed by the `iris.sql.exec` IrisPython function. This method will save the message in the IRIS local database.
 
-Don't forget to register your component :
+Don't forget to register your components :
 Following [5.4.](#54-register-components) and using:
 ```
 iris.cls("Grongier.PEX.Utils").RegisterComponent("bo","FileOperation","/irisdev/app/src/python/",1,"Python.FileOperation")
@@ -374,7 +373,7 @@ cat toto.csv
 To access the Iris DataBase you will need to access the management portal and seek [System Explorer] then [SQL] then [Go].
 Now you can enter in the [Execute Query] :
 ```
-SELECT * FROM ( WIP with iris script etc)
+SELECT * FROM ( WIP with iris script )
 ```
 
 
@@ -507,10 +506,13 @@ If all goes well, showing the visual trace will enable us to see what happened b
 In this section, we will create an operation to save our objects in an extern database. We will be using the JDBC API, as well as the other docker container that we set up, with postgre on it. 
 
 ## 10.1. Prerequisites
-In order to use postgre we will need to install psycopg2 which is a python module allowing us to connect to the postegre database with a simple command.<br>To do this you will need to be inside the docker container to install psycopg2 on iris python.<br>Once you are in the terminal enter :
+In order to use postgre we need psycopg2 which is a python module allowing us to connect to the postegre database with a simple command.<br>
+It was already done automatically but the steps are : access the inside of the docker container to install psycopg2 using pip3.<br>Once you are in the terminal enter :
 ```
 pip3 install psycopg2-binary
 ```
+
+Or add your module in the requirements.txt and rebuild the container.
 
 ## 10.2. Creating our new operation
 
@@ -669,11 +671,13 @@ In this part, we will create and use a REST Service.
 
 ## 11.1. Prerequisites
 In order to use Flask we will need to install flask which is a python module allowing us to easily create a REST service.
-To do this you will need to be inside the docker container to install flask on iris python.
+It was already done automatically but for information the steps are : access the inside of the docker container to install flask on iris python.
 Once you are in the terminal enter :
 ```
 pip3 install flask
 ```
+
+Or add your module in the requirements.txt and rebuild the container.
 
 ## 11.2. Creating the service
 
@@ -809,7 +813,7 @@ In this part we can find hints to do the exercise, the [hints](#1221-hints) are 
 #### bs
 ##### Get information
 
-To get the information from the endpoint it is advised to search for the `requests` module of python.
+To get the information from the endpoint it is advised to search for the `requests` module of python and use `json` and `json.dumps` to make it into str to send it in the bp
 
 ##### Get information with requests
 
@@ -829,7 +833,8 @@ for key,val in data.items():
     ...
 ```
 
-Again, in an online python website or any local oython file, it is possible to print key, val and their type to understand what can be done with them.
+Again, in an online python website or any local python file, it is possible to print key, val and their type to understand what can be done with them.<br>
+It is advised to store `val` usign `json.dumps(val)` and then, after the SendRequest, use `json.loads(request.patient.infos)`to get it, if you have stored the informations of val into patient.infos
 
 #### bp
 ##### Average and dict
@@ -870,9 +875,9 @@ print(avgl3_info1)
 
 ##### Average and dict the answer
 
-If your request hold a patient which as an atribute infos which is a dict of date and number of steps, you can calculate is avergae nb of steps using :
+If your request hold a patient which as an atribute infos which is a json.dumps of a dict of date and number of steps, you can calculate his avergae number of steps using :
 ```python
-statistics.mean(list(map(lambda x: int(x['steps']),request.patient.infos)))
+statistics.mean(list(map(lambda x: int(x['steps']),json.loads(request.patient.infos))))
 ```
 #### bo
 
@@ -901,7 +906,7 @@ from obj import Formation,Training,Patient
 class PatientRequest(Message):
     patient:Patient = None
 ```
-We will hold the information in a single obj and we will put the dict out of the get requests directly into the `infos` attribute.
+We will hold the information in a single obj and we will put the str of the dict out of the get requests directly into the `infos` attribute.
 The avg will be calculated in the process.
 
 ### bs
@@ -912,41 +917,44 @@ import requests
 
 class PatientService(BusinessService):
 
-        def getAdapterType():
-            """
-            Name of the registred adaptor
-            """
-            return "Ens.InboundAdapter"
+    def getAdapterType():
+        """
+        Name of the registred adaptor
+        """
+        return "Ens.InboundAdapter"
 
-        def OnInit(self):
-            if not hasattr(self,'Target'):
-                self.Target = "Python.PatientProcess"
+    def OnInit(self):
+        if not hasattr(self,'Target'):
+            self.Target = "Python.PatientProcess"
 
-            if not hasattr(self,'ApiUrl'):
-                self.ApiUrl = "https://lucasenard.github.io/Data/patients.json"
+        if not hasattr(self,'ApiUrl'):
+            self.ApiUrl = "https://lucasenard.github.io/Data/patients.json"
         
-            return
+        return
 
-        def OnProcessInput(self,request):
-            r = requests.get(self.ApiUrl)
-            if r.status_code == 200:
+    def OnProcessInput(self,request):
+        r = requests.get(self.ApiUrl)
+        if r.status_code == 200:
 
-                dat = r.json()
+            dat = r.json()
 
-                for key,val in dat.items():
+            for key,val in dat.items():
 
-                    patient = Patient()
-                    patient.name = key
-                    patient.infos = val
+                patient = Patient()
+                patient.name = key
+                patient.infos = json.dumps(val)
 
-                    msg = PatientRequest()
-                    msg.patient = patient
+                msg = PatientRequest()
+                msg.patient = patient
+                
+                self.SendRequestSync(self.Target,msg)
 
-                    self.SendRequestSync(self.Target,msg)
-            return 
+        return 
 ```
 It is advised to make the target and the api url variables ( see OnInit )
-After get the information in the `r` variable, it is needed to extract the information in json, which will make `dat`a dict, using dat.items it is possible to iterate on the patient and its info directly.
+After get the information in the `r` variable, it is needed to extract the information in json, which will make `dat` a dict, using dat.items it is possible to iterate on the patient and its info directly.<br>
+We then create our object patient and put `val` into a str into the patient.infos variable.<br>
+Then, we create the request `msg` which is a `msg.PatientRequest` to call our process. 
 
 ### bp
 In our `bp.py` we can add :
@@ -956,13 +964,16 @@ import statistic
 class PatientProcess(BusinessProcess):
 
     def OnRequest(self, request):
+
         if isinstance(request,PatientRequest):
-            request.patient.avg = statistics.mean(list(map(lambda x: int(x['steps']),request.patient.infos)))
+
+            request.patient.avg = statistics.mean(list(map(lambda x: int(x['steps']),json.loads(request.patient.infos))))
+
             self.SendRequestSync('Python.FileOperation',request)
 
         return 
 ```
-
+We take the request we just got, and if it is a `PatientRequest` we calculate the mean of the steps and we send it to our FileOperation.
 This fills the `avg` variable of our patient with the right information ( see the hint on the bp for more information )
 
 
@@ -977,15 +988,19 @@ In our `bo.py` we can add, inside the class `FileOperation` :
             name = pRequest.patient.name
             avg = pRequest.patient.avg
 
-        line = name + " avg nb steps : " + avg
+        line = name + " avg nb steps : " + str(avg)
 
         filename = 'Patients.csv'
 
         self.PutLine(filename, line)
-        self.PutLine(filename, " * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *")
 
         return 
 ```
+
+## Conclusion of the global exercise
+
+Through this exercise it is possible to learn and understand the creation of messages,services, processes and operation.
+We discovered how to fecth information in Python and how to execute simple task on our data.
 
 # 13. Conclusion
 

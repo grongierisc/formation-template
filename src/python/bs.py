@@ -1,4 +1,4 @@
-from grongier.pex import BusinessService
+from grongier.pex import BusinessService,Message
 
 from dataclass_csv import DataclassReader
 
@@ -6,6 +6,7 @@ from obj import Formation,Patient
 from msg import FormationRequest,PatientRequest
 
 import requests
+import json
 
 class ServiceCSV(BusinessService):
 
@@ -54,7 +55,7 @@ class PatientService(BusinessService):
 
     def OnInit(self):
         if not hasattr(self,'Target'):
-            self.Target = "Python.PatientProcess"
+            self.Target = 'Python.PatientProcess'
 
         if not hasattr(self,'ApiUrl'):
             self.ApiUrl = "https://lucasenard.github.io/Data/patients.json"
@@ -71,18 +72,11 @@ class PatientService(BusinessService):
 
                 patient = Patient()
                 patient.name = key
-                patient.infos = val
-                patient.avg = None
+                patient.infos = json.dumps(val)
 
                 msg = PatientRequest()
                 msg.patient = patient
-
+                
                 self.SendRequestSync(self.Target,msg)
+
         return 
-
-if __name__ == "__main__":
-
-    svc = ServiceCSV()
-    svc.OnInit()
-    svc.OnProcessInput('')
-
