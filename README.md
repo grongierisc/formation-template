@@ -50,23 +50,23 @@
 - [12. Global exercise](#12-global-exercise)
   - [12.1. Instructions](#121-instructions)
   - [12.2. Hints](#122-hints)
-    - [12.2.1. hints](#1221-hints)
-      - [bs](#bs)
-        - [Get information](#get-information)
-        - [Get information with requests](#get-information-with-requests)
-        - [Get information with requests and using it](#get-information-with-requests-and-using-it)
-        - [Get information solution](#get-information-solution)
-      - [bp](#bp)
-        - [Average and dict](#average-and-dict)
-        - [Average and dict hint](#average-and-dict-hint)
-        - [Average and dict with map](#average-and-dict-with-map)
-        - [Average and dict the answer](#average-and-dict-the-answer)
-      - [bo](#bo)
+    - [12.2.1. bs](#1221-bs)
+      - [12.2.1.1. Get information](#12211-get-information)
+      - [12.2.1.2. Get information with requests](#12212-get-information-with-requests)
+      - [12.2.1.3. Get information with requests and using it](#12213-get-information-with-requests-and-using-it)
+      - [12.2.1.4. Get information solution](#12214-get-information-solution)
+    - [12.2.2. bp](#1222-bp)
+      - [12.2.2.1. Average and dict](#12221-average-and-dict)
+      - [12.2.2.2. Average and dict hint](#12222-average-and-dict-hint)
+      - [12.2.2.3. Average and dict with map](#12223-average-and-dict-with-map)
+      - [12.2.2.4. Average and dict the answer](#12224-average-and-dict-the-answer)
+    - [12.2.3. bo](#1223-bo)
   - [12.3. Solutions](#123-solutions)
-    - [obj & msg](#obj--msg)
-    - [bs](#bs-1)
-    - [bp](#bp-1)
-    - [bo](#bo-1)
+    - [12.3.1. obj & msg](#1231-obj--msg)
+    - [12.3.2. bs](#1232-bs)
+    - [12.3.3. bp](#1233-bp)
+    - [12.3.4. bo](#1234-bo)
+  - [12.4. Conclusion of the global exercise](#124-conclusion-of-the-global-exercise)
 - [13. Conclusion](#13-conclusion)
 
 # 2. Framework
@@ -139,7 +139,7 @@ We will have to save our Production this way. After that, when we close our dock
 
 In order to register the components we are creating in python to the production it is needed to use the `RegisterComponent` function from the `Grongier.PEX.Utils` module.
 
-WIP remplissage iris script auto ??
+WIP remplissage register componenent iris script auto ??
 For this we advise you to use the build-in python console to add manually the component at first when you are working on the project.
 
 You will find those commands in the `misc/register.py` file.<br>To use them you need to firstly create the component then you can start a terminal in VSCode ( it will be automatically in the container if you followed step [5.2.](#52-management-portal-and-vscode)) and enter :
@@ -185,7 +185,7 @@ In this first production we will now add Business Operations.
 # 7. Business Operations
 
 A **Business Operation** (BO) is a specific operation that will enable us to send requests from IRIS to an external application / system. It can also be used to directly save in IRIS what we want.<br>
-BO also have an `OnMessage` function that will be called everytime this instance receive a message from any source, this will allow us to (WIP)receive information and send it, as seen in the framework, to an external client.
+BO also have an `OnMessage` function that will be called everytime this instance receive a message from any source, this will allow us to receive information and send it, as seen in the framework, to an external client.
 
 We will create those operations in local in VSCode, that is, in the `python/bo.py` file.<br>Saving this file will compile them in IRIS. 
 
@@ -351,7 +351,6 @@ By doing so, we will send the operation a message of the type we declared earlie
 You should get a result like this :
 ![IrisOperation](https://user-images.githubusercontent.com/77791586/164474137-f21b78f1-fbe6-493f-8f50-f2729f81295d.png)
 
-WIP talk about iris.script and autoimport<br>
 For IrisOperation it is to be noted that the table was automatically created in the Iris DataBase when the building was done.
 
 For FileOperation it is to be noted that you must fill the Path in the `%settings` available on the Management Portal as follow ( and you can add in the settings the `Filename` if you have followed the `Filename` note from [7.3.](#73-creating-our-operations) ) :
@@ -360,7 +359,7 @@ For FileOperation it is to be noted that you must fill the Path in the `%setting
 You should get a result like this :
 ![FileOperation](https://user-images.githubusercontent.com/77791586/164474286-0eaa6f27-e56f-4a87-b12a-9dab57c21506.png)
 
-WIP ajouter screenshot
+
 In order to see if our operations worked it is needed for us to acces the toto.csv file and the Iris DataBase to see the changes.<br>
 To access the toto.csv you will need to open a terminal inside the container then type:
 ```
@@ -681,8 +680,7 @@ Or add your module in the requirements.txt and rebuild the container.
 
 ## 11.2. Creating the service
 
-To create a REST service, we will need a service that will link our API to our porduction, for this we create a new simple service in `python/bs.py` just after the `ServiceCSV` class.
-WIP
+To create a REST service, we will need a service that will link our API to our production, for this we create a new simple service in `python/bs.py` just after the `ServiceCSV` class.
 ```python
 class FlaskService(BusinessService):
 
@@ -697,7 +695,7 @@ class FlaskService(BusinessService):
 
         return self.SendRequestSync(self.Target,request)
 ```
-OnProcessInput this service will simply tranfer the request to the Router.
+OnProcessInput this service will simply transfer the request to the Router.
 
 Don't forget to register your component :
 Following [5.4.](#54-register-components) and using:
@@ -707,7 +705,6 @@ iris.cls("Grongier.PEX.Utils").RegisterComponent("bs","FlaskService","/irisdev/a
 
 To create a REST service, we will need Flask to create an API that will manage the `get` and `post` function:
 We need to create a new file as `python/app.py`:
-WIP
 ```python
 from flask import Flask, jsonify, request, make_response
 from grongier.pex import Director
@@ -778,7 +775,7 @@ if __name__ == '__main__':
     app.run('0.0.0.0', port = "8081")
 ```
 
-WIP Note that the Flask API will use a Director to create an instance of our FlaskService from earlier and then send the right request.
+Note that the Flask API will use a Director to create an instance of our FlaskService from earlier and then send the right request.
 
 We made the POST formation functional in the code above, it is now your task, if you wish, to make the other functions in order to get/post the right information using all the things we have learned so far.
 
@@ -793,8 +790,6 @@ WIP gif with the wrong http link.
 
 # 12. Global exercise
 
-WIP
-
 Now that we are familliar with all the important concepts of the Iris DataPlatform and its [Framework](#2-framework) it is time to try ourselves on a global exercise that will make us create a new BS and BP, modify greatly our BO and also explore new concept in Python.
 
 ## 12.1. Instructions
@@ -808,22 +803,21 @@ When everything is done and tested, or if the hints aren't enough to complete th
 ## 12.2. Hints
 In this part we can find hints to do the exercise, the [hints](#1221-hints) are an increasing guidance on how to accomplish different task.
 
-### 12.2.1. hints
 
-#### bs
-##### Get information
+### 12.2.1. bs
+#### 12.2.1.1. Get information
 
 To get the information from the endpoint it is advised to search for the `requests` module of python and use `json` and `json.dumps` to make it into str to send it in the bp
 
-##### Get information with requests
+#### 12.2.1.2. Get information with requests
 
 An online python website or any local python file can be used to use requests and print the output and it's type to go further and understand what we get.
 
-##### Get information with requests and using it
+#### 12.2.1.3. Get information with requests and using it
 
 It is advised to create a new message type and object type to hold information and send it to a process to calculate the average.
 
-##### Get information solution
+#### 12.2.1.4. Get information solution
 
 Solution on how to use request to get data and in our case, partially what to do with it.
 ```python
@@ -836,18 +830,18 @@ for key,val in data.items():
 Again, in an online python website or any local python file, it is possible to print key, val and their type to understand what can be done with them.<br>
 It is advised to store `val` usign `json.dumps(val)` and then, after the SendRequest, use `json.loads(request.patient.infos)`to get it, if you have stored the informations of val into patient.infos
 
-#### bp
-##### Average and dict
+### 12.2.2. bp
+#### 12.2.2.1. Average and dict
 
 `statistics` is a native library that can be used to do math.
 
-##### Average and dict hint
+#### 12.2.2.2. Average and dict hint
 
 The native `map` function in python can allow you to seperate information within a list or a dict for example.
 
 Don't forget to transform the result of `map` back to a list using the `list` native function.
 
-##### Average and dict with map
+#### 12.2.2.3. Average and dict with map
 
 Using an online python website or any local python file it is possible to calculate average of a list of lists or a list of dict doing :
 ```python
@@ -873,13 +867,13 @@ print(avgl2_1)
 print(avgl3_info1)
 ```
 
-##### Average and dict the answer
+#### 12.2.2.4. Average and dict the answer
 
 If your request hold a patient which as an atribute infos which is a json.dumps of a dict of date and number of steps, you can calculate his avergae number of steps using :
 ```python
 statistics.mean(list(map(lambda x: int(x['steps']),json.loads(request.patient.infos))))
 ```
-#### bo
+### 12.2.3. bo
 
 It is advised to use something really similar to `bo.Fileoperation.WriteFormation`
 
@@ -887,7 +881,7 @@ Something like `bo.Fileoperation.WritePatient`
 
 ## 12.3. Solutions
 
-### obj & msg
+### 12.3.1. obj & msg
 
 In our `obj.py` we can add :
 ```python
@@ -909,7 +903,7 @@ class PatientRequest(Message):
 We will hold the information in a single obj and we will put the str of the dict out of the get requests directly into the `infos` attribute.
 The avg will be calculated in the process.
 
-### bs
+### 12.3.2. bs
 
 In our `bs.py` we can add :
 ```python
@@ -956,7 +950,7 @@ After get the information in the `r` variable, it is needed to extract the infor
 We then create our object patient and put `val` into a str into the patient.infos variable.<br>
 Then, we create the request `msg` which is a `msg.PatientRequest` to call our process. 
 
-### bp
+### 12.3.3. bp
 In our `bp.py` we can add :
 ```python
 import statistic
@@ -977,7 +971,7 @@ We take the request we just got, and if it is a `PatientRequest` we calculate th
 This fills the `avg` variable of our patient with the right information ( see the hint on the bp for more information )
 
 
-### bo
+### 12.3.4. bo
 In our `bo.py` we can add, inside the class `FileOperation` :
 ```python
     def WritePatient(self, pRequest:PatientRequest):
@@ -997,7 +991,7 @@ In our `bo.py` we can add, inside the class `FileOperation` :
         return 
 ```
 
-## Conclusion of the global exercise
+## 12.4. Conclusion of the global exercise
 
 Through this exercise it is possible to learn and understand the creation of messages,services, processes and operation.
 We discovered how to fecth information in Python and how to execute simple task on our data.
