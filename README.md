@@ -66,7 +66,8 @@
     - [12.3.2. bs](#1232-bs)
     - [12.3.3. bp](#1233-bp)
     - [12.3.4. bo](#1234-bo)
-  - [12.4. Conclusion of the global exercise](#124-conclusion-of-the-global-exercise)
+  - [12.4. Testing](#124-testing)
+  - [12.5. Conclusion of the global exercise](#125-conclusion-of-the-global-exercise)
 - [13. Conclusion](#13-conclusion)
 
 # 2. Framework
@@ -346,8 +347,6 @@ We now need to add these operations to the production. For this, we use the Mana
 
 Double clicking on the operation will enable us to activate it. After that, by selecting the operation and going in the [Actions] tabs in the right sidebar menu, we should be able to test the operation (if not see the production creation part to activate testings / you may need to start the production if stopped).
 
-By doing so, we will send the operation a message of the type we declared earlier. If all goes well, showing the visual trace will enable us to see what happened between the processes, services and operations. <br>Here, we can see the message being sent to the operation by the process, and the operation sending back a response (that is just an empty string).
-
 For IrisOperation it is to be noted that the table must be created before use.
 To access the Iris DataBase you will need to access the management portal and seek [System Explorer] then [SQL] then [Go].
 Now you can enter in the [Execute Query] :
@@ -358,10 +357,12 @@ CREATE TABLE iris.training (
 );
 ```
 
+By using the test function of our management portal, we will send the operation a message of the type we declared earlier. If all goes well, showing the visual trace will enable us to see what happened between the processes, services and operations. <br>Here, we can see the message being sent to the operation by the process, and the operation sending back a response (that is just an empty string).
 You should get a result like this :
 ![IrisOperation](https://user-images.githubusercontent.com/77791586/164474137-f21b78f1-fbe6-493f-8f50-f2729f81295d.png)
 
 
+<br><br><br>
 
 For FileOperation it is to be noted that you must fill the Path in the `%settings` available on the Management Portal as follow ( and you can add in the settings the `Filename` if you have followed the `Filename` note from [7.3.](#73-creating-our-operations) ) :
 ![Settings for FileOperation](https://user-images.githubusercontent.com/77791586/164474207-f31805ff-b36c-49be-972a-dc8d32ce495c.png)
@@ -372,6 +373,9 @@ You should get a result like this :
 
 In order to see if our operations worked it is needed for us to acces the toto.csv file and the Iris DataBase to see the changes.<br>
 To access the toto.csv you will need to open a terminal inside the container then type:
+```
+bash
+```
 ```
 cd /tmp
 ```
@@ -848,7 +852,7 @@ for key,val in data.items():
 ```
 
 Again, in an online python website or any local python file, it is possible to print key, val and their type to understand what can be done with them.<br>
-It is advised to store `val` usign `json.dumps(val)` and then, after the SendRequest, use `json.loads(request.patient.infos)`to get it, if you have stored the informations of val into patient.infos
+It is advised to store `val` usign `json.dumps(val)` and then, after the SendRequest,when you are in the process, use `json.loads(request.patient.infos)`to get it ( if you have stored the informations of `val` into `patient.infos` )
 
 ### 12.2.2. bp
 #### 12.2.2.1. Average and dict
@@ -965,9 +969,10 @@ class PatientService(BusinessService):
 
         return 
 ```
-It is advised to make the target and the api url variables ( see OnInit )
-After get the information in the `r` variable, it is needed to extract the information in json, which will make `dat` a dict, using dat.items it is possible to iterate on the patient and its info directly.<br>
-We then create our object patient and put `val` into a str into the patient.infos variable.<br>
+It is advised to make the target and the api url variables ( see OnInit ).<br>
+After the `requests.get`putting the information in the `r` variable, it is needed to extract the information in json, which will make `dat` a dict.<br>
+Using dat.items it is possible to iterate on the patient and its info directly.<br>
+We then create our object patient and put `val` into a string into the `patient.infos` variable using `json.dumps` that transform any json data to string.<br>
 Then, we create the request `msg` which is a `msg.PatientRequest` to call our process. 
 
 ### 12.3.3. bp
@@ -1010,8 +1015,14 @@ In our `bo.py` we can add, inside the class `FileOperation` :
 
         return 
 ```
+## 12.4. Testing
 
-## 12.4. Conclusion of the global exercise
+Now we can head towards the management portal and do as before.
+Remember that our new service will execute automatically since we added an InboundAdapter to it.
+
+The same way we checked for the `toto.csv` we can check the `Patients.csv`
+
+## 12.5. Conclusion of the global exercise
 
 Through this exercise it is possible to learn and understand the creation of messages,services, processes and operation.
 We discovered how to fecth information in Python and how to execute simple task on our data.
