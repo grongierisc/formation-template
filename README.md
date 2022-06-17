@@ -55,7 +55,7 @@ This is the IRIS Framework.
 
 ![FrameworkFull](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/FrameworkFull.png)
 
-The components inside of IRIS represent a production. Inbound adapters and outbound adapters enable us to use different kind of format as input and output for our databse. The composite applications will give us access to the production through external applications like REST services.
+The components inside of IRIS represent a production. Inbound adapters and outbound adapters enable us to use different kind of format as input and output for our database. The composite applications will give us access to the production through external applications like REST services.
 
 The arrows between them all of this components are **messages**. They can be requests or responses.
 
@@ -63,7 +63,7 @@ The arrows between them all of this components are **messages**. They can be req
 
 In our case, we will read lines in a csv file and save it into the IRIS database. 
 
-We will then add an operation that will enable us to save objects in an extern database too, using JDBC. This database will be located in a docker container, using postgre.
+We will then add an operation that will enable us to save objects in an extern database too, using JDBC. This database will be located in a docker container, using Postgres.
 
 Finally, we will see how to use composite applications to insert new objects in our database or to consult this database (in our case, through a REST service).
 
@@ -103,7 +103,7 @@ A part of the things we will be doing will be saved locally, but all the process
 
 ![ExportProgress](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ExportProgress.png)
 
-We will have to save our Production, Record Map, Business Processes and Data Transfromation this way. After that, when we close our docker container and compose it up again, we will still have all of our progress saved locally (it is, of course, to be done after every change through the portal). To make it accessible to IRIS again we need to compile the exported files (by saving them, InterSystems addons take care of the rest).
+We will have to save our Production, Record Map, Business Processes and Data Transformation this way. After that, when we close our docker container and compose it up again, we will still have all of our progress saved locally (it is, of course, to be done after every change through the portal). To make it accessible to IRIS again we need to compile the exported files (by saving them, InterSystems addons take care of the rest).
 # 6. Productions 
 We can now create our first production. For this, we will go through the [Interoperability] and [Configure] menus: 
 
@@ -113,7 +113,7 @@ We then have to press [New], select the [Formation] package and chose a name for
 
 ![ProductionCreation](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ProductionCreation.png)
 
-Immediatly after creating our production, we will need to click on [Production Settings] just above the [Operations] section. In the right sidebar menu, we will have to activate [Testing Enabled] in the [Development and Debugging] part of the [Settings] tab (don't forget to press [Apply]).
+Immediately after creating our production, we will need to click on [Production Settings] just above the [Operations] section. In the right sidebar menu, we will have to activate [Testing Enabled] in the [Development and Debugging] part of the [Settings] tab (don't forget to press [Apply]).
 
 ![ProductionTesting](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ProductionTesting.png)
 
@@ -138,9 +138,21 @@ In our `Formation/Table/Formation.cls` file we have:
 Class Formation.Table.Formation Extends %Persistent
 {
 
-Property Name As %String;
+Property Nom As %String;
 
 Property Salle As %String;
+
+}
+```
+
+In our `Formation/Table/Training.cls` file we have: 
+```objectscript
+Class Formation.Table.Training Extends %Persistent
+{
+
+Property Name As %String;
+
+Property Room As %String;
 
 }
 ```
