@@ -1,6 +1,6 @@
  # 1. **Ensemble / Interoperability Formation**
 
- The goal of this formation is to learn InterSystems' interoperability framework, and particularly the use of: 
+ The goal of this formation is to learn InterSystems' interoperability framework using python, and particularly the use of: 
 * Productions
 * Messages
 * Business Operations
@@ -18,36 +18,57 @@
 - [4. Prerequisites](#4-prerequisites)
 - [5. Setting up](#5-setting-up)
   - [5.1. Docker containers](#51-docker-containers)
-  - [5.2. Management Portal](#52-management-portal)
+  - [5.2. Management Portal and VSCode](#52-management-portal-and-vscode)
   - [5.3. Saving progress](#53-saving-progress)
+  - [5.4. Register components](#54-register-components)
 - [6. Productions](#6-productions)
-- [7. Operations](#7-operations)
-  - [7.1. Creating our storage class](#71-creating-our-storage-class)
-  - [7.2. Creating our message class](#72-creating-our-message-class)
-  - [7.3. Creating our operation](#73-creating-our-operation)
-  - [7.4. Adding the operation to the production](#74-adding-the-operation-to-the-production)
+- [7. Business Operations](#7-business-operations)
+  - [7.1. Creating our storage classes](#71-creating-our-storage-classes)
+  - [7.2. Creating our message classes](#72-creating-our-message-classes)
+  - [7.3. Creating our operations](#73-creating-our-operations)
+  - [7.4. Adding the operations to the production](#74-adding-the-operations-to-the-production)
   - [7.5. Testing](#75-testing)
 - [8. Business Processes](#8-business-processes)
   - [8.1. Simple BP](#81-simple-bp)
-    - [8.1.1. Creating the process](#811-creating-the-process)
-    - [8.1.2. Modifying the context of a BP](#812-modifying-the-context-of-a-bp)
-  - [8.2. BP reading CSV lines](#82-bp-reading-csv-lines)
-    - [8.2.1. Creating a record map](#821-creating-a-record-map)
-    - [8.2.2. Creating a Data Transformation](#822-creating-a-data-transformation)
-    - [8.2.3. Adding the Data Transformation to the Business Process](#823-adding-the-data-transformation-to-the-business-process)
-    - [8.2.4. Configuring Production](#824-configuring-production)
-    - [8.2.5. Testing](#825-testing)
-- [9. Getting access to an extern database using JDBC](#9-getting-access-to-an-extern-database-using-jdbc)
-  - [9.1. Creating our new operation](#91-creating-our-new-operation)
-  - [9.2. Configuring the production](#92-configuring-the-production)
+  - [8.2. Adding the process to the production](#82-adding-the-process-to-the-production)
+  - [8.3. Testing](#83-testing)
+- [9. Business Service](#9-business-service)
+  - [9.1. Simple BS](#91-simple-bs)
+  - [9.2. Adding the service to the production](#92-adding-the-service-to-the-production)
   - [9.3. Testing](#93-testing)
-  - [9.4. Exercise](#94-exercise)
-  - [9.5. Solution](#95-solution)
-- [10. REST service](#10-rest-service)
-  - [10.1. Creating the service](#101-creating-the-service)
-  - [10.2. Adding our BS](#102-adding-our-bs)
-  - [10.3. Testing](#103-testing)
-- [Conclusion](#conclusion)
+- [10. Getting access to an extern database using JDBC](#10-getting-access-to-an-extern-database-using-jdbc)
+  - [10.1. Prerequisites](#101-prerequisites)
+  - [10.2. Creating our new operation](#102-creating-our-new-operation)
+  - [10.3. Configuring the production](#103-configuring-the-production)
+  - [10.4. Testing](#104-testing)
+  - [10.5. Exercise](#105-exercise)
+  - [10.6. Solution](#106-solution)
+- [11. REST service](#11-rest-service)
+  - [11.1. Prerequisites](#111-prerequisites)
+  - [11.2. Creating the service](#112-creating-the-service)
+  - [11.3. Testing](#113-testing)
+- [12. Global exercise](#12-global-exercise)
+  - [12.1. Instructions](#121-instructions)
+  - [12.2. Hints](#122-hints)
+    - [12.2.1. bs](#1221-bs)
+      - [12.2.1.1. Get information](#12211-get-information)
+      - [12.2.1.2. Get information with requests](#12212-get-information-with-requests)
+      - [12.2.1.3. Get information with requests and using it](#12213-get-information-with-requests-and-using-it)
+      - [12.2.1.4. Get information solution](#12214-get-information-solution)
+    - [12.2.2. bp](#1222-bp)
+      - [12.2.2.1. Average and dict](#12221-average-and-dict)
+      - [12.2.2.2. Average and dict hint](#12222-average-and-dict-hint)
+      - [12.2.2.3. Average and dict with map](#12223-average-and-dict-with-map)
+      - [12.2.2.4. Average and dict the answer](#12224-average-and-dict-the-answer)
+    - [12.2.3. bo](#1223-bo)
+  - [12.3. Solutions](#123-solutions)
+    - [12.3.1. obj & msg](#1231-obj--msg)
+    - [12.3.2. bs](#1232-bs)
+    - [12.3.3. bp](#1233-bp)
+    - [12.3.4. bo](#1234-bo)
+  - [12.4. Testing](#124-testing)
+  - [12.5. Conclusion of the global exercise](#125-conclusion-of-the-global-exercise)
+- [13. Conclusion](#13-conclusion)
 
 # 2. Framework
 
@@ -55,13 +76,13 @@ This is the IRIS Framework.
 
 ![FrameworkFull](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/FrameworkFull.png)
 
-The components inside of IRIS represent a production. Inbound adapters and outbound adapters enable us to use different kind of format as input and output for our databse. The composite applications will give us access to the production through external applications like REST services.
+The components inside of IRIS represent a production. Inbound adapters and outbound adapters enable us to use different kind of format as input and output for our databse. <br>The composite applications will give us access to the production through external applications like REST services.
 
 The arrows between them all of this components are **messages**. They can be requests or responses.
 
 # 3. Adapting the framework
 
-In our case, we will read lines in a csv file and save it into the IRIS database. 
+In our case, we will read lines from a csv file and save it into the IRIS database and in a .txt file. 
 
 We will then add an operation that will enable us to save objects in an extern database too, using JDBC. This database will be located in a docker container, using postgre.
 
@@ -69,6 +90,7 @@ Finally, we will see how to use composite applications to insert new objects in 
 
 The framework adapted to our purpose gives us:
 
+WIP
 ![FrameworkAdapted](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/FrameworkAdapted.png)
 
 
@@ -79,6 +101,9 @@ For this formation, you'll need:
 * The InterSystems addons suite for vscode: https://intersystems-community.github.io/vscode-objectscript/installation/
 * Docker: https://docs.docker.com/get-docker/
 * The docker addon for VSCode.
+* Automatically done : [Postgre requisites](#101-prerequisites)
+* Automatically done : [Flask requisites](#111-prerequisites)
+
 # 5. Setting up 
 
 
@@ -89,531 +114,922 @@ In order to have access to the InterSystems images, we need to go to the followi
 
 From there, we should be able to build and compose our containers (with the `docker-compose.yml` and `Dockerfile` files given).
 
-## 5.2. Management Portal
+## 5.2. Management Portal and VSCode
 
-We will open a Management Portal. It will give us access to an webpage where we will be able to create our production. The portal should be located at the url: http://localhost:52775/csp/sys/UtilHome.csp?$NAMESPACE=IRISAPP. You will need the following credentials: 
+This repository is ready for [VS Code](https://code.visualstudio.com/).
 
->LOGIN: SuperUser
->
->PASSWORD: SYS
+Open the locally-cloned `formation-template` folder in VS Code.
+
+If prompted (bottom right corner), install the recommended extensions.
+
+When prompted, reopen the folder inside the container so you will be able to use the python components within it. The first time you do this it may take several minutes while the container is readied.
+
+By opening the folder remote you enable VS Code and any terminals you open within it to use the python components within the container. Configure these to use `/usr/irissys/bin/irispython`
+
+<img width="1614" alt="PythonInterpreter" src="https://user-images.githubusercontent.com/47849411/145864423-2de24aaa-036c-4beb-bda0-3a73fe15ccbd.png">
 
 ## 5.3. Saving progress
 
-A part of the things we will be doing will be saved locally, but all the processes and productions are saved in the docker container. In order to persist all of our progress, we need to export every class that is created through the Management Portal with the InterSystems addon `ObjectScript`:
+A part of the things we will be doing will be saved locally, but productions are saved in the docker container. In order to persist all of our progress, we need to export every class that is created through the Management Portal with the InterSystems addon `ObjectScript`:
 
-![ExportProgress](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ExportProgress.png)
+![ExportProgress](https://user-images.githubusercontent.com/77791586/164473715-b08d0465-0c7b-42f5-9de4-f1a125ecce96.png)
 
-We will have to save our Production, Record Map, Business Processes and Data Transfromation this way. After that, when we close our docker container and compose it up again, we will still have all of our progress saved locally (it is, of course, to be done after every change through the portal). To make it accessible to IRIS again we need to compile the exported files (by saving them, InterSystems addons take care of the rest).
+We will have to save our Production this way. After that, when we close our docker container and compose it up again, we will still have all of our progress saved locally (it is, of course, to be done after every change through the portal). To make it accessible to IRIS again we need to compile the exported files (by saving them, InterSystems addons take care of the rest).
+
+## 5.4. Register components
+
+In order to register the components we are creating in python to the production it is needed to use the `RegisterComponent` function from the `Grongier.PEX.Utils` module.
+
+For this we advise you to use the build-in python console to add manually the component at first when you are working on the project.
+
+You will find those commands in the `misc/register.py` file.<br>To use them you need to firstly create the component then you can start a terminal in VSCode ( it will be automatically in the container if you followed step [5.2.](#52-management-portal-and-vscode)) and enter :
+```
+/usr/irissys/bin/irispython
+```
+To launch an IrisPython console.
+
+Then enter :
+```
+import iris
+```
+
+Now you can register your component using :
+```
+iris.cls("Grongier.PEX.Utils").RegisterComponent("bo","FileOperation","/irisdev/app/src/python/",1,"Python.FileOperation")
+```
+This line will register the class `FileOperation` that is coded inside the file `bo`, file situated in `/irisdev/app/src/python/` (which is the right path if you follow this course) using the name `Python.FileOperation` in the management portal.
+
+It is to be noted that if you don't change to name of the file or the class, if a component was registered you can modify it on VSCode without the need to register it again. Just don't forget to restart it in the management portal.
+
 # 6. Productions 
-We can now create our first production. For this, we will go through the [Interoperability] and [Configure] menus: 
 
-![ProductionMenu](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ProductionMenu.png)
+A **production** is the base of all our work on Iris, it must be seen as the shell of our [framework](#2-framework) that will hold the **services**, **processes** and **operations**.<br>
+Everything in the production is going to inherit functions ; Those are the `OnInit` function that resolve at the creation of an instance of this class and the `OnTearDown` function that resolve when the instance is killed.
+This will be useful to set variables or close a used open file when writing.
+
+We can now create our first production.<br>
+For this, we will go through the [Interoperability] and [Configure] menus: 
+
+![ProductionMenu](https://user-images.githubusercontent.com/77791586/164473827-ffa2b322-095a-46e3-8c8b-16d467a80485.png)
 
 We then have to press [New], select the [Formation] package and chose a name for our production: 
 
-![ProductionCreation](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ProductionCreation.png)
+![ProductionCreation](https://user-images.githubusercontent.com/77791586/164473884-5c7aec69-c45d-4062-bedc-2933e215da22.png)
 
 Immediatly after creating our production, we will need to click on [Production Settings] just above the [Operations] section. In the right sidebar menu, we will have to activate [Testing Enabled] in the [Development and Debugging] part of the [Settings] tab (don't forget to press [Apply]).
 
-![ProductionTesting](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ProductionTesting.png)
+![ProductionTesting](https://user-images.githubusercontent.com/77791586/164473965-47ab1ba4-85d5-46e3-9e15-64186b5a457e.png)
 
 In this first production we will now add Business Operations.
 
-# 7. Operations
+# 7. Business Operations
 
-A Business Operation (BO) is a specific operation that will enable us to send requests from IRIS to an external application / system. It can also be used to directly save in IRIS what we want.
+A **Business Operation** (BO) is a specific operation that will enable us to send requests from IRIS to an external application / system. It can also be used to directly save in IRIS what we want.<br>
+BO also have an `OnMessage` function that will be called everytime this instance receive a message from any source, this will allow us to receive information and send it, as seen in the framework, to an external client.
 
-We will create those operations in local, that is, in the `Formation/BO/` file. Saving the files will compile them in IRIS. 
+We will create those operations in local in VSCode, that is, in the `python/bo.py` file.<br>Saving this file will compile them in IRIS. 
 
-For our first operation we will save the content of a message in  the local database.
+For our first operations we will save the content of a message in the local database and write the same information locally in a .txt file.
 
 We need to have a way of storing this message first. 
 
-## 7.1. Creating our storage class
+## 7.1. Creating our storage classes
 
-Storage classes in IRIS extends the type `%Persistent`. They will be saved in the intern database.
+We will use `dataclass` to hold information in our [messages](#72-creating-our-message-classes).
 
-In our `Formation/Table/Formation.cls` file we have: 
-```objectscript
-Class Formation.Table.Formation Extends %Persistent
-{
+In our `python/obj.py` file we have: 
+```python
+from dataclasses import dataclass
 
-Property Name As %String;
+@dataclass
+class Formation:
 
-Property Salle As %String;
+    id:int = None
+    nom:str = None
+    salle:str = None
 
-}
+@dataclass
+class Training:
+
+    name:str = None
+    room:str = None
 ```
 
-Note that when saving, additional lines are automatically added to the file. They are mandatory and are added by the InterSystems addons.
+The Formation class will be used as a Python object to read a csv and write in a texte file later on, while the Training class will be used as a way to interact with the Iris database.
 
-## 7.2. Creating our message class
+## 7.2. Creating our message classes
 
-This message will contain a `Formation` object, located in the `Formation/Obj/Formation.cls` file: 
-```objectscript
-Class Formation.Obj.Formation Extends (%SerialObject, %XML.Adaptor)
-{
+These messages will contain a `Formation` object or a `Training` object, located in the `obj.py` file created in [7.1](#71-creating-our-storage-classes)
 
-Property Nom As %String;
+Note that messages, requests and responses all inherit from the `grongier.pex.Message` class.
 
-Property Salle As %String;
+In the `python/msg.py` file we have: 
+```python
+from dataclasses import dataclass
+import grongier.pex.Message
 
-}
+from obj import Formation,Training
+
+@dataclass
+class FormationRequest(Message):
+
+    formation:Formation = None
+
+@dataclass
+class TrainingIrisRequest(Message):
+
+    training:Training = None
 ```
 
-The `Message` class will use that `Formation` object, `src/Formation/Msg/FormationInsertRequest.cls`:
-```objectscript
-Class Formation.Msg.FormationInsertRequest Extends Ens.Request
-{
+Again, the `FormationRequest` class will be used as a message to read a csv and write in a texte file later on, while the `TrainingIrisRequest` class will be used as a message to interact with the Iris database.
 
-Property Formation As Formation.Obj.Formation;
+## 7.3. Creating our operations
 
-}
+Now that we have all the elements we need, we can create our operations.<br>
+Note that any Business Operation inherit from the `grongier.pex.BusinessOperation` class.
+
+In the `python/bo.py` file we have: 
+```python
+from grongier.pex import BusinessOperation
+import os
+import iris
+
+from msg import TrainingIrisRequest,FormationRequest
+
+class FileOperation(BusinessOperation):
+
+    def OnInit(self):
+        if hasattr(self,'Path'):
+            os.chdir(self.Path)
+        else:
+            os.chdir("/tmp")
+
+    def WriteFormation(self, pRequest:FormationRequest):
+        id = salle = nom = ""
+
+        if (pRequest.formation is not None):
+            id = str(pRequest.formation.id)
+            salle = pRequest.formation.salle
+            nom = pRequest.formation.nom
+
+        line = id+" : "+salle+" : "+nom+"\n"
+
+        filename = 'toto.csv'
+
+        self.PutLine(filename, line)
+
+        return 
+
+    def OnMessage(self, request):
+        return 
+
+
+    @staticmethod
+    def PutLine(filename,string):
+        try:
+            with open(filename, "a",encoding="utf-8",newline="") as outfile:
+                outfile.write(string)
+        except Exception as e:
+            raise e
+
+
+class IrisOperation(BusinessOperation):
+
+    def InsertTraining(self, request:TrainingIrisRequest):
+        sql = """
+        INSERT INTO iris.training
+        ( name, room )
+        VALUES( ?, ? )
+        """
+        iris.sql.exec(sql,request.training.name,request.training.room)
+        return
+        
+    def OnMessage(self, request):
+        return
 ```
 
-## 7.3. Creating our operation
+When one of the operation receive a message/request, it will automatically dispatch the message/request to the correct function depending of the type of message/request specified in the signature of each function.
+If the type of the message/request is not handled, it will be forwarded to the `OnMessage` function.
 
-Now that we have all the elements we need, we can create our operation, in the `Formation/BO/LocalBDD.cls` file: 
-```objectscript
-Class Formation.BO.LocalBDD Extends Ens.BusinessOperation
-{
+As we can see, if the `FileOperation` receive a message of the type `msg.FormationRequest`, the information hold by the message will be written down on the `toto.csv` file.<br>Note that `Path` is already a parameter of the operation and you could make `filename` a variable with a base value of `toto.csv` that can be change directly onto the management portal by doing :
+```python
+    def OnInit(self):
+        if hasattr(self,'Path'):
+            os.chdir(self.Path)
+        else:
+            os.chdir("/tmp")
+        if not hasattr(self,'Filename'):
+          self.Filename = 'toto.csv'
+```
+Then, we would call `self.Filename` instead of coding it directly inside the operation.
+<br><br><br>
 
-Parameter INVOCATION = "Queue";
+As we can see, if the `IrisOperation` receive a message of the type `msg.TrainingIrisRequest`, the information hold by the message will be transformed into an SQL querry and executed by the `iris.sql.exec` IrisPython function. This method will save the message in the IRIS local database.
 
-Method InsertLocalBDD(pRequest As Formation.Msg.FormationInsertRequest, Output pResponse As Ens.StringResponse) As %Status
-{
-    set tStatus = $$$OK
-    
-    try{
-        set pResponse = ##class(Ens.Response).%New()
-        set tFormation = ##class(Formation.Table.Formation).%New()
-        set tFormation.Name = pRequest.Formation.Nom
-        set tFormation.Salle = pRequest.Formation.Salle
-        $$$ThrowOnError(tFormation.%Save())
-    }
-    catch exp
-    {
-        Set tStatus = exp.AsStatus()
-    }
-
-    Quit tStatus
-}
-
-XData MessageMap
-{
-<MapItems>
-    <MapItem MessageType="Formation.Msg.FormationInsertRequest"> 
-        <Method>InsertLocalBDD</Method>
-    </MapItem>
-</MapItems>
-}
-
-}
-
+Don't forget to register your components :
+Following [5.4.](#54-register-components) and using:
+```
+iris.cls("Grongier.PEX.Utils").RegisterComponent("bo","FileOperation","/irisdev/app/src/python/",1,"Python.FileOperation")
 ```
 
-The MessageMap gives us the method to launch depending on the type of the request (the message sent to the operation).
+And:
+```
+iris.cls("Grongier.PEX.Utils").RegisterComponent("bo","IrisOperation","/irisdev/app/src/python/",1,"Python.IrisOperation")
+```
 
-As we can see, if the operation received a message of the type `Formation.Msg.FormationInsertRequest`, the `InsertLocalBDD` method will be called. This method will save the message in the IRIS local database.
+## 7.4. Adding the operations to the production
 
-## 7.4. Adding the operation to the production
+We now need to add these operations to the production. For this, we use the Management Portal. By pressing the [+] sign next to [Operations], we have access to the [Business Operation Wizard].<br>There, we chose the operation classes we just created in the scrolling menu. 
 
-We now need to add this operation to the production. For this, we use the Management Portal. By pressing the [+] sign next to [Operations], we have access to the [Business Operation Wizard]. There, we chose the operation class we just created in the scrolling menu. 
-
-![OperationCreation](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/OperationCreation.png)
+![OperationCreation](https://user-images.githubusercontent.com/77791586/164474068-49c7799c-c6a2-4e1e-8489-3788c50acb86.png)
 
 ## 7.5. Testing
 
 Double clicking on the operation will enable us to activate it. After that, by selecting the operation and going in the [Actions] tabs in the right sidebar menu, we should be able to test the operation (if not see the production creation part to activate testings / you may need to start the production if stopped).
 
-By doing so, we will send the operation a message of the type we declared earlier. If all goes well, the results should be as shown below: 
+For IrisOperation it is to be noted that the table must be created before use.
+To access the Iris DataBase you will need to access the management portal and seek [System Explorer] then [SQL] then [Go].
+Now you can enter in the [Execute Query] :
+```
+CREATE TABLE iris.training (
+	name varchar(50) NULL,
+	room varchar(50) NULL
+);
+```
 
-![OperationTest](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/OperationTest.png)
+By using the test function of our management portal, we will send the operation a message of the type we declared earlier. If all goes well, showing the visual trace will enable us to see what happened between the processes, services and operations. <br>Here, we can see the message being sent to the operation by the process, and the operation sending back a response (that is just an empty string).
+You should get a result like this :
+![IrisOperation](https://user-images.githubusercontent.com/77791586/164474137-f21b78f1-fbe6-493f-8f50-f2729f81295d.png)
 
-Showing the visual trace will enable us to see what happened between the processes, services and operations. here, we can see the message being sent to the operation by the process, and the operation sending back a response (that is just an empty string).
+
+<br><br><br>
+
+For FileOperation it is to be noted that you must fill the Path in the `%settings` available on the Management Portal as follow ( and you can add in the settings the `Filename` if you have followed the `Filename` note from [7.3.](#73-creating-our-operations) ) :
+![Settings for FileOperation](https://user-images.githubusercontent.com/77791586/164474207-f31805ff-b36c-49be-972a-dc8d32ce495c.png)
+
+You should get a result like this :
+![FileOperation](https://user-images.githubusercontent.com/77791586/164474286-0eaa6f27-e56f-4a87-b12a-9dab57c21506.png)
+
+
+In order to see if our operations worked it is needed for us to acces the toto.csv file and the Iris DataBase to see the changes.<br>
+To access the toto.csv you will need to open a terminal inside the container then type:
+```
+bash
+```
+```
+cd /tmp
+```
+```
+cat toto.csv
+```
+
+To access the Iris DataBase you will need to access the management portal and seek [System Explorer] then [SQL] then [Go].
+Now you can enter in the [Execute Query] :
+```
+SELECT * FROM iris.training
+```
+
+
 
 # 8. Business Processes
 
-Business Processes (BP) are the business logic of our production. They are used to process requests or relay those requests to other components of the production.
+**Business Processes** (BP) are the business logic of our production. They are used to process requests or relay those requests to other components of the production.<br>
+BP also have an `OnRequest` function that will be called everytime this instance receive a request from any source, this will allow us to receive information and process it in anyway and disptach it to the right BO.
 
-Business Processes are created within the Management Portal:
+We will create those process in local in VSCode, that is, in the `python/bp.py` file.<br>Saving this file will compile them in IRIS. 
 
-![BPMenu](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BPMenu.png)
 
 ## 8.1. Simple BP
 
-### 8.1.1. Creating the process
+We now have to create a **Business Process** to process the information coming from our future services and dispatch it accordingly. We are going to create a simple BP that will call our operations.
 
-We are now in the Business Process Designer. We are going to create a simple BP that will call our operation: 
+Since our BP will only redirect information we will call it `Router` and it will be in the file `python/bp.py` like this :
+```python
+from grongier.pex import BusinessProcess
 
-![BPAddingCall](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BPAddingCall.gif)
-
-### 8.1.2. Modifying the context of a BP
-
-A BP has a **Context**. It is composed of a request class, the class of the input, and of a response class, the class of the output. **Business Processes only have one input and one output**. It is also possible to add properties. 
-
-Since our BP will only be used to call our BO, we can put as request class the message class we created (we don't need an output as we just want to insert into the database).
-
-![BPContext](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BPContext.png)
-
-We then chose the target of the call function : our BO. That operation, being **called** has a **callrequest** property. We need to bind that callrequest to the request of the BP (they both are of the class `Formation.Msg.FormationInsertRequest`), we do that by clicking on the call function and using the request builder: 
-
-![BPBindRequests](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BPBindRequests.gif)
-
-We can now save this BP (in the package ‘Formation.BP‘ and under the name ‘InsertLocalBDD‘ or 'Main', for example). Just like the operations, the processes can be instantiated and tested through the production configuration, for that they need to be compiled beforehand (on the Business Process Designer screen).
-
-Our Process for now only passes the message to our Operation. We are going to complexify it so that the BP will take as input one line of a CSV file. 
+from msg import FormationRequest, TrainingIrisRequest
+from obj import Training
 
 
-## 8.2. BP reading CSV lines
+class Router(BusinessProcess):
 
-### 8.2.1. Creating a record map
+    def OnRequest(self, request):
+        if isinstance(request,FormationRequest):
+            msg = TrainingIrisRequest()
+            msg.training = Training()
+            msg.training.name = request.formation.nom
+            msg.training.room = request.formation.salle
+            self.SendRequestSync('Python.FileOperation',request)
+            self.SendRequestSync('Python.IrisOperation',msg)
 
-In order to read a file and put its content into a file, we need a Record Map (RM). There is a Record Mapper specialized for CSV files in the [Interoperability > Build] menu of the management portal: 
+        return 
+```
+The Router will receive a request of the type `FormationRequest` and will send a message of the type `TrainingIrisRequest` to the `IrisOperation` operation.
+If the message/request is not an instance of the type we are looking for, we will just do nothing and not dispatch it.
 
-![RMMenu](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/RMMenu.png)
+Don't forget to register your component :
+Following [5.4.](#54-register-components) and using:
+```
+iris.cls("Grongier.PEX.Utils").RegisterComponent("bp","Router","/irisdev/app/src/python/",1,"Python.Router")
+```
 
-We will create the mapper like this: 
+## 8.2. Adding the process to the production
 
-![RMCreation](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/RMCreation.png)
+We now need to add the process to the production. For this, we use the Management Portal. By pressing the [+] sign next to [Processes], we have access to the [Business Process Wizard]. There, we chose the process class we just created in the scrolling menu. 
 
-You should now have this Record Map: 
+## 8.3. Testing
 
-![RMDetails](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/RMDetails.png)
+Double clicking on the process will enable us to activate it. After that, by selecting the process and going in the [Actions] tabs in the right sidebar menu, we should be able to test the process (if not see the production creation part to activate testings / you may need to start the production if stopped).
 
-Now that the Map is created, we have to generate it (with the Generate button). We now need to have a Data Transformation from the record map format and an insertion message.
+By doing so, we will send the process a message of the type `msg.FormationRequest`.
+![RouterTest](https://user-images.githubusercontent.com/77791586/164474368-838fd740-0548-44e6-9bc0-4c6c056f0cd7.png)
 
-### 8.2.2. Creating a Data Transformation
+If all goes well, showing the visual trace will enable us to see what happened between the process, services and processes. <br>Here, we can see the messages being sent to the operations by the process, and the operations sending back a response.
+![RouterResults](https://user-images.githubusercontent.com/77791586/164474411-efdae647-5b8b-4790-8828-5e926c597fd1.png)
 
-We will find the Data Transformation (DT) Builder in the [Interoperability > Builder] menu. We will create our DT like this (if you can't find `Formation.RM.Csv.Record`, maybe you didn't generate the record map): 
+# 9. Business Service
 
-![DTCreation](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/DTCreation.png)
+**Business Service** (BS) are the ins of our production. They are used to gather information and send them to our routers.
+BS also have an `OnProcessInput` function that often gather information in our framework, it can be called by multiple ways such as a REST API or an other service, or by the service itself to execute his code again.
+BS also have a `getAdapterType` function that allow us to allocate an adapter to the class, for example `Ens.InboundAdapter`that will make it so that the service will call his own `OnProcessInput`every 5 seconds.
 
-Now, we can map the different fields together:
+We will create those services in local in VSCode, that is, in the `python/bs.py` file.<br>Saving this file will compile them in IRIS.
 
-![DTMap](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/DTMap.gif)
+## 9.1. Simple BS
 
-### 8.2.3. Adding the Data Transformation to the Business Process
+We now have to create a Business Service to read a CSV and send each line as a `msg.FormationRequest` to the router.
 
-The first thing we have to change is the BP's request class, since we need to have in input the Record Map we created.
+Since our BS will read a csv we will call it `ServiceCSV` and it will be in the file `python/bs.py` like this :
+```python
+from grongier.pex import BusinessService
 
-![BP2ChangeContext](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BP2ChangeContext.png)
+from dataclass_csv import DataclassReader
 
-We can then add our transformation (the name of the process doesn't change anything, from here we chose to name it `Main`): 
+from obj import Formation
+from msg import FormationRequest
 
-![BP2AddingTransform](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BP2AddingTransform.gif)
+class ServiceCSV(BusinessService):
 
-The transform activity will take the request of the BP (a Record of the CSV file, thanks to our Record Mapper), and transform it into a `FormationInsertRequest` message. In order to store that message to send it to the BO, we need to add a property to the context of the BP. 
+    def getAdapterType():
+        """
+        Name of the registred adaptor
+        """
+        return "Ens.InboundAdapter"
+    
+    def OnInit(self):
+        if hasattr(self,'Path'):
+            self.Path = self.Path
+        else:
+            self.Path = '/irisdev/app/misc/'
+        return
 
-![BP2MsgContext](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BP2MsgContext.png)
+    def OnProcessInput(self,request):
+        filename='formation.csv'
+        with open(self.Path+filename) as formation_csv:
+            reader = DataclassReader(formation_csv, Formation,delimiter=";")
+            for row in reader:
+                msg = FormationRequest()
+                msg.formation = row
+                self.SendRequestSync('Python.Router',msg)
 
-We can now configure our transform function so that it takes it input as the input of the BP and saves its output in the newly created property. The source and target of the `RmToMsg` transformation are respectively `request` and `context.Msg`:
+        return
+```
+As we can see, the ServiceCSV gets an InboundAdapter that will allow it to function on it's own and to call OnProcessInput every 5 seconds ( parameter that can be changed in the basic settings of the settings of the service on the Management Portal)
 
-![BP2RmToMsg](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BP2RmToMsg.png)
+Every 5 seconds, the service will open the `formation.csv` to read each line and create a `msg.FormationRequest` that will be send to the `Python.Router`.
 
-We need to do the same for `Call BO`. Its input, or `callrequest`, is the value stored in `context.msg`: 
+Don't forget to register your component :
+Following [5.4.](#54-register-components) and using:
+```
+iris.cls("Grongier.PEX.Utils").RegisterComponent("bs","ServiceCSV","/irisdev/app/src/python/",1,"Python.ServiceCSV")
+```
 
-![BP2CallBO](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BP2CallBO.gif)
+## 9.2. Adding the service to the production
 
-In the end, the flow in the BP can be represented like this: 
+We now need to add the service to the production. For this, we use the Management Portal. By pressing the [+] sign next to [Services], we have access to the [Business service Wizard]. There, we chose the service class we just created in the scrolling menu. 
 
-![BP2Diagram](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BP2Diagram.png)
+## 9.3. Testing
 
-### 8.2.4. Configuring Production
+Double clicking on the process will enable us to activate it. As explained before, nothing more has to be done here since the service will start on his own every 5 seconds.
+If all goes well, showing the visual trace will enable us to see what happened between the process, services and processes. Here, we can see the messages being sent to the process by the service, the messages to the operations by the process, and the operations sending back a response.
+![ServiceCSVResults](https://user-images.githubusercontent.com/77791586/164474470-c77c4a06-0d8f-4ba9-972c-ce09b20fa54a.png)
 
-With the [+] sign, we can add our new process to the production (if not already done). We also need a generic service to use the record map, we use `EnsLib.RecordMap.Service.FileService` (we add it with the [+] button next to services). We then parameter this service: 
-
-![ServiceParam](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ServiceParam.gif)
-
-We should now be able to test our BP.
-
-### 8.2.5. Testing 
-
-We test the whole production this way: 
-
-![TestProductionCSV](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/TestProductionCSV.gif)
-
-In `System Explorer > SQL` menu, you can execute the command
-````sql
-SELECT 
-ID, Name, Salle
-FROM Formation_Table.Formation
-````
-to see the objects we just saved.
-
-
-# 9. Getting access to an extern database using JDBC
+# 10. Getting access to an extern database using JDBC
 
 In this section, we will create an operation to save our objects in an extern database. We will be using the JDBC API, as well as the other docker container that we set up, with postgre on it. 
 
-## 9.1. Creating our new operation
+## 10.1. Prerequisites
+In order to use postgre we need psycopg2 which is a python module allowing us to connect to the postegre database with a simple command.<br>
+It was already done automatically but the steps are : access the inside of the docker container to install psycopg2 using pip3.<br>Once you are in the terminal enter :
+```
+pip3 install psycopg2-binary
+```
 
-Our new operation, in the file `Formation/BO/RemoteBDD.cls` is as follows: 
+Or add your module in the requirements.txt and rebuild the container.
 
-````objectscript
-Include EnsSQLTypes
+## 10.2. Creating our new operation
 
-Class Formation.BO.RemoteBDD Extends Ens.BusinessOperation
-{
+Our new operation needs to be added after the two other one in the file `python/bo.py`.
+Our new operation and the imports are as follows: 
+````python
+import psycopg2
 
-Parameter ADAPTER = "EnsLib.SQL.OutboundAdapter";
+class PostgresOperation(BusinessOperation):
 
-Property Adapter As EnsLib.SQL.OutboundAdapter;
+    def OnInit(self):
+        if not hasattr(self,'FileName'):
+            self.FileName = "/tmp/test.txt"
 
-Parameter INVOCATION = "Queue";
+        self.conn = psycopg2.connect(
+        host="db",
+        database="DemoData",
+        user="DemoData",
+        password="DemoData",
+        port="5432")
+        self.conn.autocommit = True
 
-Method InsertRemoteBDD(pRequest As Formation.Msg.FormationInsertRequest, Output pResponse As Ens.StringResponse) As %Status
-{
-	set tStatus = $$$OK
-	
-	try{
-		set pResponse = ##class(Ens.Response).%New()
-		set ^inc = $I(^inc)
-		set tInsertSql = "INSERT INTO public.formation (id, nom, salle) VALUES(?, ?, ?)"
-		$$$ThrowOnError(..Adapter.ExecuteUpdate(.nrows,tInsertSql,^inc,pRequest.Formation.Nom, pRequest.Formation.Salle ))
-	}
-	catch exp
-	{
-		Set tStatus = exp.AsStatus()
-	}
+        return 
 
-	Quit tStatus
-}
+    def OnTearDown(self):
+        self.conn.close()
 
-XData MessageMap
-{
-<MapItems>
-	<MapItem MessageType="Formation.Msg.FormationInsertRequest"> 
-		<Method>InsertRemoteBDD</Method>
-	</MapItem>
-</MapItems>
-}
-
-}
+    def InsertTraining(self,request:FormationRequest):
+        cursor = self.conn.cursor()
+        sql = "INSERT INTO public.formation ( id,nom,salle ) VALUES ( %s , %s , %s )"
+        cursor.execute(sql,(request.formation.id,request.formation.nom,request.formation.salle))
+        return 
+    
+    def OnMessage(self,request):
+        return
 ````
+It is to be noted that it is better if you put the `import psycopg2` at the beginning of the file with the other imports for clarity.
+This operation is similar to the first one we created. When it will receive a message of the type `msg.FormationRequest`, it will use the psycopg module to execute SQL requests. Those requests will be sent to our postgre database.
 
-This operation is similar to the first one we created. When it will receive a message of the type `Formation.Msg.FormationInsertRequest`, it will use an adapter to execute SQL requests. Those requests will be sent to our postgre database.
+As you can see here the connection is written directly into the code, to improve our code we could do as before for the other operations and make, `host`, `database` and the other connection information, variables with a base value of `db` and `DemoData` etc that can be change directly onto the management portal.<br>To do this we can change our `OnInit` function by :
+```python
+    def OnInit(self):
+        if hasattr(self,'Path'):
+            os.chdir(self.Path)
+        if not hasattr(self,'Host'):
+          self.Host = 'db'
+        if not hasattr(self,'Database'):
+          self.Database = 'DemoData'
+        if not hasattr(self,'User'):
+          self.User = 'DemoData'
+        if not hasattr(self,'Password'):
+          self.Password = 'DemoData'
+        if not hasattr(self,'Port'):
+          self.Port = '5432'
 
-## 9.2. Configuring the production
+        self.conn = psycopg2.connect(
+        host=self.Host,
+        database=self.Database,
+        user=self.User,
+        password=self.Password,
+        port=self.Port)
 
-Now, through the Management Portal, we will instantiate that operation (by adding it with the [+] sign in the production).
+        self.conn.autocommit = True
 
-We will also need to add the JavaGateway for the JDBC driver in the services. The full name of this service is `EnsLib.JavaGateway.Service`.
+        return 1
+```
 
-![JDBCProduction](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/JDBCProduction.png)
+Don't forget to register your component :
+Following [5.4.](#54-register-components) and using:
+```
+iris.cls("Grongier.PEX.Utils").RegisterComponent("bo","PostgresOperation","/irisdev/app/src/python/",1,"Python.PostgresOperation")
+```
 
-We now need to configure our operation. Since we have set up a postgre container, and connected its port `5432`, the value we need in the following parameters are:
+## 10.3. Configuring the production
 
->DSN: `jdbc:postgresql://db:5432/DemoData`
->
->JDBC Driver: `org.postgresql.Driver`
->
->JDBC Classpath: `/tmp/iris/postgresql-42.2.14.jar`
+We now need to add the operation to the production. For this, we use the Management Portal. By pressing the [+] sign next to [Operations], we have access to the [Business Operation Wizard]. There, we chose the operation class we just created in the scrolling menu. 
 
-![JDBCParam](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/JDBCParam.png)
+Afterward, if you wish to change the connection, you can simply add in the %settings in [Python] in the [parameter] window of the operation the parameter you wish to change.
+See the second image of [7.5. Testing](#75-testing) for more details.
 
-Finally, we need to configure the credentials to have access to the remote database. For that, we need to open the Credential Viewer: 
-
-![JDBCCredentialMenu](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/JDBCCredentialMenu.png)
-
-The login and password are both `DemoData`, as we set up in the `docker-compose.yml` file.
-
-![JDBCCredentialCreation](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/JDBCCredentialCreation.gif)
-
-Back to the production, we can add `"Postgre"` in the [Credential] field in the settings of our operation (it should be in the scrolling menu). Before being able to test it, we need to add the JGService to the operation. In the [Settings] tab, in the [Additional Settings]: 
-
-![JDBCService](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/JDBCService.png)
-
-## 9.3. Testing
+## 10.4. Testing
 
 When testing the visual trace should show a success: 
 
 
-![JDBCTest](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/JDBCTest.png)
+![JDBCTest](https://user-images.githubusercontent.com/77791586/164474520-8e355daf-77f0-4827-9c08-8b0c7ae4b18a.png)
 
 We have successfully connected with an extern database. 
 
-## 9.4. Exercise
+## 10.5. Exercise
 
-As an exercise, it could be interesting to modify BO.LocalBDD so that it returns a boolean that will tell the BP to call BO.RemoteBDD depending on the value of that boolean.
+As an exercise, it could be interesting to modify `bo.IrisOperation` so that it returns a boolean that will tell the `bp.Router` to call `bo.PostgresOperation` depending on the value of that boolean.
 
-**Hint**: This can be done by changing the type of reponse LocalBDD returns and by adding a new property to the context and using the `if` activity in our BP.
+**Hint**: This can be done by changing the type of reponse bo.IrisOperation returns and by adding to that new type of message/response a new boolean property and using the `if` activity in our bp.Router.
 
-## 9.5. Solution
+## 10.6. Solution
 
-First, we need to have a response from our LocalBDD operation. We are going to create a new message, in the `Formation/Msg/FormationInsertResponse.cls`:
-````objectscript
-Class Formation.Msg.FormationInsertResponse Extends Ens.Response
-{
+First, we need to have a response from our bo.IrisOperation . We are going to create a new message after the other two, in the `python/msg.py`:
+````python
+@dataclass
+class TrainingirisResponse(Message):
 
-Property Double As %Boolean;
-
-}
+    bool:Boolean = None
 ````
 
-Then, we change the response of LocalBDD by that response, and set the value of its boolean randomly (or not): 
-````objectscript
-Method InsertLocalBDD(pRequest As Formation.Msg.FormationInsertRequest, Output pResponse As Formation.Msg.FormationInsertResponse) As %Status
-{
-    set tStatus = $$$OK
-    
-    try{
-        set pResponse = ##class(Formation.Msg.FormationInsertResponse).%New()
-        if $RANDOM(10) < 5 {
-            set pResponse.Double = 1
-        } 
-        else {
-            set pResponse.Double = 0
-        }
-...
+Then, we change the response of bo.IrisOperation by that response, and set the value of its boolean randomly (or not).<br>In the `python/bo.py`you need to add two imports and change the IrisOperation class:
+````python
+import random
+from msg import TrainingIrisResponse
+
+class IrisOperation(BusinessOperation):
+
+    def InsertTraining(self, request:TrainingIrisRequest):
+        resp = TrainingIrisResponse()
+        resp.bool = (random.random() < 0.5)
+        sql = """
+        INSERT INTO iris.training
+        ( name, room )
+        VALUES( ?, ? )
+        """
+        iris.sql.exec(sql,request.training.name,request.training.room)
+        return resp
+        
+    def OnMessage(self, request):
+        return
 ````
 
-We will now create a new process (copied from the one we made), where we will add a new context property, of type `%Boolean`:
+We will now change our process `bp.Router` in `python/bp.py` , where we will make it so that if the response from the IrisOperation has a boolean equal to True it will call the PostgesOperation.
+Here is the new code :
+```python
+class Router(BusinessProcess):
 
-![ExerciseContext](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ExerciseContext.png)
+    def OnRequest(self, request):
+        if isinstance(request,FormationRequest):
+            msg = TrainingIrisRequest()
+            msg.training = Training()
+            msg.training.name = request.formation.nom
+            msg.training.room = request.formation.salle
+            self.SendRequestSync('Python.FileOperation',request)
+            formIrisResp = self.SendRequestSync('Python.IrisOperation',msg)
+            if formIrisResp.bool:
+                self.SendRequestSync('Python.PostgresOperation',request)
 
-This property will be filled with the value of the callresponse.Double of our operation call (we need to set the [Response Message Class] to our new message class):
+        return 
+```
 
-![ExerciseBinding](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ExerciseBinding.png)
+VERY IMPORTANT : we need to make sure we use **SendRequestSync** and not **SendRequestAsync** in the call of our operations, or else the activity will set off before receiving the boolean response.
 
-We then add an `if` activity, with the `context.Double` property as condition:
+In the visual trace, after testing, we should have approximately half of objects read in the csv saved also in the remote database.<br>
+Note that to test you can just start the `bs.ServiceCSV` and it will automatically send request to the router that will then dispatch properly the requests.<br>
+Also note that you must double click on a service and press reload or restart if you want your saved changes on VSCode to apply.
 
-![ExerciseIf](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ExerciseIf.png)
-
-VERY IMPORTANT : we need to uncheck **Asynchronous** in the settings of our LocallBDD Call, or the if activity will set off before receiving the boolean response.
-
-Finally we set up our call activity with as a target the RemoteBDD BO:
-
-![ExerciseRemoteCall](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ExerciseRemoteCall.png)
-
-To complete the if activity, we need to drag another connector from the output of the `if` to the `join` triangle below. As we won't do anything if the boolean is false, we will leave this connector empty. 
-After compiling and instantiating, we should be able to test our new process. For that, we need to change the `Target Config Name` of our File Service.
-
-In the trace, we should have approximately half of objects read in the csv saved also in the remote database. 
-
-# 10. REST service
+# 11. REST service
 
 In this part, we will create and use a REST Service.
 
-## 10.1. Creating the service
-
-To create a REST service, we need a cless that extends %CSP.REST, in `Formation/REST/Dispatch.cls` we have:
-
-````objectscript
-Class Formation.REST.Dispatch Extends %CSP.REST
-{
-
-/// Ignore any writes done directly by the REST method.
-Parameter IgnoreWrites = 0;
-
-/// By default convert the input stream to Unicode
-Parameter CONVERTINPUTSTREAM = 1;
-
-/// The default response charset is utf-8
-Parameter CHARSET = "utf-8";
-
-Parameter HandleCorsRequest = 1;
-
-XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
-{
-<Routes>
-  <!-- Get this spec -->
-  <Route Url="/import" Method="post" Call="import" />
-</Routes>
-}
-
-/// Get this spec
-ClassMethod import() As %Status
-{
-  set tSc = $$$OK
-
-  Try {
-
-      set tBsName = "Formation.BS.RestInput"
-      set tMsg = ##class(Formation.Msg.FormationInsertRequest).%New()
-
-      set body = $zcvt(%request.Content.Read(),"I","UTF8")
-      set dyna = {}.%FromJSON(body)
-
-      set tFormation = ##class(Formation.Obj.Formation).%New()
-      set tFormation.Nom = dyna.nom
-      set tFormation.Salle = dyna.salle
-
-      set tMsg.Formation = tFormation
-      
-      $$$ThrowOnError(##class(Ens.Director).CreateBusinessService(tBsName,.tService))
-      
-      $$$ThrowOnError(tService.ProcessInput(tMsg,.output))
-
-  } Catch ex {
-      set tSc = ex.AsStatus()
-  }
-
-  Quit tSc
-}
-
-}
-````
-
-This class contains a route to import an object, bound to the POST verb: 
-
-````xml
-<Routes>
-  <!-- Get this spec -->
-  <Route Url="/import" Method="post" Call="import" />
-</Routes>
-````
-The import method will create a message that will be sent to a Business Service.
-
-## 10.2. Adding our BS
-
-We are going to create a generic class that will route all of its sollicitations towards `TargetConfigNames`. This target will be configured when we will instantiate this service. In the `Formation/BS/RestInput.cls` file we have:
-
-```objectscript
-Class Formation.BS.RestInput Extends Ens.BusinessService
-{
-
-Property TargetConfigNames As %String(MAXLEN = 1000) [ InitialExpression = "BuisnessProcess" ];
-
-Parameter SETTINGS = "TargetConfigNames:Basic:selector?multiSelect=1&context={Ens.ContextSearch/ProductionItems?targets=1&productionName=@productionId}";
-
-Method OnProcessInput(pDocIn As %RegisteredObject, Output pDocOut As %RegisteredObject) As %Status
-{
-    set status = $$$OK
-
-    try {
-
-        for iTarget=1:1:$L(..TargetConfigNames, ",") {
-		    set tOneTarget=$ZStrip($P(..TargetConfigNames,",",iTarget),"<>W")  Continue:""=tOneTarget
-		    $$$ThrowOnError(..SendRequestSync(tOneTarget,pDocIn,.pDocOut))
-	    }
-    } catch ex {
-        set status = ex.AsStatus()
-    }
-
-    Quit status
-}
-
-}
+## 11.1. Prerequisites
+In order to use Flask we will need to install flask which is a python module allowing us to easily create a REST service.
+It was already done automatically but for information the steps are : access the inside of the docker container to install flask on iris python.
+Once you are in the terminal enter :
+```
+pip3 install flask
 ```
 
-Back to the production configuration, we add the service the usual way. In the [Target Config Names], we put our BO LocalBDD: 
+Or add your module in the requirements.txt and rebuild the container.
 
-![RESTServiceSetup](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/RESTServiceSetup.png)
+## 11.2. Creating the service
 
-To use this service, we need to publish it. For that, we use the [Edit Web Application] menu:
+To create a REST service, we will need a service that will link our API to our production, for this we create a new simple service in `python/bs.py` just after the `ServiceCSV` class.
+```python
+class FlaskService(BusinessService):
 
-![RESTServicePublish](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/RESTServicePublish.gif)
+    def OnInit(self):
+        
+        if not hasattr(self,'Target'):
+            self.Target = "Python.Router"
+        
+        return
 
-## 10.3. Testing
+    def OnProcessInput(self,request):
 
-Finally, we can test our service with any kind of REST client:
+        return self.SendRequestSync(self.Target,request)
+```
+OnProcessInput this service will simply transfer the request to the Router.
 
-![RESTTest](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/RESTTest.gif)
+Don't forget to register your component :
+Following [5.4.](#54-register-components) and using:
+```
+iris.cls("Grongier.PEX.Utils").RegisterComponent("bs","FlaskService","/irisdev/app/src/python/",1,"Python.FlaskService")
+```
 
-# Conclusion
+To create a REST service, we will need Flask to create an API that will manage the `get` and `post` function:
+We need to create a new file as `python/app.py`:
+```python
+from flask import Flask, jsonify, request, make_response
+from grongier.pex import Director
+import iris
 
-Through this formation, we have created a production that is able to read lines from a csv file and save the read data into both the IRIS database and an extern database using JDBC. We also added a REST service in order to use the POST verb to save new objects.
+from obj import Formation
+from msg import FormationRequest
+
+
+app = Flask(__name__)
+
+# ----------------------------------------------------------------
+### CRUD FOR Person
+# ----------------------------------------------------------------
+
+# GET Infos
+@app.route("/", methods=["GET"])
+def getInfo():
+    info = {'version':'1.0.6'}
+    return jsonify(info)
+
+# GET all the formations
+@app.route("/training/", methods=["GET"])
+def getAlltraining():
+    payload = {}
+    return jsonify(payload)
+
+# POST a formation
+@app.route("/training/", methods=["POST"])
+def postPerson():
+    payload = {} 
+
+    formation = Formation(request.get_json()['id'],request.get_json()['nom'],request.get_json()['salle'])
+    msg = FormationRequest(formation=formation)
+
+    tService = Director.CreateBusinessService("Python.FlaskService")
+    response = tService.dispatchProcessInput(msg)
+
+
+    return jsonify(payload)
+
+# GET formation with id
+@app.route("/training/<int:id>", methods=["GET"])
+def getPerson(id):
+    payload = {}
+    return jsonify(payload)
+
+# PUT to update formation with id
+@app.route("/training/<int:id>", methods=["PUT"])
+def updatePerson(id):
+
+    payload = {
+    }
+    return jsonify(payload)
+
+# DELETE formation with id
+@app.route("/training/<int:id>", methods=["DELETE"])
+def deletePerson(id):
+    payload = {}  
+    return jsonify(payload)
+
+
+# ----------------------------------------------------------------
+### MAIN PROGRAM
+# ----------------------------------------------------------------
+
+if __name__ == '__main__':
+    app.run('0.0.0.0', port = "8081")
+```
+
+Note that the Flask API will use a Director to create an instance of our FlaskService from earlier and then send the right request.
+
+We made the POST formation functional in the code above, it is now your task, if you wish, to make the other functions in order to get/post the right information using all the things we have learned so far.
+
+## 11.3. Testing
+
+Finally, we can test our service with any kind of REST client after having reloaded the Router service.
+
+Using any REST service as RESTer for Mozilla, it is needed to fill the headers like this:
+![RESTHeaders](https://user-images.githubusercontent.com/77791586/165522396-154a4ef4-535b-44d7-bcdd-a4bfd2f574d3.png)
+
+
+The body like this:
+![RESTBody](https://user-images.githubusercontent.com/77791586/165522641-b4e772e0-bad3-495e-9a1f-ffe3210053a9.png)
+
+The authorization like this:
+![RESTAuthorization](https://user-images.githubusercontent.com/77791586/165522730-bb89797a-0dd1-4691-b1e8-b7c491b53a6a.png)
+
+
+Finally, the results should be something like this:
+![RESTResults](https://user-images.githubusercontent.com/77791586/165522839-feec14c0-07fa-4d3f-a435-c9a06a544785.png)
+
+
+# 12. Global exercise
+
+Now that we are familliar with all the important concepts of the Iris DataPlatform and its [Framework](#2-framework) it is time to try ourselves on a global exercise that will make us create a new BS and BP, modify greatly our BO and also explore new concept in Python.
+
+## 12.1. Instructions
+Using this **endpoint** : `https://lucasenard.github.io/Data/patients.json` we have to automatically **get** information about `patients and their number of steps`.
+Then, we must calculate the average number of steps per patient before writing it down on a csv file locally.
+
+If needed, it is advised to seek guidance by rereading through the whole formation or the parts needed or by seeking help using the [hints](#122-hints) below.
+
+When everything is done and tested, or if the hints aren't enough to complete the exercise, the [solution](#123-solutions) step-by-step is present to walk us through the whole procedure.
+
+## 12.2. Hints
+In this part we can find hints to do the exercise, the [hints](#1221-hints) are an increasing guidance on how to accomplish different task.
+
+
+### 12.2.1. bs
+#### 12.2.1.1. Get information
+
+To get the information from the endpoint it is advised to search for the `requests` module of python and use `json` and `json.dumps` to make it into str to send it in the bp
+
+#### 12.2.1.2. Get information with requests
+
+An online python website or any local python file can be used to use requests and print the output and it's type to go further and understand what we get.
+
+#### 12.2.1.3. Get information with requests and using it
+
+It is advised to create a new message type and object type to hold information and send it to a process to calculate the average.
+
+#### 12.2.1.4. Get information solution
+
+Solution on how to use request to get data and in our case, partially what to do with it.
+```python
+r = requests.get(https://lucasenard.github.io/Data/patients.json)
+data = r.json()
+for key,val in data.items():
+    ...
+```
+
+Again, in an online python website or any local python file, it is possible to print key, val and their type to understand what can be done with them.<br>
+It is advised to store `val` usign `json.dumps(val)` and then, after the SendRequest,when you are in the process, use `json.loads(request.patient.infos)`to get it ( if you have stored the informations of `val` into `patient.infos` )
+
+### 12.2.2. bp
+#### 12.2.2.1. Average and dict
+
+`statistics` is a native library that can be used to do math.
+
+#### 12.2.2.2. Average and dict hint
+
+The native `map` function in python can allow you to seperate information within a list or a dict for example.
+
+Don't forget to transform the result of `map` back to a list using the `list` native function.
+
+#### 12.2.2.3. Average and dict with map
+
+Using an online python website or any local python file it is possible to calculate average of a list of lists or a list of dict doing :
+```python
+l1 = [[0,5],[8,9],[5,10],[3,25]]
+l2 = [["info",12],["bidule",9],[3,3],["patient1",90]]
+l3 = [{"info1":"7","info2":0},{"info1":"15","info2":0},{"info1":"27","info2":0},{"info1":"7","info2":0}]
+
+#avg of the first columns of the first list (0/8/5/3)
+avgl1_0 = statistics.mean(list(map(lambda x: x[0]),l1))
+
+#avg of the second columns of the first list (5/9/10/25)
+avgl1_1 = statistics.mean(list(map(lambda x: x[1]),l1))
+
+#avg of 12/9/3/90
+avgl2_1 = statistics.mean(list(map(lambda x: x[1]),l2))
+
+#avg of 7/15/27/7
+avgl3_info1 = statistics.mean(list(map(lambda x: int(x["info1"])),l3))
+
+print(avgl1_0)
+print(avgl1_1)
+print(avgl2_1)
+print(avgl3_info1)
+```
+
+#### 12.2.2.4. Average and dict the answer
+
+If your request hold a patient which as an atribute infos which is a json.dumps of a dict of date and number of steps, you can calculate his avergae number of steps using :
+```python
+statistics.mean(list(map(lambda x: int(x['steps']),json.loads(request.patient.infos))))
+```
+### 12.2.3. bo
+
+It is advised to use something really similar to `bo.Fileoperation.WriteFormation`
+
+Something like `bo.Fileoperation.WritePatient`
+
+## 12.3. Solutions
+
+### 12.3.1. obj & msg
+
+In our `obj.py` we can add :
+```python
+@dataclass
+class Patient:
+    name:str = None
+    avg:int = None
+    infos = None
+```
+
+In our `msg.py` we can add :
+```python
+from obj import Formation,Training,Patient
+
+@dataclass
+class PatientRequest(Message):
+    patient:Patient = None
+```
+We will hold the information in a single obj and we will put the str of the dict out of the get requests directly into the `infos` attribute.
+The avg will be calculated in the process.
+
+### 12.3.2. bs
+
+In our `bs.py` we can add :
+```python
+import requests
+
+class PatientService(BusinessService):
+
+    def getAdapterType():
+        """
+        Name of the registred adaptor
+        """
+        return "Ens.InboundAdapter"
+
+    def OnInit(self):
+        if not hasattr(self,'Target'):
+            self.Target = "Python.PatientProcess"
+
+        if not hasattr(self,'ApiUrl'):
+            self.ApiUrl = "https://lucasenard.github.io/Data/patients.json"
+        
+        return
+
+    def OnProcessInput(self,request):
+        r = requests.get(self.ApiUrl)
+        if r.status_code == 200:
+
+            dat = r.json()
+
+            for key,val in dat.items():
+
+                patient = Patient()
+                patient.name = key
+                patient.infos = json.dumps(val)
+
+                msg = PatientRequest()
+                msg.patient = patient
+                
+                self.SendRequestSync(self.Target,msg)
+
+        return 
+```
+It is advised to make the target and the api url variables ( see OnInit ).<br>
+After the `requests.get`putting the information in the `r` variable, it is needed to extract the information in json, which will make `dat` a dict.<br>
+Using dat.items it is possible to iterate on the patient and its info directly.<br>
+We then create our object patient and put `val` into a string into the `patient.infos` variable using `json.dumps` that transform any json data to string.<br>
+Then, we create the request `msg` which is a `msg.PatientRequest` to call our process. 
+
+### 12.3.3. bp
+In our `bp.py` we can add :
+```python
+import statistic
+
+class PatientProcess(BusinessProcess):
+
+    def OnRequest(self, request):
+
+        if isinstance(request,PatientRequest):
+
+            request.patient.avg = statistics.mean(list(map(lambda x: int(x['steps']),json.loads(request.patient.infos))))
+
+            self.SendRequestSync('Python.FileOperation',request)
+
+        return 
+```
+We take the request we just got, and if it is a `PatientRequest` we calculate the mean of the steps and we send it to our FileOperation.
+This fills the `avg` variable of our patient with the right information ( see the hint on the bp for more information )
+
+
+### 12.3.4. bo
+In our `bo.py` we can add, inside the class `FileOperation` :
+```python
+    def WritePatient(self, pRequest:PatientRequest):
+        name = ""
+        avg = 0
+
+        if (pRequest.patient is not None):
+            name = pRequest.patient.name
+            avg = pRequest.patient.avg
+
+        line = name + " avg nb steps : " + str(avg)
+
+        filename = 'Patients.csv'
+
+        self.PutLine(filename, line)
+
+        return 
+```
+## 12.4. Testing
+
+Now we can head towards the management portal and do as before.
+Remember that our new service will execute automatically since we added an InboundAdapter to it.
+
+The same way we checked for the `toto.csv` we can check the `Patients.csv`
+
+## 12.5. Conclusion of the global exercise
+
+Through this exercise it is possible to learn and understand the creation of messages,services, processes and operation.
+We discovered how to fecth information in Python and how to execute simple task on our data.
+
+# 13. Conclusion
+
+Through this formation, we have created a fully fonctional production using only IrisPython that is able to read lines from a csv file and save the read data into a local txt, the IRIS database and an extern database using JDBC. <br>We also added a REST service in order to use the POST verb to save new objects.
 
 We have discovered the main elements of InterSystems' interoperability Framework.
 
