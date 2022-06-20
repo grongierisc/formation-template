@@ -55,7 +55,7 @@ This is the IRIS Framework.
 
 ![FrameworkFull](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/FrameworkFull.png)
 
-The components inside of IRIS represent a production. Inbound adapters and outbound adapters enable us to use different kind of format as input and output for our databse. The composite applications will give us access to the production through external applications like REST services.
+The components inside of IRIS represent a production. Inbound adapters and outbound adapters enable us to use different kind of format as input and output for our database. The composite applications will give us access to the production through external applications like REST services.
 
 The arrows between them all of this components are **messages**. They can be requests or responses.
 
@@ -63,7 +63,7 @@ The arrows between them all of this components are **messages**. They can be req
 
 In our case, we will read lines in a csv file and save it into the IRIS database. 
 
-We will then add an operation that will enable us to save objects in an extern database too, using JDBC. This database will be located in a docker container, using postgre.
+We will then add an operation that will enable us to save objects in an extern database too, using JDBC. This database will be located in a docker container, using Postgres.
 
 Finally, we will see how to use composite applications to insert new objects in our database or to consult this database (in our case, through a REST service).
 
@@ -103,7 +103,7 @@ A part of the things we will be doing will be saved locally, but all the process
 
 ![ExportProgress](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ExportProgress.png)
 
-We will have to save our Production, Record Map, Business Processes and Data Transfromation this way. After that, when we close our docker container and compose it up again, we will still have all of our progress saved locally (it is, of course, to be done after every change through the portal). To make it accessible to IRIS again we need to compile the exported files (by saving them, InterSystems addons take care of the rest).
+We will have to save our Production, Record Map, Business Processes and Data Transformation this way. After that, when we close our docker container and compose it up again, we will still have all of our progress saved locally (it is, of course, to be done after every change through the portal). To make it accessible to IRIS again we need to compile the exported files (by saving them, InterSystems addons take care of the rest).
 # 6. Productions 
 We can now create our first production. For this, we will go through the [Interoperability] and [Configure] menus: 
 
@@ -113,7 +113,7 @@ We then have to press [New], select the [Formation] package and chose a name for
 
 ![ProductionCreation](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ProductionCreation.png)
 
-Immediatly after creating our production, we will need to click on [Production Settings] just above the [Operations] section. In the right sidebar menu, we will have to activate [Testing Enabled] in the [Development and Debugging] part of the [Settings] tab (don't forget to press [Apply]).
+Immediately after creating our production, we will need to click on [Production Settings] just above the [Operations] section. In the right sidebar menu, we will have to activate [Testing Enabled] in the [Development and Debugging] part of the [Settings] tab (don't forget to press [Apply]).
 
 ![ProductionTesting](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ProductionTesting.png)
 
@@ -123,7 +123,7 @@ In this first production we will now add Business Operations.
 
 A Business Operation (BO) is a specific operation that will enable us to send requests from IRIS to an external application / system. It can also be used to directly save in IRIS what we want.
 
-We will create those operations in local, that is, in the `Formation/BO/` file. Saving the files will compile them in IRIS. 
+We will create those operations in local, that is, in the `src/Formation/BO/` file. Saving the files will compile them in IRIS. 
 
 For our first operation we will save the content of a message in  the local database.
 
@@ -133,12 +133,12 @@ We need to have a way of storing this message first.
 
 Storage classes in IRIS extends the type `%Persistent`. They will be saved in the intern database.
 
-In our `Formation/Table/Formation.cls` file we have: 
+In our `src/Formation/Table/Formation.cls` file we have: 
 ```objectscript
 Class Formation.Table.Formation Extends %Persistent
 {
 
-Property Name As %String;
+Property Nom As %String;
 
 Property Salle As %String;
 
@@ -149,7 +149,7 @@ Note that when saving, additional lines are automatically added to the file. The
 
 ## 7.2. Creating our message class
 
-This message will contain a `Formation` object, located in the `Formation/Obj/Formation.cls` file: 
+This message will contain a `Formation` object, located in the `src/Formation/Obj/Formation.cls` file: 
 ```objectscript
 Class Formation.Obj.Formation Extends (%SerialObject, %XML.Adaptor)
 {
@@ -173,7 +173,7 @@ Property Formation As Formation.Obj.Formation;
 
 ## 7.3. Creating our operation
 
-Now that we have all the elements we need, we can create our operation, in the `Formation/BO/LocalBDD.cls` file: 
+Now that we have all the elements we need, we can create our operation, in the `src/Formation/BO/LocalBDD.cls` file: 
 ```objectscript
 Class Formation.BO.LocalBDD Extends Ens.BusinessOperation
 {
@@ -187,7 +187,7 @@ Method InsertLocalBDD(pRequest As Formation.Msg.FormationInsertRequest, Output p
     try{
         set pResponse = ##class(Ens.Response).%New()
         set tFormation = ##class(Formation.Table.Formation).%New()
-        set tFormation.Name = pRequest.Formation.Nom
+        set tFormation.Nom = pRequest.Formation.Nom
         set tFormation.Salle = pRequest.Formation.Salle
         $$$ThrowOnError(tFormation.%Save())
     }
@@ -209,7 +209,6 @@ XData MessageMap
 }
 
 }
-
 ```
 
 The MessageMap gives us the method to launch depending on the type of the request (the message sent to the operation).
@@ -256,7 +255,7 @@ Since our BP will only be used to call our BO, we can put as request class the m
 
 ![BPContext](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BPContext.png)
 
-We then chose the target of the call function : our BO. That operation, being **called** has a **callrequest** property. We need to bind that callrequest to the request of the BP (they both are of the class `Formation.Msg.FormationInsertRequest`), we do that by clicking on the call function and using the request builder: 
+We then chose the target of the call function : our BO. That operation, being **called** has a **callrequest** property that holds as seen before a Formation, that is made of a 'Nom' and a 'Salle'. We need to bind that Formation to the Formation request of the BP, we do that by clicking on the call function and using the request builder to link the Request to the callrequest. 
 
 ![BPBindRequests](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BPBindRequests.gif)
 
@@ -336,7 +335,7 @@ We test the whole production this way:
 In `System Explorer > SQL` menu, you can execute the command
 ````sql
 SELECT 
-ID, Name, Salle
+ID, Nom, Salle
 FROM Formation_Table.Formation
 ````
 to see the objects we just saved.
@@ -344,11 +343,11 @@ to see the objects we just saved.
 
 # 9. Getting access to an extern database using JDBC
 
-In this section, we will create an operation to save our objects in an extern database. We will be using the JDBC API, as well as the other docker container that we set up, with postgre on it. 
+In this section, we will create an operation to save our objects in an extern database. We will be using the JDBC API, as well as the other docker container that we set up, with Postgres on it. 
 
 ## 9.1. Creating our new operation
 
-Our new operation, in the file `Formation/BO/RemoteBDD.cls` is as follows: 
+Our new operation, in the file `src/Formation/BO/RemoteBDD.cls` is as follows: 
 
 ````objectscript
 Include EnsSQLTypes
@@ -392,7 +391,7 @@ XData MessageMap
 }
 ````
 
-This operation is similar to the first one we created. When it will receive a message of the type `Formation.Msg.FormationInsertRequest`, it will use an adapter to execute SQL requests. Those requests will be sent to our postgre database.
+This operation is similar to the first one we created. When it will receive a message of the type `Formation.Msg.FormationInsertRequest`, it will use an adapter to execute SQL requests. Those requests will be sent to our Postgres database.
 
 ## 9.2. Configuring the production
 
@@ -402,7 +401,7 @@ We will also need to add the JavaGateway for the JDBC driver in the services. Th
 
 ![JDBCProduction](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/JDBCProduction.png)
 
-We now need to configure our operation. Since we have set up a postgre container, and connected its port `5432`, the value we need in the following parameters are:
+We now need to configure our operation. Since we have set up a Postgres container, and connected its port `5432`, the value we need in the following parameters are:
 
 >DSN: `jdbc:postgresql://db:5432/DemoData`
 >
@@ -437,7 +436,7 @@ We have successfully connected with an extern database.
 
 As an exercise, it could be interesting to modify BO.LocalBDD so that it returns a boolean that will tell the BP to call BO.RemoteBDD depending on the value of that boolean.
 
-**Hint**: This can be done by changing the type of reponse LocalBDD returns and by adding a new property to the context and using the `if` activity in our BP.
+**Hint**: This can be done by changing the type of response LocalBDD returns and by adding a new property to the context and using the `if` activity in our BP.
 
 ## 9.5. Solution
 
@@ -480,7 +479,7 @@ We then add an `if` activity, with the `context.Double` property as condition:
 
 ![ExerciseIf](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ExerciseIf.png)
 
-VERY IMPORTANT : we need to uncheck **Asynchronous** in the settings of our LocallBDD Call, or the if activity will set off before receiving the boolean response.
+VERY IMPORTANT : we need to uncheck **Asynchronous** in the settings of our LocalBDD Call, or the if activity will set off before receiving the boolean response.
 
 Finally we set up our call activity with as a target the RemoteBDD BO:
 
@@ -497,7 +496,7 @@ In this part, we will create and use a REST Service.
 
 ## 10.1. Creating the service
 
-To create a REST service, we need a cless that extends %CSP.REST, in `Formation/REST/Dispatch.cls` we have:
+To create a REST service, we need a class that extends %CSP.REST, in `Formation/REST/Dispatch.cls` we have:
 
 ````objectscript
 Class Formation.REST.Dispatch Extends %CSP.REST
@@ -567,13 +566,13 @@ The import method will create a message that will be sent to a Business Service.
 
 ## 10.2. Adding our BS
 
-We are going to create a generic class that will route all of its sollicitations towards `TargetConfigNames`. This target will be configured when we will instantiate this service. In the `Formation/BS/RestInput.cls` file we have:
+We are going to create a generic class that will route all of its solicitations towards `TargetConfigNames`. This target will be configured when we will instantiate this service. In the `src/Formation/BS/RestInput.cls` file we have:
 
 ```objectscript
 Class Formation.BS.RestInput Extends Ens.BusinessService
 {
 
-Property TargetConfigNames As %String(MAXLEN = 1000) [ InitialExpression = "BuisnessProcess" ];
+Property TargetConfigNames As %String(MAXLEN = 1000) [ InitialExpression = "BusinessProcess" ];
 
 Parameter SETTINGS = "TargetConfigNames:Basic:selector?multiSelect=1&context={Ens.ContextSearch/ProductionItems?targets=1&productionName=@productionId}";
 
