@@ -180,18 +180,12 @@ Class Formation.BO.LocalBDD Extends Ens.BusinessOperation
 
 Parameter INVOCATION = "Queue";
 
-Method InsertLocalBDD(pRequest As Formation.Msg.FormationInsertRequest, Output pResponse As Formation.Msg.FormationInsertResponse) As %Status
+Method InsertLocalBDD(pRequest As Formation.Msg.FormationInsertRequest, Output pResponse As Ens.StringResponse) As %Status
 {
     set tStatus = $$$OK
     
     try{
-        set pResponse = ##class(Formation.Msg.FormationInsertResponse).%New()
-        if $RANDOM(10) < 5 {
-            set pResponse.Double = 1
-        } 
-        else {
-            set pResponse.Double = 0
-        }
+        set pResponse = ##class(Ens.Response).%New()
         set tFormation = ##class(Formation.Table.Formation).%New()
         set tFormation.Nom = pRequest.Formation.Nom
         set tFormation.Salle = pRequest.Formation.Salle
@@ -219,7 +213,7 @@ XData MessageMap
 
 The MessageMap gives us the method to launch depending on the type of the request (the message sent to the operation).
 
-As we can see, if the operation received a message of the type `Formation.Msg.TrainingInsertRequest`, the `InsertLocalBDD` method will be called. This method will save the message in the IRIS local database.
+As we can see, if the operation received a message of the type `Formation.Msg.FormationInsertRequest`, the `InsertLocalBDD` method will be called. This method will save the message in the IRIS local database.
 
 ## 7.4. Adding the operation to the production
 
@@ -261,7 +255,7 @@ Since our BP will only be used to call our BO, we can put as request class the m
 
 ![BPContext](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BPContext.png)
 
-We then chose the target of the call function : our BO. That operation, being **called** has a **callrequest** property that holds as seen before a Formation, that is made of a 'Nom' and a 'Salle. We need to bind that Formation to the Formation request of the BP, we do that by clicking on the call function and using the request builder to link the Request to the callrequest. 
+We then chose the target of the call function : our BO. That operation, being **called** has a **callrequest** property that holds as seen before a Formation, that is made of a 'Nom' and a 'Salle'. We need to bind that Formation to the Formation request of the BP, we do that by clicking on the call function and using the request builder to link the Request to the callrequest. 
 
 ![BPBindRequests](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BPBindRequests.gif)
 
