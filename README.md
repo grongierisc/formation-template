@@ -123,7 +123,7 @@ In this first production we will now add Business Operations.
 
 A Business Operation (BO) is a specific operation that will enable us to send requests from IRIS to an external application / system. It can also be used to directly save in IRIS what we want.
 
-We will create those operations in local, that is, in the `Formation/BO/` file. Saving the files will compile them in IRIS. 
+We will create those operations in local, that is, in the `src/Formation/BO/` file. Saving the files will compile them in IRIS. 
 
 For our first operation we will save the content of a message in  the local database.
 
@@ -133,7 +133,7 @@ We need to have a way of storing this message first.
 
 Storage classes in IRIS extends the type `%Persistent`. They will be saved in the intern database.
 
-In our `Formation/Table/Formation.cls` file we have: 
+In our `src/Formation/Table/Formation.cls` file we have: 
 ```objectscript
 Class Formation.Table.Formation Extends %Persistent
 {
@@ -145,7 +145,7 @@ Property Salle As %String;
 }
 ```
 
-In our `Formation/Table/Training.cls` file we have: 
+In our `src/Formation/Table/Training.cls` file we have: 
 ```objectscript
 Class Formation.Table.Training Extends %Persistent
 {
@@ -161,7 +161,7 @@ Note that when saving, additional lines are automatically added to the file. The
 
 ## 7.2. Creating our message class
 
-This message will contain a `Formation` object, located in the `Formation/Obj/Formation.cls` file: 
+This message will contain a `Formation` object, located in the `src/Formation/Obj/Formation.cls` file: 
 ```objectscript
 Class Formation.Obj.Formation Extends (%SerialObject, %XML.Adaptor)
 {
@@ -169,6 +169,18 @@ Class Formation.Obj.Formation Extends (%SerialObject, %XML.Adaptor)
 Property Nom As %String;
 
 Property Salle As %String;
+
+}
+```
+
+This message will contain a `Training` object, located in the `src/Formation/Obj/Training.cls` file: 
+```objectscript
+Class Formation.Obj.Training Extends (%SerialObject, %XML.Adaptor)
+{
+
+Property Name As %String;
+
+Property Room As %String;
 
 }
 ```
@@ -183,6 +195,16 @@ Property Formation As Formation.Obj.Formation;
 }
 ```
 
+The `Message` class will use that `Training` object, `src/Formation/Msg/TrainingInsertRequest.cls`:
+```objectscript
+Class Formation.Msg.TrainingInsertRequest Extends Ens.Request
+{
+
+Property Training As Formation.Obj.Training;
+
+}
+```
+
 ## 7.3. Creating our operation
 
 Now that we have all the elements we need, we can create our operation, in the `Formation/BO/LocalBDD.cls` file: 
@@ -192,16 +214,16 @@ Class Formation.BO.LocalBDD Extends Ens.BusinessOperation
 
 Parameter INVOCATION = "Queue";
 
-Method InsertLocalBDD(pRequest As Formation.Msg.FormationInsertRequest, Output pResponse As Ens.StringResponse) As %Status
+Method InsertLocalBDD(pRequest As Formation.Msg.TrainingInsertRequest, Output pResponse As Ens.StringResponse) As %Status
 {
     set tStatus = $$$OK
     
     try{
         set pResponse = ##class(Ens.Response).%New()
-        set tFormation = ##class(Formation.Table.Formation).%New()
-        set tFormation.Name = pRequest.Formation.Nom
-        set tFormation.Salle = pRequest.Formation.Salle
-        $$$ThrowOnError(tFormation.%Save())
+        set tTraining = ##class(Formation.Table.Training).%New()
+        set tTraining.Name = pRequest.Training.Name
+        set tTraining.Room = pRequest.Training.Room
+        $$$ThrowOnError(tTraining.%Save())
     }
     catch exp
     {
@@ -214,7 +236,7 @@ Method InsertLocalBDD(pRequest As Formation.Msg.FormationInsertRequest, Output p
 XData MessageMap
 {
 <MapItems>
-    <MapItem MessageType="Formation.Msg.FormationInsertRequest"> 
+    <MapItem MessageType="Formation.Msg.TrainingInsertRequest"> 
         <Method>InsertLocalBDD</Method>
     </MapItem>
 </MapItems>
@@ -226,7 +248,7 @@ XData MessageMap
 
 The MessageMap gives us the method to launch depending on the type of the request (the message sent to the operation).
 
-As we can see, if the operation received a message of the type `Formation.Msg.FormationInsertRequest`, the `InsertLocalBDD` method will be called. This method will save the message in the IRIS local database.
+As we can see, if the operation received a message of the type `Formation.Msg.TrainingInsertRequest`, the `InsertLocalBDD` method will be called. This method will save the message in the IRIS local database.
 
 ## 7.4. Adding the operation to the production
 
@@ -268,7 +290,7 @@ Since our BP will only be used to call our BO, we can put as request class the m
 
 ![BPContext](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BPContext.png)
 
-We then chose the target of the call function : our BO. That operation, being **called** has a **callrequest** property. We need to bind that callrequest to the request of the BP (they both are of the class `Formation.Msg.FormationInsertRequest`), we do that by clicking on the call function and using the request builder: 
+We then chose the target of the call function : our BO. That operation, being **called** has a **callrequest** property that holds as seen before a Formation, that is made of a 'Nom' and a 'Salle. We need to bind that Formation to the Training request of the BP, we do that by clicking on the call function and using the request builder to link the 'Nom' with the 'Name' and the 'Salle' with the 'Room' properties of the Training request. 
 
 ![BPBindRequests](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BPBindRequests.gif)
 
