@@ -145,18 +145,6 @@ Property Salle As %String;
 }
 ```
 
-In our `src/Formation/Table/Training.cls` file we have: 
-```objectscript
-Class Formation.Table.Training Extends %Persistent
-{
-
-Property Name As %String;
-
-Property Room As %String;
-
-}
-```
-
 Note that when saving, additional lines are automatically added to the file. They are mandatory and are added by the InterSystems addons.
 
 ## 7.2. Creating our message class
@@ -173,34 +161,12 @@ Property Salle As %String;
 }
 ```
 
-This message will contain a `Training` object, located in the `src/Formation/Obj/Training.cls` file: 
-```objectscript
-Class Formation.Obj.Training Extends (%SerialObject, %XML.Adaptor)
-{
-
-Property Name As %String;
-
-Property Room As %String;
-
-}
-```
-
 The `Message` class will use that `Formation` object, `src/Formation/Msg/FormationInsertRequest.cls`:
 ```objectscript
 Class Formation.Msg.FormationInsertRequest Extends Ens.Request
 {
 
 Property Formation As Formation.Obj.Formation;
-
-}
-```
-
-The `Message` class will use that `Training` object, `src/Formation/Msg/TrainingInsertRequest.cls`:
-```objectscript
-Class Formation.Msg.TrainingInsertRequest Extends Ens.Request
-{
-
-Property Training As Formation.Obj.Training;
 
 }
 ```
@@ -214,16 +180,22 @@ Class Formation.BO.LocalBDD Extends Ens.BusinessOperation
 
 Parameter INVOCATION = "Queue";
 
-Method InsertLocalBDD(pRequest As Formation.Msg.TrainingInsertRequest, Output pResponse As Ens.StringResponse) As %Status
+Method InsertLocalBDD(pRequest As Formation.Msg.FormationInsertRequest, Output pResponse As Formation.Msg.FormationInsertResponse) As %Status
 {
     set tStatus = $$$OK
     
     try{
-        set pResponse = ##class(Ens.Response).%New()
-        set tTraining = ##class(Formation.Table.Training).%New()
-        set tTraining.Name = pRequest.Training.Name
-        set tTraining.Room = pRequest.Training.Room
-        $$$ThrowOnError(tTraining.%Save())
+        set pResponse = ##class(Formation.Msg.FormationInsertResponse).%New()
+        if $RANDOM(10) < 5 {
+            set pResponse.Double = 1
+        } 
+        else {
+            set pResponse.Double = 0
+        }
+        set tFormation = ##class(Formation.Table.Formation).%New()
+        set tFormation.Nom = pRequest.Formation.Nom
+        set tFormation.Salle = pRequest.Formation.Salle
+        $$$ThrowOnError(tFormation.%Save())
     }
     catch exp
     {
@@ -236,14 +208,13 @@ Method InsertLocalBDD(pRequest As Formation.Msg.TrainingInsertRequest, Output pR
 XData MessageMap
 {
 <MapItems>
-    <MapItem MessageType="Formation.Msg.TrainingInsertRequest"> 
+    <MapItem MessageType="Formation.Msg.FormationInsertRequest"> 
         <Method>InsertLocalBDD</Method>
     </MapItem>
 </MapItems>
 }
 
 }
-
 ```
 
 The MessageMap gives us the method to launch depending on the type of the request (the message sent to the operation).
@@ -290,7 +261,7 @@ Since our BP will only be used to call our BO, we can put as request class the m
 
 ![BPContext](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BPContext.png)
 
-We then chose the target of the call function : our BO. That operation, being **called** has a **callrequest** property that holds as seen before a Formation, that is made of a 'Nom' and a 'Salle. We need to bind that Formation to the Training request of the BP, we do that by clicking on the call function and using the request builder to link the 'Nom' with the 'Name' and the 'Salle' with the 'Room' properties of the Training request. 
+We then chose the target of the call function : our BO. That operation, being **called** has a **callrequest** property that holds as seen before a Formation, that is made of a 'Nom' and a 'Salle. We need to bind that Formation to the Formation request of the BP, we do that by clicking on the call function and using the request builder to link the Request to the callrequest. 
 
 ![BPBindRequests](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BPBindRequests.gif)
 
@@ -370,7 +341,7 @@ We test the whole production this way:
 In `System Explorer > SQL` menu, you can execute the command
 ````sql
 SELECT 
-ID, Name, Salle
+ID, Nom, Salle
 FROM Formation_Table.Formation
 ````
 to see the objects we just saved.
