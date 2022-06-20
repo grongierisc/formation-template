@@ -349,7 +349,7 @@ to see the objects we just saved.
 
 # 9. Getting access to an extern database using JDBC
 
-In this section, we will create an operation to save our objects in an extern database. We will be using the JDBC API, as well as the other docker container that we set up, with postgre on it. 
+In this section, we will create an operation to save our objects in an extern database. We will be using the JDBC API, as well as the other docker container that we set up, with Postgres on it. 
 
 ## 9.1. Creating our new operation
 
@@ -397,7 +397,7 @@ XData MessageMap
 }
 ````
 
-This operation is similar to the first one we created. When it will receive a message of the type `Formation.Msg.FormationInsertRequest`, it will use an adapter to execute SQL requests. Those requests will be sent to our postgre database.
+This operation is similar to the first one we created. When it will receive a message of the type `Formation.Msg.FormationInsertRequest`, it will use an adapter to execute SQL requests. Those requests will be sent to our Postgres database.
 
 ## 9.2. Configuring the production
 
@@ -407,7 +407,7 @@ We will also need to add the JavaGateway for the JDBC driver in the services. Th
 
 ![JDBCProduction](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/JDBCProduction.png)
 
-We now need to configure our operation. Since we have set up a postgre container, and connected its port `5432`, the value we need in the following parameters are:
+We now need to configure our operation. Since we have set up a Postgres container, and connected its port `5432`, the value we need in the following parameters are:
 
 >DSN: `jdbc:postgresql://db:5432/DemoData`
 >
@@ -442,7 +442,7 @@ We have successfully connected with an extern database.
 
 As an exercise, it could be interesting to modify BO.LocalBDD so that it returns a boolean that will tell the BP to call BO.RemoteBDD depending on the value of that boolean.
 
-**Hint**: This can be done by changing the type of reponse LocalBDD returns and by adding a new property to the context and using the `if` activity in our BP.
+**Hint**: This can be done by changing the type of response LocalBDD returns and by adding a new property to the context and using the `if` activity in our BP.
 
 ## 9.5. Solution
 
@@ -485,7 +485,7 @@ We then add an `if` activity, with the `context.Double` property as condition:
 
 ![ExerciseIf](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/ExerciseIf.png)
 
-VERY IMPORTANT : we need to uncheck **Asynchronous** in the settings of our LocallBDD Call, or the if activity will set off before receiving the boolean response.
+VERY IMPORTANT : we need to uncheck **Asynchronous** in the settings of our LocalBDD Call, or the if activity will set off before receiving the boolean response.
 
 Finally we set up our call activity with as a target the RemoteBDD BO:
 
@@ -502,7 +502,7 @@ In this part, we will create and use a REST Service.
 
 ## 10.1. Creating the service
 
-To create a REST service, we need a cless that extends %CSP.REST, in `Formation/REST/Dispatch.cls` we have:
+To create a REST service, we need a class that extends %CSP.REST, in `Formation/REST/Dispatch.cls` we have:
 
 ````objectscript
 Class Formation.REST.Dispatch Extends %CSP.REST
@@ -572,13 +572,13 @@ The import method will create a message that will be sent to a Business Service.
 
 ## 10.2. Adding our BS
 
-We are going to create a generic class that will route all of its sollicitations towards `TargetConfigNames`. This target will be configured when we will instantiate this service. In the `Formation/BS/RestInput.cls` file we have:
+We are going to create a generic class that will route all of its solicitations towards `TargetConfigNames`. This target will be configured when we will instantiate this service. In the `Formation/BS/RestInput.cls` file we have:
 
 ```objectscript
 Class Formation.BS.RestInput Extends Ens.BusinessService
 {
 
-Property TargetConfigNames As %String(MAXLEN = 1000) [ InitialExpression = "BuisnessProcess" ];
+Property TargetConfigNames As %String(MAXLEN = 1000) [ InitialExpression = "BusinessProcess" ];
 
 Parameter SETTINGS = "TargetConfigNames:Basic:selector?multiSelect=1&context={Ens.ContextSearch/ProductionItems?targets=1&productionName=@productionId}";
 

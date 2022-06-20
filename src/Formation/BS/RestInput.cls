@@ -1,7 +1,7 @@
 Class Formation.BS.RestInput Extends Ens.BusinessService
 {
 
-Property TargetConfigNames As %String(MAXLEN = 1000) [ InitialExpression = "BuisnessProcess" ];
+Property TargetConfigNames As %String(MAXLEN = 1000) [ InitialExpression = "BusinessProcess" ];
 
 Parameter SETTINGS = "TargetConfigNames:Basic:selector?multiSelect=1&context={Ens.ContextSearch/ProductionItems?targets=1&productionName=@productionId}";
 
