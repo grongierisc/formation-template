@@ -173,7 +173,7 @@ Property Formation As Formation.Obj.Formation;
 
 ## 7.3. Creating our operation
 
-Now that we have all the elements we need, we can create our operation, in the `Formation/BO/LocalBDD.cls` file: 
+Now that we have all the elements we need, we can create our operation, in the `src/Formation/BO/LocalBDD.cls` file: 
 ```objectscript
 Class Formation.BO.LocalBDD Extends Ens.BusinessOperation
 {
@@ -347,7 +347,7 @@ In this section, we will create an operation to save our objects in an extern da
 
 ## 9.1. Creating our new operation
 
-Our new operation, in the file `Formation/BO/RemoteBDD.cls` is as follows: 
+Our new operation, in the file `src/Formation/BO/RemoteBDD.cls` is as follows: 
 
 ````objectscript
 Include EnsSQLTypes
@@ -566,7 +566,7 @@ The import method will create a message that will be sent to a Business Service.
 
 ## 10.2. Adding our BS
 
-We are going to create a generic class that will route all of its solicitations towards `TargetConfigNames`. This target will be configured when we will instantiate this service. In the `Formation/BS/RestInput.cls` file we have:
+We are going to create a generic class that will route all of its solicitations towards `TargetConfigNames`. This target will be configured when we will instantiate this service. In the `src/Formation/BS/RestInput.cls` file we have:
 
 ```objectscript
 Class Formation.BS.RestInput Extends Ens.BusinessService
