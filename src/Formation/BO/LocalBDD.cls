@@ -16,7 +16,7 @@ Method InsertLocalBDD(pRequest As Formation.Msg.FormationInsertRequest, Output p
             set pResponse.Double = 0
         }
         set tFormation = ##class(Formation.Table.Formation).%New()
-        set tFormation.Name = pRequest.Formation.Nom
+        set tFormation.Nom = pRequest.Formation.Nom
         set tFormation.Salle = pRequest.Formation.Salle
         $$$ThrowOnError(tFormation.%Save())
     }

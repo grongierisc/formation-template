@@ -33,9 +33,6 @@ XData MessageMap
 	<MapItem MessageType="Formation.Msg.FormationInsertRequest"> 
 		<Method>InsertRemoteBDD</Method>
 	</MapItem>
-	<MapItem MessageType="Ens.StringRequest"> 
-		<Method>SelectByNameRemoteBDD</Method>
-	</MapItem>
 </MapItems>
 }
 

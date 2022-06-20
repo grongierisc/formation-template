@@ -9,6 +9,8 @@ services:
     ports:
     - 52775:52773
     - 51776:1972
+    command : --check-caps false
+
   db:
     image: postgres:12.2
     hostname: db

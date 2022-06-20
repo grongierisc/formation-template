@@ -5,6 +5,8 @@ COPY . /tmp/iris
 
 USER root
 
+ARG DEBIAN_FRONTEND=noninteractive
+
 # Update package and install sudo
 RUN apt-get update && apt-get install -y \
 	openjdk-8-jdk \

@@ -1,7 +1,7 @@
 Class Formation.Table.Formation Extends %Persistent
 {
 
-Property Name As %String;
+Property Nom As %String;
 
 Property Salle As %String;
 
@@ -12,7 +12,7 @@ Storage Default
 <Value>%%CLASSNAME</Value>
 </Value>
 <Value name="2">
-<Value>Name</Value>
+<Value>Nom</Value>
 </Value>
 <Value name="3">
 <Value>Salle</Value>
