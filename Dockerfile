@@ -1,5 +1,3 @@
-ARG IMAGE=intersystemsdc/irishealth-community:2020.4.0.521.0-zpm
-ARG IMAGE=containers.intersystems.com/intersystems/irishealth-community:2020.1.408.0
 ARG IMAGE=intersystemsdc/iris-community:latest
 FROM $IMAGE
 # copy files
