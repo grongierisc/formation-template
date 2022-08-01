@@ -1,6 +1,3 @@
-
-DROP TABLE formation;
-
 CREATE TABLE public.formation (
 	id int8 NULL,
 	nom varchar(50) NULL,
