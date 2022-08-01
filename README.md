@@ -133,14 +133,14 @@ We need to have a way of storing this message first.
 
 Storage classes in IRIS extends the type `%Persistent`. They will be saved in the intern database.
 
-In our `Formation/Table/Formation.cls` file we have: 
+In our `Formation/Table/Training.cls` file we have: 
 ```objectscript
-Class Formation.Table.Formation Extends %Persistent
+Class Formation.Table.Training Extends %Persistent
 {
 
 Property Name As %String;
 
-Property Salle As %String;
+Property Room As %String;
 
 }
 ```
@@ -186,10 +186,10 @@ Method InsertLocalBDD(pRequest As Formation.Msg.FormationInsertRequest, Output p
     
     try{
         set pResponse = ##class(Ens.Response).%New()
-        set tFormation = ##class(Formation.Table.Formation).%New()
-        set tFormation.Name = pRequest.Formation.Nom
-        set tFormation.Salle = pRequest.Formation.Salle
-        $$$ThrowOnError(tFormation.%Save())
+        set tTraining = ##class(Formation.Table.Training).%New()
+        set tTraining.Name = pRequest.Formation.Nom
+        set tTraining.Room = pRequest.Formation.Salle
+        $$$ThrowOnError(tTraining.%Save())
     }
     catch exp
     {
@@ -336,8 +336,8 @@ We test the whole production this way:
 In `System Explorer > SQL` menu, you can execute the command
 ````sql
 SELECT 
-ID, Name, Salle
-FROM Formation_Table.Formation
+ID, Name, Room
+FROM Formation_Table.Training
 ````
 to see the objects we just saved.
 
