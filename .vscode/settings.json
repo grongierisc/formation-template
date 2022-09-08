@@ -12,7 +12,20 @@
         "service": "iris",
         "internalPort": 52773
       },
-      "active": true,
-    }
+      "active": true
+    },
+    "objectscript.overwriteServerChanges": true,
+    "sqltools.connections": [
+      {
+        "previewLimit": 50,
+        "server": "localhost",
+        "port": 5432,
+        "driver": "PostgreSQL",
+        "name": "db",
+        "database": "DemoData",
+        "username": "DemoData",
+        "password": "DemoData"
+      }
+    ]
 
 }
