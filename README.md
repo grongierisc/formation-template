@@ -246,7 +246,7 @@ Business Processes are created within the Management Portal:
 
 We are now in the Business Process Designer. We are going to create a simple BP that will call our operation: 
 
-<video src="https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/BPAddingCall.mp4" width="640" height="480" controls preload></video>
+<video src="https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/BPAddingCall.mp4" width="640" height="480" controls></video>
 
 ### 8.1.2. Modifying the context of a BP
 
@@ -258,7 +258,7 @@ Since our BP will only be used to call our BO, we can put as request class the m
 
 We then chose the target of the call function : our BO. That operation, being **called** has a **callrequest** property. We need to bind that callrequest to the request of the BP (they both are of the class `Formation.Msg.FormationInsertRequest`), we do that by clicking on the call function and using the request builder: 
 
-<video src="https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/BPBindRequests.mp4" width="640" height="480" controls preload></video>
+<video src="https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/BPBindRequests.mp4" width="640" height="480" controls></video>
 
 We can now save this BP (in the package ‘Formation.BP‘ and under the name ‘InsertLocalBDD‘ or 'Main', for example). Just like the operations, the processes can be instantiated and tested through the production configuration, for that they need to be compiled beforehand (on the Business Process Designer screen).
 
@@ -291,7 +291,7 @@ We will find the Data Transformation (DT) Builder in the [Interoperability > Bui
 
 Now, we can map the different fields together:
 
-<video src="https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/DTMap.mp4" width="640" height="480" controls preload></video>
+<video src="https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/DTMap.mp4" width="640" height="480" controls></video>
 
 ### 8.2.3. Adding the Data Transformation to the Business Process
 
@@ -301,7 +301,7 @@ The first thing we have to change is the BP's request class, since we need to ha
 
 We can then add our transformation (the name of the process doesn't change anything, from here we chose to name it `Main`): 
 
-<video src="https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/BP2AddingTransform.mp4" width="640" height="480" controls preload></video>
+<video src="https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/BP2AddingTransform.mp4" width="640" height="480" controls></video>
 
 The transform activity will take the request of the BP (a Record of the CSV file, thanks to our Record Mapper), and transform it into a `FormationInsertRequest` message. In order to store that message to send it to the BO, we need to add a property to the context of the BP. 
 
@@ -313,7 +313,7 @@ We can now configure our transform function so that it takes it input as the inp
 
 We need to do the same for `Call BO`. Its input, or `callrequest`, is the value stored in `context.msg`: 
 
-<video src="https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/BP2CallBO.mp4" width="640" height="480" controls preload></video>
+<video src="https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/BP2CallBO.mp4" width="640" height="480" controls></video>
 
 In the end, the flow in the BP can be represented like this: 
 
@@ -323,7 +323,7 @@ In the end, the flow in the BP can be represented like this:
 
 With the [+] sign, we can add our new process to the production (if not already done). We also need a generic service to use the record map, we use `EnsLib.RecordMap.Service.FileService` (we add it with the [+] button next to services). We then parameter this service: 
 
-<video src="https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/ServiceParam.mp4" width="640" height="480" controls preload></video>
+<video src="https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/ServiceParam.mp4" width="640" height="480" controls></video>
 
 We should now be able to test our BP.
 
@@ -331,7 +331,7 @@ We should now be able to test our BP.
 
 We test the whole production this way: 
 
-<video src="https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/TestProductionCSV.mp4" width="640" height="480" controls preload></video>
+<video src="https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/TestProductionCSV.mp4" width="640" height="480" controls></video>
 
 In `System Explorer > SQL` menu, you can execute the command
 ````sql
@@ -418,7 +418,7 @@ Finally, we need to configure the credentials to have access to the remote datab
 
 The login and password are both `DemoData`, as we set up in the `docker-compose.yml` file.
 
-<video src="https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/JDBCCredentialCreation.mp4" width="640" height="480" controls preload></video>
+<video src="https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/JDBCCredentialCreation.mp4" width="640" height="480" controls></video>
 
 Back to the production, we can add `"Postgre"` in the [Credential] field in the settings of our operation (it should be in the scrolling menu). Before being able to test it, we need to add the JGService to the operation. In the [Settings] tab, in the [Additional Settings]: 
 
@@ -603,13 +603,13 @@ Back to the production configuration, we add the service the usual way. In the [
 
 To use this service, we need to publish it. For that, we use the [Edit Web Application] menu:
 
-<video src="https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/RESTServicePublish.mp4" width="640" height="480" controls preload></video>
+<video src="https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/RESTServicePublish.mp4" width="640" height="480" controls></video>
 
 ## 10.3. Testing
 
 Finally, we can test our service with any kind of REST client:
 
-<video src="https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/RESTTest.mp4" width="640" height="480" controls preload></video>
+<video src="https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/RESTTest.mp4" width="640" height="480" controls></video>
 
 # Conclusion
 
