@@ -246,7 +246,7 @@ Business Processes are created within the Management Portal:
 
 We are now in the Business Process Designer. We are going to create a simple BP that will call our operation: 
 
-![BPAddingCall](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BPAddingCall.gif)
+<video src="https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/BPAddingCall.mp4" width="640" height="480" controls preload></video>
 
 ### 8.1.2. Modifying the context of a BP
 
