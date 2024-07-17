@@ -260,6 +260,10 @@ We then chose the target of the call function : our BO. That operation, being **
 
 <video src="https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/BPBindRequests.mp4" width="640" height="480" controls></video>
 
+
+https://github.com/user-attachments/assets/5a663571-d505-4115-8cae-5538259947e1
+
+
 We can now save this BP (in the package ‘Formation.BP‘ and under the name ‘InsertLocalBDD‘ or 'Main', for example). Just like the operations, the processes can be instantiated and tested through the production configuration, for that they need to be compiled beforehand (on the Business Process Designer screen).
 
 Our Process for now only passes the message to our Operation. We are going to complexify it so that the BP will take as input one line of a CSV file. 
@@ -293,6 +297,10 @@ Now, we can map the different fields together:
 
 <video src="https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/DTMap.mp4" width="640" height="480" controls></video>
 
+
+https://github.com/user-attachments/assets/a7b47788-1c6f-4d82-88e7-f33f985cce40
+
+
 ### 8.2.3. Adding the Data Transformation to the Business Process
 
 The first thing we have to change is the BP's request class, since we need to have in input the Record Map we created.
@@ -302,6 +310,10 @@ The first thing we have to change is the BP's request class, since we need to ha
 We can then add our transformation (the name of the process doesn't change anything, from here we chose to name it `Main`): 
 
 <video src="https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/BP2AddingTransform.mp4" width="640" height="480" controls></video>
+
+
+https://github.com/user-attachments/assets/37c075ec-cc8a-4020-b263-dfd332120e54
+
 
 The transform activity will take the request of the BP (a Record of the CSV file, thanks to our Record Mapper), and transform it into a `FormationInsertRequest` message. In order to store that message to send it to the BO, we need to add a property to the context of the BP. 
 
@@ -315,6 +327,10 @@ We need to do the same for `Call BO`. Its input, or `callrequest`, is the value 
 
 <video src="https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/BP2CallBO.mp4" width="640" height="480" controls></video>
 
+
+https://github.com/user-attachments/assets/1d7c6bff-246c-4145-9956-8a33033c938d
+
+
 In the end, the flow in the BP can be represented like this: 
 
 ![BP2Diagram](https://raw.githubusercontent.com/thewophile-beep/formation-template/master/misc/img/BP2Diagram.png)
@@ -325,6 +341,10 @@ With the [+] sign, we can add our new process to the production (if not already 
 
 <video src="https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/ServiceParam.mp4" width="640" height="480" controls></video>
 
+
+https://github.com/user-attachments/assets/39ea761f-56ad-440c-adf7-fac7b46d8acd
+
+
 We should now be able to test our BP.
 
 ### 8.2.5. Testing 
@@ -332,6 +352,10 @@ We should now be able to test our BP.
 We test the whole production this way: 
 
 <video src="https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/TestProductionCSV.mp4" width="640" height="480" controls></video>
+
+
+https://github.com/user-attachments/assets/37535201-50c6-42a4-a576-2eb1514483d6
+
 
 In `System Explorer > SQL` menu, you can execute the command
 ````sql
@@ -419,6 +443,10 @@ Finally, we need to configure the credentials to have access to the remote datab
 The login and password are both `DemoData`, as we set up in the `docker-compose.yml` file.
 
 <video src="https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/JDBCCredentialCreation.mp4" width="640" height="480" controls></video>
+
+
+https://github.com/user-attachments/assets/b6e63659-be2b-4ec3-8301-dfc6ae7652d9
+
 
 Back to the production, we can add `"Postgre"` in the [Credential] field in the settings of our operation (it should be in the scrolling menu). Before being able to test it, we need to add the JGService to the operation. In the [Settings] tab, in the [Additional Settings]: 
 
@@ -605,11 +633,19 @@ To use this service, we need to publish it. For that, we use the [Edit Web Appli
 
 <video src="https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/RESTServicePublish.mp4" width="640" height="480" controls></video>
 
+
+https://github.com/user-attachments/assets/7821c249-0a96-42d4-a4d6-8573bf683b2e
+
+
 ## 10.3. Testing
 
 Finally, we can test our service with any kind of REST client:
 
 <video src="https://raw.githubusercontent.com/grongierisc/formation-template/master/misc/img/RESTTest.mp4" width="640" height="480" controls></video>
+
+
+https://github.com/user-attachments/assets/2000a8d5-e48a-41df-97ba-ae5c69a9c1d0
+
 
 # Conclusion
 
