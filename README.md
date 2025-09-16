@@ -525,7 +525,7 @@ In this part, we will create and use a REST Service.
 
 ## 10.1. Creating the service
 
-To create a REST service, we need a cless that extends %CSP.REST, in `Formation/REST/Dispatch.cls` we have:
+To create a REST service, we need a class that extends %CSP.REST, in `Formation/REST/Dispatch.cls` we have:
 
 ````objectscript
 Class Formation.REST.Dispatch Extends %CSP.REST
